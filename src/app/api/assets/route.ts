@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
-
-type AssetWhereInput = Prisma.AssetWhereInput;
-type AssetOrderByInput = Prisma.AssetOrderByWithRelationInput;
 
 export async function GET(req: NextRequest) {
   try {
@@ -22,7 +19,7 @@ export async function GET(req: NextRequest) {
     const maxPrice = searchParams.get('maxPrice');
 
     // Build where clause with proper typing
-    const where: AssetWhereInput = {};
+    const where: any = {};
 
     // Filter by status
     if (statusParam) {
@@ -44,7 +41,7 @@ export async function GET(req: NextRequest) {
     if (typeParam) {
       const types = typeParam.split(',').map((t) => t.trim().toUpperCase());
       where.type = {
-        in: types,
+        in: types as Array<'COURSE' | 'SOFTWARE' | 'TEMPLATE' | 'EBOOK' | 'VIDEO' | 'AUDIO' | 'OTHER'>,
       };
     }
 
@@ -68,7 +65,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Build orderBy clause with proper typing
-    let orderBy: AssetOrderByInput = { createdAt: 'desc' };
+    let orderBy: any = { createdAt: 'desc' };
     switch (sort) {
       case 'newest':
         orderBy = { createdAt: 'desc' };

@@ -14,6 +14,7 @@ import { Suspense } from 'react';
 import { AssetCard } from '@/components/features/asset-card';
 import { Button } from '@/components/ui/button';
 import { db } from '@/lib/db';
+import type { IconType } from '@/types/ui';
 
 async function AssetGrid() {
   const assets = await db.asset.findMany({
@@ -53,7 +54,7 @@ function StatCard({
   value,
   description,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   value: string;
   description: string;
@@ -80,7 +81,7 @@ function FeatureCard({
   title,
   description,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   description: string;
 }) {

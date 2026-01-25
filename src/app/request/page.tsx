@@ -166,7 +166,7 @@ export default function RequestAssetPage() {
         ? ['title', 'description', 'type', 'estimatedPrice', 'sourceUrl']
         : ['deliveryType', 'whyThisAsset', 'additionalNotes'];
 
-    const isValid = await form.trigger(fieldsToValidate as any);
+    const isValid = await form.trigger(fieldsToValidate as Array<'title' | 'description' | 'type' | 'estimatedPrice' | 'sourceUrl' | 'deliveryType' | 'whyThisAsset' | 'additionalNotes'>);
     if (isValid) {
       setDirection(1);
       setCurrentStep((prev) => Math.min(prev + 1, 3));
@@ -208,11 +208,11 @@ export default function RequestAssetPage() {
       if (!res.ok) {
         if (data.details) {
           const fieldErrors: Record<string, string> = {};
-          data.details.forEach((detail: any) => {
+          data.details.forEach((detail: { path: string[]; message: string }) => {
             fieldErrors[detail.path[0]] = detail.message;
           });
           Object.entries(fieldErrors).forEach(([field, message]) => {
-            form.setError(field as any, { message });
+            form.setError(field as 'title' | 'description' | 'type' | 'deliveryType' | 'estimatedPrice' | 'sourceUrl' | 'thumbnail' | 'whyThisAsset' | 'additionalNotes', { message });
           });
         } else {
           toast({

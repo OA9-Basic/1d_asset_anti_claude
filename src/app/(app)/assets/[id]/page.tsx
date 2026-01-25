@@ -18,6 +18,7 @@ import {
   Users,
   Wallet,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -40,6 +41,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -310,7 +312,7 @@ function EmptyState({
   title,
   description,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   description: string;
 }) {
@@ -332,10 +334,12 @@ function RelatedAssetCard({ asset }: { asset: RelatedAsset }) {
       <Card className="overflow-hidden border-2 card-hover h-full">
         <div className="relative aspect-video overflow-hidden">
           {asset.thumbnail ? (
-            <img
+            <Image
               src={asset.thumbnail}
               alt={asset.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center">
@@ -556,10 +560,12 @@ export default function AssetDetailPage() {
               <Card className="border-2 overflow-hidden">
                 <div className="relative aspect-video overflow-hidden group">
                   {asset.thumbnail ? (
-                    <img
+                    <Image
                       src={asset.thumbnail}
                       alt={asset.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 rounded-2xl"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center rounded-2xl">

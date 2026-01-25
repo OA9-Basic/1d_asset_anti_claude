@@ -18,6 +18,7 @@ import {
   Wallet,
   Package,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -37,6 +38,7 @@ import {
   staggerContainer,
   staggerItem,
 } from '@/lib/animations';
+import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -97,12 +99,50 @@ interface Asset {
   featured: boolean;
 }
 
+interface Purchase {
+  id: string;
+  amount: number;
+  createdAt: string;
+  asset: {
+    id: string;
+    title: string;
+    thumbnail: string | null;
+  };
+}
+
+interface ActivityItem {
+  id: string;
+  type: string;
+  amount: number;
+  user: {
+    id: string;
+    name: string;
+  };
+  asset: {
+    id: string;
+    title: string;
+    type: string;
+    thumbnail: string | null;
+  };
+  createdAt: string;
+}
+
+interface Vote {
+  id: string;
+  assetRequest: {
+    id: string;
+    title: string;
+  };
+  voteType: string;
+  createdAt: string;
+}
+
 interface DashboardData {
   stats: DashboardStats;
   contributions: Contribution[];
-  purchases: any[];
-  recentActivity: any[];
-  votes: any[];
+  purchases: Purchase[];
+  recentActivity: ActivityItem[];
+  votes: Vote[];
 }
 
 interface FeaturedAssetsData {
@@ -120,7 +160,7 @@ function StatCard({
   data,
   delay,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   value: string | number;
   description: string;
@@ -291,10 +331,12 @@ function MiniAssetCard({ asset }: { asset: Asset }) {
       <Card className="overflow-hidden border-2 card-hover h-full">
         <div className="relative aspect-video overflow-hidden">
           {asset.thumbnail ? (
-            <img
+            <Image
               src={asset.thumbnail}
               alt={asset.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center">
@@ -724,11 +766,15 @@ export default function DashboardPage() {
                         >
                           <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors border">
                             {contribution.asset.thumbnail ? (
-                              <img
-                                src={contribution.asset.thumbnail}
-                                alt={contribution.asset.title}
-                                className="w-12 h-12 rounded object-cover"
-                              />
+                              <div className="relative w-12 h-12 rounded overflow-hidden">
+                                <Image
+                                  src={contribution.asset.thumbnail}
+                                  alt={contribution.asset.title}
+                                  fill
+                                  sizes="48px"
+                                  className="object-cover"
+                                />
+                              </div>
                             ) : (
                               <div className="w-12 h-12 rounded bg-muted flex items-center justify-center">
                                 <Package className="w-6 h-6 text-muted-foreground" />

@@ -96,7 +96,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         throw new Error(`Withdrawal is ${withdrawal.status.toLowerCase()}, cannot update`);
       }
 
-      let updatedWithdrawal: any;
+      let updatedWithdrawal: Awaited<ReturnType<typeof tx.withdrawalRequest.update>>;
 
       if (status === 'COMPLETED') {
         // Mark as completed

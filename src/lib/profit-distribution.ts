@@ -269,7 +269,16 @@ export async function runDailyProfitDistribution() {
 
     if (recentPurchases.length > 0) {
       const result = await distributeProfit(asset.id, recentPurchases.length);
-      results.push({ assetId: asset.id, assetTitle: asset.title, ...(result as any) });
+      results.push({
+        assetId: asset.id,
+        assetTitle: asset.title,
+        success: result.success,
+        totalRevenue: result.totalRevenue,
+        platformProfit: result.platformProfit,
+        contributorProfit: result.contributorProfit,
+        distributedShares: result.distributedShares,
+        message: result.message
+      });
     }
   }
 

@@ -2,9 +2,10 @@
 
 import { Asset } from '@prisma/client';
 import { Wallet, CheckCircle2, Clock, Users, ShoppingCart, TrendingUp, Star } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -64,7 +65,7 @@ const statusConfig = {
   },
 };
 
-export function AssetCard({ asset }: AssetCardProps) {
+export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -147,11 +148,13 @@ export function AssetCard({ asset }: AssetCardProps) {
         {/* Image Section */}
         <CardHeader className="p-0 relative">
           {asset.thumbnail ? (
-            <div className="relative overflow-hidden">
-              <img
+            <div className="relative overflow-hidden w-full h-52">
+              <Image
                 src={asset.thumbnail}
                 alt={asset.title}
-                className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
@@ -268,4 +271,4 @@ export function AssetCard({ asset }: AssetCardProps) {
       </Card>
     </Link>
   );
-}
+});

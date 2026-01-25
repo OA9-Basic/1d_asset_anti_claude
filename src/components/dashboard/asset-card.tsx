@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -113,7 +113,7 @@ const cardVariants = {
   },
 };
 
-export function AssetCard({ asset }: AssetCardProps) {
+export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -480,4 +480,4 @@ export function AssetCard({ asset }: AssetCardProps) {
       </Link>
     </motion.div>
   );
-}
+});

@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, ArrowLeft, Sparkles, Check, ChevronRight, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -152,7 +153,7 @@ export default function CreateAssetPage() {
         ? ['title', 'description', 'type', 'deliveryType', 'thumbnail', 'sourceUrl']
         : ['targetPrice'];
 
-    const isValid = await form.trigger(fieldsToValidate as any);
+    const isValid = await form.trigger(fieldsToValidate as Array<'title' | 'description' | 'type' | 'deliveryType' | 'thumbnail' | 'sourceUrl' | 'targetPrice'>);
     if (isValid) {
       setDirection(1);
       setCurrentStep((prev) => Math.min(prev + 1, 3));
@@ -194,11 +195,11 @@ export default function CreateAssetPage() {
       if (!res.ok) {
         if (data.details) {
           const fieldErrors: Record<string, string> = {};
-          data.details.forEach((detail: any) => {
+          data.details.forEach((detail: { path: string[]; message: string }) => {
             fieldErrors[detail.path[0]] = detail.message;
           });
           Object.entries(fieldErrors).forEach(([field, message]) => {
-            form.setError(field as any, { message });
+            form.setError(field as 'title' | 'description' | 'type' | 'deliveryType' | 'thumbnail' | 'sourceUrl' | 'targetPrice', { message });
           });
         } else {
           toast({
@@ -639,11 +640,13 @@ export default function CreateAssetPage() {
                             {watchedValues.thumbnail && (
                               <div>
                                 <span className="text-muted-foreground text-sm">Thumbnail</span>
-                                <div className="mt-2 rounded-lg overflow-hidden border">
-                                  <img
+                                <div className="mt-2 rounded-lg overflow-hidden border relative w-full h-48">
+                                  <Image
                                     src={watchedValues.thumbnail}
                                     alt="Thumbnail"
-                                    className="w-full h-48 object-cover"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 768px"
+                                    className="object-cover"
                                   />
                                 </div>
                               </div>

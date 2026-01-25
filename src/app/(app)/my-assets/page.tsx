@@ -29,6 +29,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { buttonTap, hoverLift, staggerContainer, staggerItem } from '@/lib/animations';
+import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -76,7 +77,7 @@ interface MyAssetsData {
   };
 }
 
-const statusConfig: Record<string, { label: string; className: string; icon: any }> = {
+const statusConfig: Record<string, { label: string; className: string; icon: IconType }> = {
   REQUESTED: {
     label: 'Requested',
     className: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
@@ -122,7 +123,7 @@ function StatCard({
   description,
   delay,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   value: string | number;
   description: string;

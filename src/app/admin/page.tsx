@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
@@ -37,6 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import type { IconType } from '@/types/ui';
 
 interface DashboardStats {
   totalUsers: number;
@@ -91,7 +93,7 @@ function StatCard({
   description,
   _trend,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   value: string | number;
   description: string;
@@ -693,11 +695,15 @@ export default function AdminDashboardPage() {
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 {asset.thumbnail && (
-                                  <img
-                                    src={asset.thumbnail}
-                                    alt={asset.title}
-                                    className="w-10 h-10 rounded object-cover"
-                                  />
+                                  <div className="relative w-10 h-10 rounded overflow-hidden">
+                                    <Image
+                                      src={asset.thumbnail}
+                                      alt={asset.title}
+                                      fill
+                                      sizes="40px"
+                                      className="object-cover"
+                                    />
+                                  </div>
                                 )}
                                 <div>
                                   <p className="font-medium">{asset.title}</p>

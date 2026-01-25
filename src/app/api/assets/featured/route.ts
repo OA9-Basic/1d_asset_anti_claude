@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
 
-type AssetOrderBy = Prisma.AssetsOrderByWithRelationInput;
+type AssetOrderBy = Prisma.AssetOrderByWithRelationInput;
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '6');
     const trending = searchParams.get('trending') === 'true';
 
-    let orderBy: AssetOrderBy = { createdAt: 'desc' };
+    let orderBy: AssetOrderBy | Array<AssetOrderBy> = { createdAt: 'desc' };
 
     // If trending, order by purchases and collected amount
     if (trending) {

@@ -36,15 +36,11 @@ const assetRequestSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
+    const _status = searchParams.get('status');
     const userId = searchParams.get('userId');
     const voting = searchParams.get('voting') === 'true';
 
     const where: any = {};
-
-    if (status) {
-      where.status = status;
-    }
 
     if (userId) {
       where.userId = userId;

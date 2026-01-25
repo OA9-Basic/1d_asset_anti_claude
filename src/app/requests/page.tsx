@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Sparkles,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
@@ -176,10 +177,12 @@ export default function RequestsPage() {
                 <CardHeader className="p-0">
                   {req.thumbnail ? (
                     <div className="relative h-40 overflow-hidden">
-                      <img
+                      <Image
                         src={req.thumbnail}
                         alt={req.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-3 left-3 right-3 flex justify-between">

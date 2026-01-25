@@ -146,8 +146,8 @@ export async function GET(req: NextRequest) {
     const uniqueAssets = Array.from(
       new Map(allAssets.map((asset) => [asset.id, asset])).values()
     ).sort((a, b) => {
-      const dateA = new Date(a.contributionId ? a.createdAt : a.purchasedAt);
-      const dateB = new Date(b.contributionId ? b.createdAt : b.purchasedAt);
+      const dateA = new Date(a.contributionId ? (a.createdAt || '') : (a.purchasedAt || ''));
+      const dateB = new Date(b.contributionId ? (b.createdAt || '') : (b.purchasedAt || ''));
       return dateB.getTime() - dateA.getTime();
     });
 

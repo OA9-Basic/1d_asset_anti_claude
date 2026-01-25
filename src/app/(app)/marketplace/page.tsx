@@ -12,11 +12,13 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import useSWR from 'swr';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -45,7 +47,7 @@ function StatCard({
   description,
   delay,
 }: {
-  icon: any;
+  icon: IconType;
   title: string;
   value: string | number;
   description: string;
@@ -82,10 +84,12 @@ function FeaturedAssetCard({ asset }: { asset: Asset }) {
       <Card className="overflow-hidden border-2 card-hover h-full">
         <div className="relative aspect-video overflow-hidden">
           {asset.thumbnail ? (
-            <img
+            <Image
               src={asset.thumbnail}
               alt={asset.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center">

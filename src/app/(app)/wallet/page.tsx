@@ -54,6 +54,7 @@ import {
 } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
 import { buttonTap, modalScaleUp, staggerContainer, staggerItem } from '@/lib/animations';
+import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -83,7 +84,7 @@ interface TransactionsData {
 }
 
 // Credit Card Visual Component
-function CreditCard({ balance, user }: { balance: number; user: any }) {
+function CreditCard({ balance, user }: { balance: number; user: { id: string; name?: string | null; email?: string | null; firstName?: string | null } }) {
   const [showNumber, setShowNumber] = useState(false);
 
   // Generate a mock card number based on user ID
@@ -202,7 +203,7 @@ function CreditCard({ balance, user }: { balance: number; user: any }) {
 
 // Transaction Status Badge
 function TransactionStatus({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string; icon: any }> = {
+  const statusConfig: Record<string, { label: string; className: string; icon: IconType }> = {
     COMPLETED: {
       label: 'Success',
       className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -233,7 +234,7 @@ function TransactionStatus({ status }: { status: string }) {
 
 // Transaction Type Badge
 function TransactionType({ type }: { type: string }) {
-  const typeConfig: Record<string, { label: string; className: string; icon: any }> = {
+  const typeConfig: Record<string, { label: string; className: string; icon: IconType }> = {
     DEPOSIT: {
       label: 'Deposit',
       className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
