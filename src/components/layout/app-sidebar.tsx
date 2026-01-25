@@ -119,7 +119,7 @@ export function AppSidebar() {
           animate="show"
           className="flex-1 overflow-y-auto py-4 px-2 space-y-1"
         >
-          {navigation.map((item, index) => {
+          {navigation.map((item) => {
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
             const Icon = item.icon;
 

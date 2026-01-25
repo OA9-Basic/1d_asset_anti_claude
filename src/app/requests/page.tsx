@@ -96,7 +96,7 @@ export default function RequestsPage() {
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to process vote',

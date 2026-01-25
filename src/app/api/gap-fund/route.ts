@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 
-const gapFundSchema = z.object({
-  assetId: z.string().cuid(),
-});
-
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   // Gap funding feature is not yet implemented - requires gapLoan table in Prisma schema
   return NextResponse.json(
     {

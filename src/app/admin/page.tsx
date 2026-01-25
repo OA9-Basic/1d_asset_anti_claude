@@ -265,7 +265,7 @@ export default function AdminDashboardPage() {
           description: data.error || 'Failed to approve request',
         });
       }
-    } catch (_error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -293,7 +293,7 @@ export default function AdminDashboardPage() {
         setRejectReason('');
         fetchDashboardData();
       }
-    } catch (_error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -317,7 +317,7 @@ export default function AdminDashboardPage() {
         });
         fetchDashboardData();
       }
-    } catch (_error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -344,7 +344,7 @@ export default function AdminDashboardPage() {
         });
         fetchDashboardData();
       }
-    } catch (_error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -380,7 +380,7 @@ export default function AdminDashboardPage() {
           description: data.error || 'Failed to process asset',
         });
       }
-    } catch (_error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',

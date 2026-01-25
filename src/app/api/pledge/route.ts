@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 
-const pledgeSchema = z.object({
-  assetId: z.string().cuid(),
-  amount: z
-    .string()
-    .or(z.number())
-    .transform((val) => {
-      const num = typeof val === 'string' ? parseFloat(val) : val;
-      if (isNaN(num) || num <= 0) throw new Error('Invalid amount');
-      return num;
-    }),
-});
-
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   // Pledge feature is not yet implemented - requires pledge table in Prisma schema
   return NextResponse.json(
     {

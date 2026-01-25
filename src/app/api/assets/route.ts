@@ -1,6 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 
 import { db } from '@/lib/db';
+
+import { NextRequest, NextResponse } from 'next/server';
+
+type AssetWhereInput = Prisma.AssetWhereInput;
+type AssetOrderByInput = Prisma.AssetOrderByWithRelationInput;
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,14 +22,22 @@ export async function GET(req: NextRequest) {
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
 
-    // Build where clause
-    const where: any = {};
+    // Build where clause with proper typing
+    const where: AssetWhereInput = {};
 
     // Filter by status
     if (statusParam) {
       const statuses = statusParam.split(',').map((s) => s.trim().toUpperCase());
       where.status = {
-        in: statuses,
+        in: statuses as Array<
+          | 'REQUESTED'
+          | 'APPROVED'
+          | 'COLLECTING'
+          | 'PURCHASED'
+          | 'AVAILABLE'
+          | 'PAUSED'
+          | 'REJECTED'
+        >,
       };
     }
 
@@ -55,8 +68,8 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Build orderBy clause
-    let orderBy: any = {};
+    // Build orderBy clause with proper typing
+    let orderBy: AssetOrderByInput = { createdAt: 'desc' };
     switch (sort) {
       case 'newest':
         orderBy = { createdAt: 'desc' };
@@ -120,7 +133,9 @@ export async function GET(req: NextRequest) {
     let nextCursor: string | undefined = undefined;
     if (assets.length > limit) {
       const nextItem = assets.pop();
-      nextCursor = nextItem!.id;
+      if (nextItem) {
+        nextCursor = nextItem.id;
+      }
     }
 
     // Get total count for filters

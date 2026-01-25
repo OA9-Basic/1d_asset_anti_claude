@@ -216,7 +216,7 @@ export default function CreateAssetPage() {
       });
 
       router.push('/');
-    } catch (error) {
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error',

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { hash as bcryptHash, compare as bcryptCompare } from 'bcryptjs';
+import { sign as jwtSign, verify as jwtVerify } from 'jsonwebtoken';
 
 // CRITICAL SECURITY FIX: No fallback for JWT secret - must be set in environment
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -16,20 +16,20 @@ const SECRET: string = JWT_SECRET;
 const TOKEN_EXPIRY = '7d';
 
 export async function hashPassword(password: string) {
-  return await bcrypt.hash(password, 10);
+  return await bcryptHash(password, 10);
 }
 
 export async function verifyPassword(password: string, hash: string) {
-  return await bcrypt.compare(password, hash);
+  return await bcryptCompare(password, hash);
 }
 
 export function signToken(userId: string) {
-  return jwt.sign({ userId }, SECRET, { expiresIn: TOKEN_EXPIRY });
+  return jwtSign({ userId }, SECRET, { expiresIn: TOKEN_EXPIRY });
 }
 
 export function verifyToken(token: string) {
   try {
-    return jwt.verify(token, SECRET) as { userId: string } | null;
+    return jwtVerify(token, SECRET) as { userId: string } | null;
   } catch {
     return null;
   }

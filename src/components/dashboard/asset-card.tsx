@@ -128,47 +128,6 @@ export function AssetCard({ asset }: AssetCardProps) {
   const progressPercent = Math.min((Number(asset.currentCollected) / targetWithFee) * 100, 100);
   const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0);
 
-  const handleContribute = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/contribute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          assetId: asset.id,
-          amount: 1, // Default $1 contribution
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Contribution failed');
-      }
-
-      toast({
-        title: 'Contribution Successful!',
-        description: `You contributed $1 to ${asset.title}. ${data.excessAmount ? `$${data.excessAmount.toFixed(2)} was added to your store credit.` : ''}`,
-        variant: 'default',
-      });
-
-      // Redirect to asset page or refresh
-      router.push(`/assets/${asset.id}`);
-    } catch (error) {
-      console.error('Contribution error:', error);
-      toast({
-        title: 'Contribution Failed',
-        description: error instanceof Error ? error.message : 'An error occurred',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handlePurchase = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
