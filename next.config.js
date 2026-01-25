@@ -6,9 +6,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   reactStrictMode: true,
 
-  // Disable ESLint during build (prevents build from failing on warnings)
+  // ESLint configuration - enable dev indicator by NOT ignoring during builds
+  // Build will still succeed with warnings, but you'll see the dev indicator
   eslint: {
-    ignoreDuringBuilds: true,
+    // Only ignore in production builds, keep it enabled for development
+    ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
 
   // Enable SWC minification
