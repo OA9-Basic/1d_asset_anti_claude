@@ -371,7 +371,7 @@ export const shimmer: Variants = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: 'linear' as any,
+      ease: 'linear',
     },
   },
 };
@@ -386,7 +386,7 @@ export const pulse: Variants = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: 'easeInOut' as any,
+      ease: 'easeInOut',
     },
   },
 };
@@ -400,7 +400,7 @@ export const bounce: Variants = {
     transition: {
       duration: 0.5,
       repeat: Infinity,
-      ease: 'easeInOut' as any,
+      ease: 'easeInOut',
     },
   },
 };
@@ -414,7 +414,7 @@ export const rotate: Variants = {
     transition: {
       duration: 1,
       repeat: Infinity,
-      ease: 'linear' as any,
+      ease: 'linear',
     },
   },
 };
@@ -444,7 +444,7 @@ export const spinner = {
     transition: {
       duration: 1,
       repeat: Infinity,
-      ease: 'linear' as any,
+      ease: 'linear',
     },
   },
 };
@@ -458,7 +458,7 @@ export const loadingDots = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: 'easeInOut' as any,
+      ease: 'easeInOut',
     },
   },
 };
@@ -530,7 +530,7 @@ export const cardEntrance: Variants = {
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.4, 0.25, 1] as any,
+      ease: [0.25, 0.4, 0.25, 1],
     },
   },
 };

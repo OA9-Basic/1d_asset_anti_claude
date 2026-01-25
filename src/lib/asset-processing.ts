@@ -25,7 +25,7 @@ export interface DeliveryData {
   streamUrl?: string;
   deliveryKey?: string;
   externalAccessUrl?: string;
-  externalCredentials?: any;
+  externalCredentials?: Record<string, unknown>;
 }
 
 export async function processFundedAsset(
@@ -106,7 +106,7 @@ export async function processFundedAsset(
         externalAccessUrl: deliveryData.externalAccessUrl || asset.externalAccessUrl,
         externalCredentials: deliveryData.externalCredentials || asset.externalCredentials,
         metadata: {
-          ...((asset.metadata as any) || {}),
+          ...((asset.metadata as Record<string, unknown>) || {}),
           processedAt: new Date().toISOString(),
           contributorsProcessed,
         },

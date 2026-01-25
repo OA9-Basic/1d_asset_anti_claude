@@ -5,11 +5,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  devIndicators: {
+    buildActivity: true,
+  },
 
-  // ESLint configuration - enable dev indicator by NOT ignoring during builds
-  // Build will still succeed with warnings, but you'll see the dev indicator
   eslint: {
-    // Only ignore in production builds, keep it enabled for development
     ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
 

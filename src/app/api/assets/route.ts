@@ -1,8 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 
 import { db } from '@/lib/db';
-
-import { NextRequest, NextResponse } from 'next/server';
 
 type AssetWhereInput = Prisma.AssetWhereInput;
 type AssetOrderByInput = Prisma.AssetOrderByWithRelationInput;

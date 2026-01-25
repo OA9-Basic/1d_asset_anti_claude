@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client';
 
+import type { AssetGroupData } from '@/types/profit';
+
 import { db } from './db';
 import {
   roundToCents,
@@ -323,7 +325,7 @@ export async function getUserProfitShares(userId: string) {
   });
 
   // Group by asset
-  const byAsset = new Map<string, any>();
+  const byAsset = new Map<string, AssetGroupData>();
 
   for (const share of shares) {
     if (!byAsset.has(share.assetId)) {
@@ -335,14 +337,16 @@ export async function getUserProfitShares(userId: string) {
       });
     }
 
-    const data = byAsset.get(share.assetId)!;
-    data.totalReceived += share.amount;
-    data.shareCount++;
-    data.shares.push({
-      amount: share.amount,
-      ratio: share.shareRatio,
-      date: share.distributedAt,
-    });
+    const data = byAsset.get(share.assetId);
+    if (data) {
+      data.totalReceived += share.amount;
+      data.shareCount++;
+      data.shares.push({
+        amount: share.amount,
+        ratio: share.shareRatio,
+        date: share.distributedAt,
+      });
+    }
   }
 
   const totalReceived = shares.reduce((sum, s) => sum + s.amount, 0);

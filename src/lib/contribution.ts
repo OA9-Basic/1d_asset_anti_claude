@@ -146,7 +146,19 @@ export async function contributeToAsset(
       data: { balance: balanceAfter },
     });
 
-    let _contribution: any;
+    let _contribution:
+      | {
+          id: string;
+          userId: string;
+          assetId: string;
+          amount: number;
+          excessAmount: number;
+          isInvestment: boolean;
+          status: string;
+          createdAt: Date;
+          updatedAt: Date;
+        }
+      | undefined;
 
     if (existingContribution) {
       _contribution = await tx.contribution.update({

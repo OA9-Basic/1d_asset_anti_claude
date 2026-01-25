@@ -92,7 +92,12 @@ export async function POST(_req: NextRequest) {
       })
 
       const newCollected = asset.currentCollected + amount
-      const assetUpdateData: any = {
+      const assetUpdateData: {
+        currentCollected: number;
+        totalPledges: { increment: number };
+        status?: 'PURCHASED';
+        purchasedAt?: Date;
+      } = {
         currentCollected: newCollected,
         totalPledges: { increment: 1 },
       }
