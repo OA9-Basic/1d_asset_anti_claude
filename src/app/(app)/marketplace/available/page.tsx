@@ -306,7 +306,7 @@ export default function AvailableAssetsPage() {
         >
           {displayedAssets.map((asset, _index) => (
             <motion.div key={asset.id} variants={staggerItem}>
-              <AssetCard asset={asset as any} />
+              <AssetCard asset={asset} />
             </motion.div>
           ))}
         </motion.div>

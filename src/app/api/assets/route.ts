@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     const maxPrice = searchParams.get('maxPrice');
 
     // Build where clause with proper typing
-    const where: any = {};
+    const where: Prisma.AssetWhereInput = {};
 
     // Filter by status
     if (statusParam) {
@@ -41,15 +41,15 @@ export async function GET(req: NextRequest) {
     if (typeParam) {
       const types = typeParam.split(',').map((t) => t.trim().toUpperCase());
       where.type = {
-        in: types as Array<'COURSE' | 'SOFTWARE' | 'TEMPLATE' | 'EBOOK' | 'VIDEO' | 'AUDIO' | 'OTHER'>,
+        in: types as Array<'COURSE' | 'SOFTWARE' | 'TEMPLATE' | 'EBOOK' | 'AI_MODEL' | 'SAAS' | 'CODE' | 'MODEL_3D' | 'OTHER'>,
       };
     }
 
     // Search in title and description
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search } },
+        { description: { contains: search } },
       ];
     }
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Build orderBy clause with proper typing
-    let orderBy: any = { createdAt: 'desc' };
+    let orderBy: Prisma.AssetOrderByWithRelationInput = { createdAt: 'desc' };
     switch (sort) {
       case 'newest':
         orderBy = { createdAt: 'desc' };
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
         orderBy = { createdAt: 'asc' };
         break;
       case 'trending':
-        orderBy = [{ totalPurchases: 'desc' }, { currentCollected: 'desc' }];
+        orderBy = { totalPurchases: 'desc' };
         break;
       case 'priceAsc':
         orderBy = { targetPrice: 'asc' };

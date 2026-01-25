@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldPath } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -199,7 +199,7 @@ export default function CreateAssetPage() {
             fieldErrors[detail.path[0]] = detail.message;
           });
           Object.entries(fieldErrors).forEach(([field, message]) => {
-            form.setError(field as 'title' | 'description' | 'type' | 'deliveryType' | 'thumbnail' | 'sourceUrl' | 'targetPrice', { message });
+            form.setError(field as FieldPath<CreateAssetFormValues>, { message });
           });
         } else {
           toast({

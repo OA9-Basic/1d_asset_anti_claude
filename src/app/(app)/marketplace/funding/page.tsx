@@ -485,7 +485,7 @@ export default function FundingAssetsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <AssetCard asset={asset as any} />
+              <AssetCard asset={asset} />
             </motion.div>
           ))}
         </motion.div>

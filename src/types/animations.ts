@@ -2,12 +2,15 @@
  * Type definitions for Framer Motion animations
  */
 
-import type { Transition } from 'framer-motion';
-
 export type EaseType = [number, number, number, number];
 
-export interface CustomTransition extends Transition {
-  ease?: EaseType;
+export interface CustomTransition {
+  duration?: number;
+  ease?: EaseType | string;
+  delay?: number;
+  type?: 'tween' | 'spring' | 'just';
+  staggerChildren?: number;
+  delayChildren?: number;
 }
 
 export interface Variants {
@@ -32,11 +35,6 @@ export interface StaggerVariants extends Variants {
     y?: number;
     x?: number;
     scale?: number;
-    transition?: {
-      staggerChildren?: number;
-      delayChildren?: number;
-      ease?: EaseType;
-      duration?: number;
-    };
+    transition?: CustomTransition;
   };
 }

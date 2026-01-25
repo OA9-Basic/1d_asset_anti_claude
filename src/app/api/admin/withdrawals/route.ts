@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserFromToken } from '@/lib/auth';
@@ -33,9 +34,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
 
-    const where: any = {};
+    const where: Prisma.WithdrawalRequestWhereInput = {};
     if (status) {
-      where.status = status;
+      where.status = status as 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'REJECTED' | 'CANCELLED';
     }
 
     const withdrawals = await db.withdrawalRequest.findMany({

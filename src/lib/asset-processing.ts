@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 import { generateSecureAccessKey } from './auth';
 import { db } from './db';
 
@@ -104,7 +106,7 @@ export async function processFundedAsset(
         streamUrl: deliveryData.streamUrl || asset.streamUrl,
         deliveryKey: deliveryData.deliveryKey || asset.deliveryKey,
         externalAccessUrl: deliveryData.externalAccessUrl || asset.externalAccessUrl,
-        externalCredentials: deliveryData.externalCredentials || asset.externalCredentials,
+        externalCredentials: (deliveryData.externalCredentials || asset.externalCredentials) as Prisma.InputJsonValue,
         metadata: {
           ...((asset.metadata as Record<string, unknown>) || {}),
           processedAt: new Date().toISOString(),

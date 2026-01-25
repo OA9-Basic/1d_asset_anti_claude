@@ -1,6 +1,6 @@
 'use client';
 
-import { Asset } from '@prisma/client';
+import { Asset, AssetStatus, AssetType, DeliveryType } from '@prisma/client';
 import { Wallet, CheckCircle2, Clock, Users, ShoppingCart, TrendingUp, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,54 +12,91 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
-interface AssetCardProps {
-  asset: Asset & {
-    _count?: {
-      pledges: number;
-    };
+type AssetCardAsset = Omit<Asset, 'contributions' | 'assetPurchases' | 'profitShares' | 'request'> | {
+  id: string;
+  status: AssetStatus | string;
+  title: string;
+  description: string;
+  type: AssetType | string;
+  deliveryType?: DeliveryType | string;
+  targetPrice: number;
+  platformFee?: number;
+  currentCollected: number;
+  totalPurchases: number;
+  totalRevenue: number;
+  thumbnail: string | null;
+  featured: boolean;
+  createdAt: Date | string;
+  availableAt?: Date | string | null;
+  purchasedAt?: Date | string | null;
+  updatedAt?: Date | string;
+  sourceUrl?: string | null;
+  metadata?: unknown;
+  deliveryUrl?: string | null;
+  deliveryKey?: string | null;
+  streamUrl?: string | null;
+  externalAccessUrl?: string | null;
+  externalCredentials?: unknown;
+  approvedAt?: Date | string | null;
+  votingStartsAt?: Date | string | null;
+  votingEndsAt?: Date | string | null;
+  totalProfitDistributed?: number;
+  slug?: string;
+} & {
+  _count?: {
+    pledges?: number;
   };
+};
+
+interface AssetCardProps {
+  asset: AssetCardAsset;
 }
 
-const statusConfig = {
+const statusConfig: Record<string, {
+  label: string;
+  variant: 'default' | 'secondary' | 'outline' | 'destructive';
+  icon: typeof Clock;
+  className: string;
+}> = {
   REQUESTED: {
     label: 'Requested',
-    variant: 'secondary' as const,
+    variant: 'secondary',
     icon: Clock,
     className: 'status-requested',
   },
   APPROVED: {
     label: 'Approved',
-    variant: 'default' as const,
+    variant: 'default',
     icon: CheckCircle2,
     className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   },
   COLLECTING: {
     label: 'Funding',
-    variant: 'default' as const,
+    variant: 'default',
     icon: Clock,
     className: 'status-collecting',
   },
   PURCHASED: {
     label: 'Purchased',
-    variant: 'outline' as const,
+    variant: 'outline',
     icon: CheckCircle2,
     className: 'status-purchased',
   },
   AVAILABLE: {
     label: 'Available',
-    variant: 'default' as const,
+    variant: 'default',
     icon: ShoppingCart,
     className: 'status-available',
   },
   PAUSED: {
     label: 'Paused',
-    variant: 'destructive' as const,
+    variant: 'destructive',
     icon: Clock,
     className: 'status-rejected',
   },
   REJECTED: {
     label: 'Rejected',
-    variant: 'destructive' as const,
+    variant: 'destructive',
     icon: Clock,
     className: 'status-rejected',
   },
@@ -69,7 +106,7 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const statusInfo = statusConfig[asset.status];
+  const statusInfo = statusConfig[asset.status] || statusConfig.REQUESTED;
   const StatusIcon = statusInfo.icon;
 
   // Calculate progress including platform fee
@@ -193,7 +230,9 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
               <Badge variant="outline" className="text-xs">
                 {asset.type}
               </Badge>
-              <span className="text-xs text-muted-foreground">{asset.deliveryType}</span>
+              {asset.deliveryType && (
+                <span className="text-xs text-muted-foreground">{asset.deliveryType}</span>
+              )}
             </div>
           </div>
 

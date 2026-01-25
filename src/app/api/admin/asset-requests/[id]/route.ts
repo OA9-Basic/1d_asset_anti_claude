@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -186,7 +187,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           externalCredentials: data.externalCredentials,
           featured: data.featured,
           approvedAt: new Date(),
-          metadata: request.metadata as any,
+          metadata: request.metadata as Prisma.InputJsonValue,
         },
       });
 

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
     const userId = searchParams.get('userId');
     const voting = searchParams.get('voting') === 'true';
 
-    const where: any = {};
+    const where: Prisma.AssetRequestWhereInput = {};
 
     if (userId) {
       where.userId = userId;
