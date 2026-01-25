@@ -7,10 +7,13 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Digital Asset Marketplace - Group Fund Courses & Software',
+  title: {
+    default: 'Digital Assets - Community-Powered Asset Marketplace',
+    template: '%s | Digital Assets',
+  },
   description:
-    'Join forces with others to purchase expensive courses, software, and digital products. Contribute any amount - when the asset is funded, everyone gets access!',
-  keywords: ['digital assets', 'group buying', 'courses', 'software', 'shared funding'],
+    'Pool resources with others to purchase premium courses, software, and digital products. Contribute any amount — when funded, everyone gets permanent access.',
+  keywords: ['digital assets', 'crowdfunding', 'courses', 'software', 'shared funding', 'community'],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
