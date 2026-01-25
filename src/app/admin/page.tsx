@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import {
   Loader2,
   Users,
@@ -8,7 +9,8 @@ import {
   CheckCircle,
   XCircle,
   CheckCircle2,
-  AlertCircle,
+  Activity,
+  Zap,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -38,6 +40,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { buttonTap, hoverLift, staggerContainer, staggerItem } from '@/lib/animations';
 import type { IconType } from '@/types/ui';
 
 interface DashboardStats {
@@ -91,37 +94,47 @@ function StatCard({
   title,
   value,
   description,
-  _trend,
+  delay,
 }: {
   icon: IconType;
   title: string;
   value: string | number;
   description: string;
-  _trend?: 'up' | 'down' | 'neutral';
+  delay?: number;
 }) {
-  const _trendColors = {
-    up: 'text-green-500',
-    down: 'text-red-500',
-    neutral: 'text-muted-foreground',
-  };
-
   return (
-    <Card className="border-2 card-hover">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
+    <motion.div
+      variants={staggerItem}
+      {...hoverLift}
+      className="group"
+    >
+      <Card className="border-2 card-hover overflow-hidden h-full">
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between mb-4">
+            <motion.div
+              whileHover={{ rotate: 360, scale: 1.1 }}
+              transition={{ duration: 0.6 }}
+              className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-shadow"
+            >
+              <Icon className="h-6 w-6" />
+            </motion.div>
+          </div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold mt-1">{value}</p>
+            <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+            <motion.p
+              key={value}
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: (delay || 0) + 0.2 }}
+              className="text-3xl font-bold text-gradient"
+            >
+              {value}
+            </motion.p>
             <p className="text-xs text-muted-foreground mt-1">{description}</p>
           </div>
-          <div
-            className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-600/10`}
-          >
-            <Icon className="h-6 w-6 text-primary" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
@@ -406,62 +419,97 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/20 to-background">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-gradient-to-br from-muted/20 to-background"
+    >
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur">
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="border-b bg-background/95 backdrop-blur sticky top-0 z-10"
+      >
         <div className="container-custom py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+              <h1 className="text-3xl font-bold">
+                <span className="text-gradient">Admin Dashboard</span>
+              </h1>
               <p className="text-muted-foreground">Manage and monitor the platform</p>
             </div>
-            <Badge variant="outline" className="px-3 py-1">
-              Admin Access
-            </Badge>
+            <motion.div {...buttonTap}>
+              <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white border-0 px-3 py-1 shadow-md">
+                <Zap className="w-3 h-3 mr-1" />
+                Admin Access
+              </Badge>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       <div className="container-custom py-8 space-y-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={Users}
-            title="Total Users"
-            value={stats.totalUsers}
-            description="Registered users"
-          />
-          <StatCard
-            icon={Package}
-            title="Total Assets"
-            value={stats.totalAssets}
-            description="Assets on platform"
-          />
-          <StatCard
-            icon={DollarSign}
-            title="Total Revenue"
-            value={`$${stats.totalRevenue.toFixed(2)}`}
-            description="Lifetime revenue"
-          />
-          <StatCard
-            icon={AlertCircle}
-            title="Pending Tasks"
-            value={stats.pendingRequests + stats.pendingWithdrawals}
-            description={`${stats.pendingRequests} requests + ${stats.pendingWithdrawals} withdrawals`}
-          />
-        </div>
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          >
+            <StatCard
+              icon={Users}
+              title="Total Users"
+              value={stats.totalUsers}
+              description="Registered users"
+              delay={0}
+            />
+            <StatCard
+              icon={Package}
+              title="Total Assets"
+              value={stats.totalAssets}
+              description="Assets on platform"
+              delay={0.1}
+            />
+            <StatCard
+              icon={DollarSign}
+              title="Total Revenue"
+              value={`$${stats.totalRevenue.toFixed(2)}`}
+              description="Lifetime revenue"
+              delay={0.2}
+            />
+            <StatCard
+              icon={Activity}
+              title="Pending Tasks"
+              value={stats.pendingRequests + stats.pendingWithdrawals}
+              description={`${stats.pendingRequests} requests + ${stats.pendingWithdrawals} withdrawals`}
+              delay={0.3}
+            />
+          </motion.div>
+        </motion.section>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="requests" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 h-12">
-            <TabsTrigger value="requests">Asset Requests</TabsTrigger>
-            <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
-            <TabsTrigger value="funded">Funded Assets</TabsTrigger>
-            <TabsTrigger value="assets">All Assets</TabsTrigger>
-          </TabsList>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Tabs defaultValue="requests" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-4 h-12">
+              <TabsTrigger value="requests">Asset Requests</TabsTrigger>
+              <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
+              <TabsTrigger value="funded">Funded Assets</TabsTrigger>
+              <TabsTrigger value="assets">All Assets</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="requests">
-            <Card className="border-2">
+            <TabsContent value="requests">
+              <Card className="border-2">
               <CardHeader>
                 <CardTitle>Asset Requests</CardTitle>
                 <CardDescription>Review and manage community asset requests</CardDescription>
@@ -767,6 +815,7 @@ export default function AdminDashboardPage() {
             </Card>
           </TabsContent>
         </Tabs>
+      </motion.div>
       </div>
 
       {/* Approve Dialog */}
@@ -794,9 +843,12 @@ export default function AdminDashboardPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button onClick={handleApproveRequest} className="flex-1">
-                Approve & Add Asset
-              </Button>
+              <motion.div {...buttonTap} className="flex-1">
+                <Button onClick={handleApproveRequest} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Approve & Add Asset
+                </Button>
+              </motion.div>
               <Button variant="outline" onClick={() => setApproveDialogOpen(false)}>
                 Cancel
               </Button>
@@ -919,6 +971,6 @@ export default function AdminDashboardPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
+      </motion.div>
+    );
+  }
