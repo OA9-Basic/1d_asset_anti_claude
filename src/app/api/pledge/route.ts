@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
+
+import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 const pledgeSchema = z.object({
   assetId: z.string().cuid(),
@@ -13,6 +14,13 @@ const pledgeSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  // Pledge feature is not yet implemented - requires pledge table in Prisma schema
+  return NextResponse.json({
+    error: 'Pledge feature is not yet available',
+    message: 'This feature requires database schema updates'
+  }, { status: 501 })
+
+  /*
   try {
     const userId = await getUserFromToken(req)
 
@@ -150,4 +158,5 @@ export async function POST(req: NextRequest) {
       error: 'Internal server error',
     }, { status: 500 })
   }
+  */
 }

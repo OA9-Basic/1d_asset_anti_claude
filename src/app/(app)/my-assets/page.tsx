@@ -1,42 +1,38 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import useSWR from 'swr'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Progress } from '@/components/ui/progress'
 import { motion } from 'framer-motion'
 import {
-  Wallet,
-  Users,
-  Package,
-  TrendingUp,
+  AlertCircle,
+  ArrowUpRight,
+  Calendar,
   CheckCircle2,
   Clock,
-  ShoppingCart,
-  Eye,
-  PlusCircle,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
-  ArrowUpRight,
   DollarSign,
-  Target,
+  Eye,
+  Loader2,
+  Package,
+  PlusCircle,
+  RefreshCw,
+  ShoppingCart,
   Star,
-  Calendar,
+  Target,
 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import useSWR from 'swr'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useAuth } from '@/hooks/use-auth'
 import {
-  fadeInUp,
+  buttonTap,
+  hoverLift,
   staggerContainer,
   staggerItem,
-  hoverLift,
-  buttonTap,
-  tabContent,
 } from '@/lib/animations'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())

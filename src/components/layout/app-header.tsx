@@ -1,19 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Menu,
   User,
@@ -22,9 +9,22 @@ import {
   Wallet,
   ChevronRight,
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { fadeInUp, staggerContainer, staggerItem, hoverScale } from '@/lib/animations'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
+import { staggerContainer, staggerItem, hoverScale } from '@/lib/animations'
 
 interface WalletBalance {
   balance: number
@@ -105,8 +105,8 @@ export function AppHeader() {
       } else {
         throw new Error('Failed to sign out')
       }
-    } catch (error) {
-      console.error('Sign out error:', error)
+    } catch (_error) {
+      console.error('Sign out error:', _error)
       toast({
         title: 'Sign out failed',
         description: 'There was a problem signing you out. Please try again.',
@@ -127,7 +127,7 @@ export function AppHeader() {
     return user?.email?.slice(0, 2).toUpperCase() || 'U'
   }
 
-  const breadcrumbs = getBreadcrumbs(pathname)
+  const _breadcrumbs = getBreadcrumbs(pathname)
 
   return (
     <motion.header
@@ -156,14 +156,14 @@ export function AppHeader() {
           animate="show"
           className="flex items-center space-x-2 text-sm text-muted-foreground overflow-hidden"
         >
-          {breadcrumbs.map((crumb, index) => (
+          {_breadcrumbs.map((crumb, index) => (
             <motion.div
               key={crumb.href}
               variants={staggerItem}
               className="flex items-center"
             >
               {index > 0 && <ChevronRight className="h-4 w-4 mx-1" />}
-              {index === breadcrumbs.length - 1 ? (
+              {index === _breadcrumbs.length - 1 ? (
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

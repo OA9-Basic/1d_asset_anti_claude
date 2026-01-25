@@ -1,11 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard,
@@ -15,12 +9,18 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  User,
   Package,
   DollarSign
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { sidebarStagger, sidebarItem, buttonTap } from '@/lib/animations'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/use-auth'
+import { sidebarStagger, sidebarItem } from '@/lib/animations'
+import { cn } from '@/lib/utils'
 
 interface NavItem {
   title: string

@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
 import { Asset } from '@prisma/client'
+import { Wallet, CheckCircle2, Clock, Users, ShoppingCart, TrendingUp, Star } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { Wallet, Zap, CheckCircle2, Clock, Users, ShoppingCart, TrendingUp, Star } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 interface AssetCardProps {
   asset: Asset & {
@@ -270,7 +271,7 @@ export function AssetCard({ asset }: AssetCardProps) {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4" />
-                {asset.totalPurchases || asset.totalPledges || 0}
+                {asset.totalPurchases || 0}
               </span>
               {asset.totalRevenue > 0 && (
                 <span className="flex items-center gap-1.5">

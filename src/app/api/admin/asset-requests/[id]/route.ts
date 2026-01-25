@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
+
+import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 const updateRequestSchema = z.object({
   status: z.enum(['PENDING', 'UNDER_REVIEW', 'VOTING', 'APPROVED', 'REJECTED']).optional(),
@@ -191,7 +192,7 @@ export async function POST(
           externalCredentials: data.externalCredentials,
           featured: data.featured,
           approvedAt: new Date(),
-          metadata: request.metadata,
+          metadata: request.metadata as any,
         },
       })
 

@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Loader2, ThumbsUp, ThumbsDown, GitPullRequest, ExternalLink, Calendar, TrendingUp, Sparkles } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
+
 
 interface AssetRequest {
   id: string
@@ -121,7 +123,7 @@ export default function RequestsPage() {
               </h1>
               <p className="text-muted-foreground">
                 Help decide which digital assets should be added to the platform next.
-                Upvote the requests you'd like to see funded.
+                Upvote the requests you&apos;d like to see funded.
               </p>
             </div>
             <Link href="/request">
@@ -261,7 +263,7 @@ export default function RequestsPage() {
                   </div>
                   <h3 className="font-semibold mb-2">Vote for Assets</h3>
                   <p className="text-sm text-muted-foreground">
-                    Upvote the asset requests you'd like to see added to the platform.
+                    Upvote the asset requests you&apos;d like to see added to the platform.
                     Popular requests get priority.
                   </p>
                 </CardContent>
@@ -274,8 +276,8 @@ export default function RequestsPage() {
                   </div>
                   <h3 className="font-semibold mb-2">Submit Requests</h3>
                   <p className="text-sm text-muted-foreground">
-                    Don't see what you're looking for? Submit a request for any digital asset
-                    you'd like the community to fund together.
+                    Don&apos;t see what you&apos;re looking for? Submit a request for any digital asset
+                    you&apos;d like the community to fund together.
                   </p>
                 </CardContent>
               </Card>

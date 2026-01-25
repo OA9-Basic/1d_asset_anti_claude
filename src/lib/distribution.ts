@@ -1,6 +1,8 @@
-import { db } from './db'
+export async function distributeRevenue(_assetId: string, _amount: number | string) {
+  // Gap loan feature is not yet implemented - requires gapLoan table in Prisma schema
+  throw new Error('Revenue distribution with gap loan repayment is not yet available')
 
-export async function distributeRevenue(assetId: string, amount: number | string) {
+  /*
   const revenueAmount = typeof amount === 'string' ? parseFloat(amount) : amount
 
   return await db.$transaction(async (tx) => {
@@ -120,4 +122,5 @@ export async function distributeRevenue(assetId: string, amount: number | string
       newLenderBalance: balanceAfter,
     }
   })
+  */
 }

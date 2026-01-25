@@ -1,15 +1,27 @@
 'use client'
 
-import { useState, useCallback, useMemo, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import useSWR from 'swr'
 import { motion } from 'framer-motion'
+import {
+  AlertCircle,
+  ArrowUpDown,
+  ChevronLeft,
+  Filter,
+  Loader2,
+  RefreshCw,
+  Search,
+  TrendingUp,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import useSWR from 'swr'
+
 import { AssetCard } from '@/components/features/asset-card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -17,20 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Search,
-  SlidersHorizontal,
-  ArrowUpDown,
-  TrendingUp,
-  Package,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
-  ChevronLeft,
-  X,
-  Filter,
-  Clock,
-} from 'lucide-react'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -130,7 +128,7 @@ function FilterChip({
 }
 
 export default function FundingAssetsPage() {
-  const router = useRouter()
+  const _router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])

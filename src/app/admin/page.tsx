@@ -1,15 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Loader2, Users, DollarSign, Package, CheckCircle, XCircle, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Loader2, Users, DollarSign, Package, CheckCircle, XCircle, Clock, TrendingUp, CheckCircle2, AlertCircle } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect } from 'react'
+
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -17,9 +14,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { useAuth } from '@/hooks/use-auth'
+import { useToast } from '@/hooks/use-toast'
 
 interface DashboardStats {
   totalUsers: number
@@ -67,8 +68,8 @@ interface FundedAsset {
   isFullyFunded: boolean
 }
 
-function StatCard({ icon: Icon, title, value, description, trend }: { icon: any, title: string, value: string | number, description: string, trend?: 'up' | 'down' | 'neutral' }) {
-  const trendColors = {
+function StatCard({ icon: Icon, title, value, description, _trend }: { icon: any, title: string, value: string | number, description: string, _trend?: 'up' | 'down' | 'neutral' }) {
+  const _trendColors = {
     up: 'text-green-500',
     down: 'text-red-500',
     neutral: 'text-muted-foreground',
@@ -218,7 +219,7 @@ export default function AdminDashboardPage() {
           description: data.error || 'Failed to approve request',
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -246,7 +247,7 @@ export default function AdminDashboardPage() {
         setRejectReason('')
         fetchDashboardData()
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -270,7 +271,7 @@ export default function AdminDashboardPage() {
         })
         fetchDashboardData()
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -294,7 +295,7 @@ export default function AdminDashboardPage() {
         })
         fetchDashboardData()
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -330,7 +331,7 @@ export default function AdminDashboardPage() {
           description: data.error || 'Failed to process asset',
         })
       }
-    } catch (error) {
+    } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -692,7 +693,7 @@ export default function AdminDashboardPage() {
           <DialogHeader>
             <DialogTitle>Approve Asset Request</DialogTitle>
             <DialogDescription>
-              Add "{selectedRequest?.title}" to the platform
+              Add &quot;{selectedRequest?.title}&quot; to the platform
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -728,7 +729,7 @@ export default function AdminDashboardPage() {
           <DialogHeader>
             <DialogTitle>Reject Asset Request</DialogTitle>
             <DialogDescription>
-              Reject "{selectedRequest?.title}"
+              Reject &quot;{selectedRequest?.title}&quot;
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -758,7 +759,7 @@ export default function AdminDashboardPage() {
           <DialogHeader>
             <DialogTitle>Process Funded Asset</DialogTitle>
             <DialogDescription>
-              Process "{selectedAsset?.title}" after purchasing the actual product
+              Process &quot;{selectedAsset?.title}&quot; after purchasing the actual product
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
@@ -768,7 +769,7 @@ export default function AdminDashboardPage() {
                 <li>Purchase the actual course/product using the collected funds</li>
                 <li>Get the delivery URL/access credentials</li>
                 <li>Update the asset with delivery information</li>
-                <li>Click "Process Asset" to give contributors access</li>
+                <li>Click &quot;Process Asset&quot; to give contributors access</li>
               </ol>
             </div>
             <div className="space-y-2 text-sm">

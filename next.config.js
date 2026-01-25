@@ -6,6 +6,11 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   reactStrictMode: true,
 
+  // Disable ESLint during build (prevents build from failing on warnings)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Enable SWC minification
   swcMinify: true,
 

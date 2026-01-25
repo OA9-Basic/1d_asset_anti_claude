@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { AlertCircle, RefreshCw, Home } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect } from 'react'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function Error({
   error,
@@ -32,7 +33,7 @@ export default function Error({
           </div>
           <CardTitle className="text-2xl font-bold">Something went wrong</CardTitle>
           <CardDescription className="text-base">
-            We encountered an unexpected error. Don't worry, our team has been notified and we're working to fix it.
+            We encountered an unexpected error. Don&apos;t worry, our team has been notified and we&apos;re working to fix it.
           </CardDescription>
         </CardHeader>
 

@@ -1,46 +1,43 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  AlertCircle,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  CreditCard as CreditCardIcon,
+  DollarSign,
+  Eye,
+  EyeOff,
+  Filter,
+  Loader2,
+  RefreshCw,
+  TrendingDown,
+  TrendingUp,
+  Wallet,
+  XCircle,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useAuth } from '@/hooks/use-auth'
 import {
-  Wallet,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  RefreshCw,
-  Loader2,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  CreditCard as CreditCardIcon,
-  Calendar,
-  Filter,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Bitcoin,
-  Eye,
-  EyeOff,
-} from 'lucide-react'
-import {
-  fadeInUp,
+  buttonTap,
+  modalScaleUp,
   staggerContainer,
   staggerItem,
-  buttonTap,
-  hoverLift,
-  modalScaleUp,
-  modalFadeIn,
 } from '@/lib/animations'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
@@ -76,7 +73,7 @@ function CreditCard({ balance, user }: { balance: number; user: any }) {
 
   // Generate a mock card number based on user ID
   const cardNumber = showNumber ? '4532 •••• •••• 1234' : '•••• •••• •••• ••••'
-  const lastFour = '1234'
+  const _lastFour = '1234'
   const expiryDate = '12/28'
 
   return (
@@ -359,7 +356,7 @@ export default function WalletPage() {
       } else {
         alert(data.error || 'Deposit failed')
       }
-    } catch (error) {
+    } catch {
       alert('An error occurred')
     } finally {
       setIsProcessing(false)
@@ -392,7 +389,7 @@ export default function WalletPage() {
       } else {
         alert(data.error || 'Withdrawal failed')
       }
-    } catch (error) {
+    } catch {
       alert('An error occurred')
     } finally {
       setIsProcessing(false)

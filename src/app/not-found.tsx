@@ -1,7 +1,10 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+'use client'
+
 import { SearchX, Home, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function NotFound() {
   return (
@@ -18,13 +21,13 @@ export default function NotFound() {
           </div>
           <CardTitle className="text-2xl font-bold">Page Not Found</CardTitle>
           <CardDescription className="text-base">
-            Sorry, we couldn't find the page you're looking for. It might have been moved, deleted, or never existed.
+            Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved, deleted, or never existed.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <div className="rounded-lg border bg-muted/30 p-4">
-            <p className="text-sm font-medium mb-2">Here are some helpful links instead:</p>
+            <p className="text-sm font-medium mb-2">Here&apos;re some helpful links instead:</p>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/#assets" className="hover:text-primary transition-colors underline">
@@ -75,7 +78,14 @@ export default function NotFound() {
           <Button
             variant="outline"
             className="w-full sm:flex-1"
+            type="button"
             onClick={() => window.history.back()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.history.back();
+              }
+            }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Go Back

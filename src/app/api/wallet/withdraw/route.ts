@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
+
+import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 const withdrawalRequestSchema = z.object({
   amount: z.string().or(z.number()).transform((val) => {
@@ -161,7 +162,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Withdrawal ID required' }, { status: 400 })
     }
 
-    const result = await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx) => {
       const withdrawal = await tx.withdrawalRequest.findUnique({
         where: { id: withdrawalId },
       })

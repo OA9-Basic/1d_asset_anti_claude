@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromToken } from '@/lib/auth'
+
 import { processFundedAsset } from '@/lib/asset-processing'
+import { getUserFromToken } from '@/lib/auth'
 import { db } from '@/lib/db'
 
 export async function POST(

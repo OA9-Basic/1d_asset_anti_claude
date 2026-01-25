@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
+
+import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 const createAssetSchema = z.object({
   title: z.string().min(1).max(255),

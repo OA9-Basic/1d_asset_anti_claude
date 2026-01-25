@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+
 import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 // Helper: Verify admin role
 async function verifyAdmin(req: NextRequest) {

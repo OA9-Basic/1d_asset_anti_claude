@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+
 import { db } from './db'
 
 export interface DistributionResult {
@@ -20,7 +22,6 @@ export interface DistributionResult {
  * 3. Remaining profit ($0.85) is distributed to over-contributors
  * 4. Distribution is proportional to their excess contribution amounts
  */
-import { Prisma } from '@prisma/client'
 
 // Helper type for Transaction Client
 type TransactionClient = Omit<Prisma.TransactionClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>;
@@ -246,7 +247,7 @@ export async function runDailyProfitDistribution() {
 
     if (recentPurchases.length > 0) {
       const result = await distributeProfit(asset.id, recentPurchases.length)
-      results.push({ assetId: asset.id, assetTitle: asset.title, ...result })
+      results.push({ assetId: asset.id, assetTitle: asset.title, ...result as any })
     }
   }
 

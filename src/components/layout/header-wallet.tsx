@@ -1,6 +1,9 @@
 'use client'
 
+import { Wallet, Plus, History } from 'lucide-react'
+import Link from 'next/link'
 import useSWR from 'swr'
+
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -8,8 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Wallet, Plus, History } from 'lucide-react'
-import Link from 'next/link'
 import { useAuth } from '@/hooks/use-auth'
 
 interface WalletResponse {

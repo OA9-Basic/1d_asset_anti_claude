@@ -368,11 +368,11 @@ export const gridItem: Variants = {
 export const shimmer: Variants = {
   animate: {
     x: ['-100%', '100%'],
-  },
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: 'linear',
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: 'linear' as any,
+    },
   },
 }
 
@@ -383,11 +383,11 @@ export const pulse: Variants = {
   animate: {
     opacity: [0.5, 1, 0.5],
     scale: [0.98, 1, 0.98],
-  },
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: 'easeInOut',
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: 'easeInOut' as any,
+    },
   },
 }
 
@@ -397,11 +397,11 @@ export const pulse: Variants = {
 export const bounce: Variants = {
   animate: {
     y: [0, -10, 0],
-  },
-  transition: {
-    duration: 0.5,
-    repeat: Infinity,
-    ease: 'easeInOut',
+    transition: {
+      duration: 0.5,
+      repeat: Infinity,
+      ease: 'easeInOut' as any,
+    },
   },
 }
 
@@ -411,11 +411,11 @@ export const bounce: Variants = {
 export const rotate: Variants = {
   animate: {
     rotate: 360,
-  },
-  transition: {
-    duration: 1,
-    repeat: Infinity,
-    ease: 'linear',
+    transition: {
+      duration: 1,
+      repeat: Infinity,
+      ease: 'linear' as any,
+    },
   },
 }
 
@@ -425,9 +425,9 @@ export const rotate: Variants = {
 export const shake: Variants = {
   animate: {
     x: [0, -10, 10, -10, 10, 0],
-  },
-  transition: {
-    duration: 0.4,
+    transition: {
+      duration: 0.4,
+    },
   },
 }
 
@@ -441,11 +441,11 @@ export const shake: Variants = {
 export const spinner = {
   animate: {
     rotate: 360,
-  },
-  transition: {
-    duration: 1,
-    repeat: Infinity,
-    ease: 'linear',
+    transition: {
+      duration: 1,
+      repeat: Infinity,
+      ease: 'linear' as any,
+    },
   },
 }
 
@@ -455,11 +455,11 @@ export const spinner = {
 export const loadingDots = {
   animate: {
     opacity: [0.2, 1, 0.2],
-  },
-  transition: {
-    duration: 1.5,
-    repeat: Infinity,
-    ease: 'easeInOut',
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: 'easeInOut' as any,
+    },
   },
 }
 
@@ -525,10 +525,13 @@ export const countUp = {
  */
 export const cardEntrance: Variants = {
   initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: {
-    duration: 0.4,
-    ease: [0.25, 0.4, 0.25, 1],
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.4, 0.25, 1] as any,
+    },
   },
 }
 

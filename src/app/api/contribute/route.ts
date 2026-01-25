@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { getUserFromToken } from '@/lib/auth'
 import { contributeToAsset } from '@/lib/contribution'
-import { z } from 'zod'
 
 const contributeSchema = z.object({
   assetId: z.string().cuid(),

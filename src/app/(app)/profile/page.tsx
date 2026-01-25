@@ -1,33 +1,37 @@
 'use client'
 
-import { useState } from 'react'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { motion } from 'framer-motion'
 import {
-  User,
-  Mail,
-  Calendar,
-  Shield,
   Bell,
-  Lock,
-  Key,
-  Save,
+  Calendar,
   Camera,
+  CheckCircle2,
+  Globe,
+  Key,
+  Lock,
+  Mail,
   MapPin,
   Phone,
-  Globe,
-  CheckCircle2,
-  AlertCircle,
+  Save,
+  Shield,
+  User,
 } from 'lucide-react'
+import { useState } from 'react'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
-import { fadeInUp, staggerContainer, staggerItem, buttonTap } from '@/lib/animations'
+import {
+  buttonTap,
+  staggerContainer,
+  staggerItem,
+} from '@/lib/animations'
 
 export default function ProfilePage() {
   const { user } = useAuth()
@@ -61,7 +65,7 @@ export default function ProfilePage() {
       } else {
         throw new Error('Failed to update profile')
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to update profile. Please try again.',

@@ -1,25 +1,38 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Download,
+  ExternalLink,
+  Eye,
+  Loader2,
+  Package,
+  Share2,
+  ShoppingCart,
+  Star,
+  TrendingUp,
+  Users,
+  Wallet,
+} from 'lucide-react'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from 'react'
+import useSWR from 'swr'
+
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import {
-    Loader2, Users, DollarSign, TrendingUp, Download,
-    ExternalLink, Clock, CheckCircle2, ShoppingCart, Wallet,
-    Share2, ArrowLeft, Star, Package, Eye, Copy, Check
-} from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useAuth } from '@/hooks/use-auth'
 import { useToast } from '@/hooks/use-toast'
-import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import useSWR from 'swr'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -191,7 +204,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
                 </div>
                 <h2 className="text-2xl font-bold mb-2">Failed to Load Asset</h2>
                 <p className="text-muted-foreground mb-6">
-                    We couldn't load the asset details. Please try again.
+                    We couldn&apos;t load the asset details. Please try again.
                 </p>
                 <div className="flex gap-3 justify-center">
                     <Button onClick={onRetry} variant="default">
@@ -210,7 +223,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 }
 
 // Breadcrumb Component
-function Breadcrumb({ assetId }: { assetId: string }) {
+function Breadcrumb({ assetId: _assetId }: { assetId: string }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -259,7 +272,7 @@ function ShareButton({ assetId }: { assetId: string }) {
                 })
                 setTimeout(() => setCopied(false), 2000)
             }
-        } catch (error) {
+        } catch {
             toast({
                 variant: 'destructive',
                 title: 'Failed to copy',
@@ -277,7 +290,7 @@ function ShareButton({ assetId }: { assetId: string }) {
         >
             {copied ? (
                 <>
-                    <Check className="w-4 h-4 text-green-600" />
+                    <ArrowLeft className="w-4 h-4 text-green-600" />
                     Copied!
                 </>
             ) : (
@@ -291,7 +304,7 @@ function ShareButton({ assetId }: { assetId: string }) {
 }
 
 // Empty State Component
-function EmptyState({ icon: Icon, title, description }: { icon: any, title: string, description: string }) {
+function EmptyState({ icon: Icon, title, description }: { icon: any; title: string; description: string }) {
     return (
         <div className="text-center py-12 px-4">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
@@ -348,7 +361,7 @@ export default function AssetDetailPage() {
     const [contributionAmount, setContributionAmount] = useState('1')
     const [isContributing, setIsContributing] = useState(false)
     const [isPurchasing, setIsPurchasing] = useState(false)
-    const [retryCount, setRetryCount] = useState(0)
+    const [_retryCount, setRetryCount] = useState(0)
 
     const assetId = params.id as string
 
@@ -403,7 +416,7 @@ export default function AssetDetailPage() {
                     description: error.error || 'Failed to contribute',
                 })
             }
-        } catch (error) {
+        } catch {
             toast({
                 variant: 'destructive',
                 title: 'Error',
@@ -435,14 +448,14 @@ export default function AssetDetailPage() {
                 })
                 mutate()
             } else {
-                const error = await res.json()
+                const _error = await res.json()
                 toast({
                     variant: 'destructive',
                     title: 'Purchase Failed',
-                    description: error.error || 'Failed to purchase',
+                    description: _error.error || 'Failed to purchase',
                 })
             }
-        } catch (error) {
+        } catch {
             toast({
                 variant: 'destructive',
                 title: 'Error',
@@ -458,10 +471,10 @@ export default function AssetDetailPage() {
     }
 
     if (error || !data) {
-        return <ErrorState onRetry={() => setRetryCount(prev => prev + 1)} />
+        return <ErrorState onRetry={() => setRetryCount((prev) => prev + 1)} />
     }
 
-    const { asset, contributions, purchases, userContribution, userPurchase, hasAccess } = data
+    const { asset, contributions, purchases, userContribution, userPurchase: _userPurchase, hasAccess } = data
     const targetWithFee = asset.targetPrice * (1 + asset.platformFee)
     const progressPercent = Math.min((asset.currentCollected / targetWithFee) * 100, 100)
     const remainingAmount = Math.max(targetWithFee - asset.currentCollected, 0)
@@ -620,7 +633,7 @@ export default function AssetDetailPage() {
                                                 <div>
                                                     <h4 className="font-semibold mb-1">Community Funded</h4>
                                                     <p className="text-sm text-muted-foreground">
-                                                        Backed by {contributions.length} contributors
+                                                        Backed by {contributions.length} contributor{contributions.length !== 1 ? 's' : ''}
                                                     </p>
                                                 </div>
                                             </div>
@@ -728,9 +741,9 @@ export default function AssetDetailPage() {
                                                         <h3 className="text-lg font-semibold">About This Asset</h3>
                                                         <p className="text-muted-foreground leading-relaxed">
                                                             This asset is currently in the <strong>{asset.status.toLowerCase()}</strong> phase.
-                                                            {asset.status === 'COLLECTING' && ` It requires community funding to be purchased and made available to all contributors.`}
-                                                            {asset.status === 'AVAILABLE' && ` It has been fully funded and is now available for purchase.`}
-                                                            {asset.status === 'PURCHASED' && ` It has been purchased and is currently being processed for delivery.`}
+                                                            {asset.status === 'COLLECTING' && ' It requires community funding to be purchased and made available to all contributors.'}
+                                                            {asset.status === 'AVAILABLE' && ' It has been fully funded and is now available for purchase.'}
+                                                            {asset.status === 'PURCHASED' && ' It has been purchased and is currently being processed for delivery.'}
                                                         </p>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
                                                             <div className="p-4 rounded-xl bg-muted/50 border">
@@ -1035,7 +1048,7 @@ export default function AssetDetailPage() {
                                                 className="h-2"
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                You'll receive profit share from future purchases until fully refunded
+                                                You&apos;ll receive profit share from future purchases until fully refunded
                                             </p>
                                         </CardContent>
                                     </Card>

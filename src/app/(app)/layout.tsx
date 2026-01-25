@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { useAuth } from '@/hooks/use-auth'
-import { AppSidebar } from '@/components/layout/app-sidebar'
+import { useEffect } from 'react'
+
 import { AppHeader } from '@/components/layout/app-header'
+import { AppSidebar } from '@/components/layout/app-sidebar'
 import { MobileNav } from '@/components/layout/mobile-nav'
+import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 export default function AppLayout({
@@ -15,7 +16,7 @@ export default function AppLayout({
 }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
-  const pathname = usePathname()
+  const _pathname = usePathname()
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {

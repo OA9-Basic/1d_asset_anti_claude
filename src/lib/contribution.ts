@@ -146,10 +146,10 @@ export async function contributeToAsset(
             data: { balance: balanceAfter },
         })
 
-        let contribution: any
+        let _contribution: any
 
         if (existingContribution) {
-            contribution = await tx.contribution.update({
+            _contribution = await tx.contribution.update({
                 where: { id: existingContribution.id },
                 data: {
                     amount: existingContribution.amount + contributionAmount,
@@ -158,7 +158,7 @@ export async function contributeToAsset(
                 },
             })
         } else {
-            contribution = await tx.contribution.create({
+            _contribution = await tx.contribution.create({
                 data: {
                     userId,
                     assetId,

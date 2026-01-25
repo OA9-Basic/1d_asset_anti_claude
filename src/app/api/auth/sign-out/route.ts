@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   cookies().delete('auth_token')
   return NextResponse.json({ success: true })
 }

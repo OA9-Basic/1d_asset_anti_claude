@@ -1,42 +1,41 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import useSWR from 'swr'
-import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { motion } from 'framer-motion'
 import {
-  Wallet,
-  Vote,
-  Package,
-  TrendingUp,
-  TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  Minus,
-  Users,
-  PlusCircle,
-  ShoppingCart,
-  Share2,
-  Sparkles,
-  Loader2,
   AlertCircle,
+  ArrowDownRight,
+  ArrowUpRight,
+  Loader2,
+  Minus,
+  PlusCircle,
   RefreshCw,
+  Share2,
+  ShoppingCart,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Vote,
+  Wallet,
+  Package,
 } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts'
+import useSWR from 'swr'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/hooks/use-auth'
 import {
-  fadeInUp,
-  staggerContainer,
-  staggerItem,
+  buttonTap,
   hoverLift,
   listCascade,
   listItem,
-  buttonTap,
+  staggerContainer,
+  staggerItem,
 } from '@/lib/animations'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
@@ -437,7 +436,7 @@ export default function DashboardPage() {
               <h1 className="text-3xl font-bold">
                 Welcome back, {user.firstName || user.name || user.email?.split('@')[0]}!
               </h1>
-              <p className="text-muted-foreground">Here's what's happening with your account</p>
+              <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your account</p>
             </motion.div>
             <motion.div {...buttonTap}>
               <Button
@@ -706,7 +705,7 @@ export default function DashboardPage() {
               <Card className="border-2">
                 <CardHeader>
                   <CardTitle className="text-lg">My Contributions</CardTitle>
-                  <CardDescription>Assets you're helping fund</CardDescription>
+                  <CardDescription>Assets you&apos;re helping fund</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {dashboardLoading ? (

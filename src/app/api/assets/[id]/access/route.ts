@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+
 import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 export async function GET(
   req: NextRequest,
@@ -128,7 +129,7 @@ export async function POST(
 
     const assetId = params.id
     const body = await req.json()
-    const { accessType } = body || {}
+    const { accessType: _accessType } = body || {}
 
     // Update purchase access record
     const purchase = await db.assetPurchase.findFirst({

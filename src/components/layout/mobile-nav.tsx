@@ -1,8 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard,
@@ -11,7 +8,11 @@ import {
   Wallet,
   PlusCircle,
 } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+
 import { buttonTap } from '@/lib/animations'
+import { cn } from '@/lib/utils'
 
 interface NavItem {
   title: string

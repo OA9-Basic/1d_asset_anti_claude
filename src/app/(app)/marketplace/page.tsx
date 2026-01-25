@@ -1,23 +1,22 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import {
+  ArrowRight,
+  CheckCircle2,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Zap,
+} from 'lucide-react'
 import Link from 'next/link'
 import useSWR from 'swr'
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+
 import { Badge } from '@/components/ui/badge'
-import {
-  ShoppingCart,
-  TrendingUp,
-  Sparkles,
-  ArrowRight,
-  Package,
-  Users,
-  DollarSign,
-  Zap,
-  Clock,
-  CheckCircle2,
-} from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 

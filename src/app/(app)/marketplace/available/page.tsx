@@ -1,15 +1,26 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import useSWR from 'swr'
 import { motion } from 'framer-motion'
+import {
+  AlertCircle,
+  ArrowUpDown,
+  CheckCircle2,
+  ChevronLeft,
+  Loader2,
+  Package,
+  RefreshCw,
+  Search,
+} from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import useSWR from 'swr'
+
 import { AssetCard } from '@/components/features/asset-card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -18,22 +29,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  Search,
-  SlidersHorizontal,
-  ArrowUpDown,
-  CheckCircle2,
-  Package,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
-  ChevronLeft,
-} from 'lucide-react'
-import {
+  buttonTap,
   fadeInUp,
+  hoverScale,
   staggerContainer,
   staggerItem,
-  hoverScale,
-  buttonTap,
 } from '@/lib/animations'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
@@ -89,22 +89,12 @@ function AssetCardSkeleton() {
 }
 
 export default function AvailableAssetsPage() {
-  const router = useRouter()
+  const _router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [cursor, setCursor] = useState<string | undefined>()
   const [allAssets, setAllAssets] = useState<Asset[]>([])
-
-  // Debounce search input
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      setDebouncedSearch(searchQuery)
-      setCursor(undefined) // Reset pagination when search changes
-      setAllAssets([]) // Clear previous results
-    }, 300)
-    return () => clearTimeout(debounceTimer)
-  }, [searchQuery])
 
   // Build query params
   const queryParams = new URLSearchParams({
@@ -336,7 +326,7 @@ export default function AvailableAssetsPage() {
           animate="show"
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {displayedAssets.map((asset, index) => (
+          {displayedAssets.map((asset, _index) => (
             <motion.div key={asset.id} variants={staggerItem}>
               <AssetCard asset={asset as any} />
             </motion.div>

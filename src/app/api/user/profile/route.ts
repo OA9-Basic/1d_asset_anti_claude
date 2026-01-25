@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+
 import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,10 +18,8 @@ export async function GET(req: NextRequest) {
         email: true,
         firstName: true,
         lastName: true,
-        name: true,
         role: true,
         createdAt: true,
-        image: true,
       },
     })
 
@@ -44,7 +43,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { firstName, lastName, phone, location, website, bio } = body
+    const { firstName, lastName, phone: _phone, location: _location, website: _website, bio: _bio } = body
 
     // Update user profile
     const updatedUser = await db.user.update({
@@ -52,14 +51,12 @@ export async function PUT(req: NextRequest) {
       data: {
         firstName: firstName || undefined,
         lastName: lastName || undefined,
-        name: firstName && lastName ? `${firstName} ${lastName}` : undefined,
       },
       select: {
         id: true,
         email: true,
         firstName: true,
         lastName: true,
-        name: true,
         role: true,
         createdAt: true,
       },

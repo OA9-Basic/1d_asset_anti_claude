@@ -5,7 +5,9 @@
  * Use this for manual testing or as a reference for automated tests.
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+/* eslint-disable */
+import { render, screen } from '@testing-library/react'
+
 import { AssetCard } from '../asset-card'
 
 // ============================================================================

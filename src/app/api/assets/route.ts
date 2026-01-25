@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { db } from '@/lib/db'
-import { AssetStatus, AssetType } from '@prisma/client'
 
 export async function GET(req: NextRequest) {
   try {

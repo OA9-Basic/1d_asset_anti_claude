@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
+
+import { getUserFromToken } from '@/lib/auth'
+import { db } from '@/lib/db'
 
 const processWithdrawalSchema = z.object({
   status: z.enum(['PROCESSING', 'COMPLETED', 'REJECTED']),
@@ -211,7 +212,10 @@ export async function PATCH(
   }
 }
 
-// GET - List all withdrawals (admin)
+// GET_ALL - List all withdrawals (admin)
+// Note: This should be in a separate route file at /api/admin/withdrawals/route.ts
+// This function is commented out as it conflicts with the dynamic [id] route
+/*
 export async function GET_ALL(req: NextRequest) {
   try {
     const adminUser = await verifyAdmin(req)
@@ -254,3 +258,4 @@ export async function GET_ALL(req: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+*/

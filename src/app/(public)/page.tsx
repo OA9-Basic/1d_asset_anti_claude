@@ -1,9 +1,19 @@
-import { db } from '@/lib/db'
-import { AssetCard } from '@/components/features/asset-card'
-import { Suspense } from 'react'
+import {
+  ArrowRight,
+  CheckCircle2,
+  PlusCircle,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Zap,
+} from 'lucide-react'
 import Link from 'next/link'
+import { Suspense } from 'react'
+
+import { AssetCard } from '@/components/features/asset-card'
 import { Button } from '@/components/ui/button'
-import { PlusCircle, ArrowRight, Users, TrendingUp, Shield, Zap, Sparkles, CheckCircle2 } from 'lucide-react'
+import { db } from '@/lib/db'
 
 async function AssetGrid() {
   const assets = await db.asset.findMany({
@@ -18,17 +28,10 @@ async function AssetGrid() {
     take: 50,
   })
 
-  // Serialize Date objects to strings for Client Component
-  const serializedAssets = assets.map((asset) => ({
-    ...asset,
-    createdAt: asset.createdAt.toISOString(),
-    updatedAt: asset.updatedAt.toISOString(),
-  }))
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {serializedAssets.map((asset) => (
-        <AssetCard key={asset.id} asset={asset} />
+      {assets.map((asset) => (
+        <AssetCard key={asset.id} asset={asset as any} />
       ))}
     </div>
   )
@@ -44,7 +47,7 @@ function AssetGridSkeleton() {
   )
 }
 
-function StatCard({ icon: Icon, title, value, description }: { icon: any, title: string, value: string, description: string }) {
+function StatCard({ icon: Icon, title, value, description }: { icon: any; title: string; value: string; description: string }) {
   return (
     <div className="group relative overflow-hidden rounded-2xl border bg-card p-6 card-hover">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -62,7 +65,7 @@ function StatCard({ icon: Icon, title, value, description }: { icon: any, title:
   )
 }
 
-function FeatureCard({ icon: Icon, title, description }: { icon: any, title: string, description: string }) {
+function FeatureCard({ icon: Icon, title, description }: { icon: any; title: string; description: string }) {
   return (
     <div className="group p-6 rounded-2xl border bg-card card-hover">
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-600/10 text-primary mb-4 group-hover:scale-110 transition-transform">
@@ -74,7 +77,7 @@ function FeatureCard({ icon: Icon, title, description }: { icon: any, title: str
   )
 }
 
-function HowItWorksStep({ number, title, description }: { number: number, title: string, description: string }) {
+function HowItWorksStep({ number, title, description }: { number: number; title: string; description: string }) {
   return (
     <div className="relative group">
       <div className="flex flex-col items-center text-center">

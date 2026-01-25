@@ -1,9 +1,13 @@
 'use client'
 
+import { Menu, Home, PlusCircle, BarChart3, LogOut, User, Settings, LayoutGrid, GitPullRequest } from 'lucide-react'
 import Link from 'next/link'
-import { useAuth } from '@/hooks/use-auth'
-import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 import { HeaderWallet } from '@/components/layout/header-wallet'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,10 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Menu, Home, PlusCircle, BarChart3, LogOut, User, Settings, LayoutGrid, GitPullRequest } from 'lucide-react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/use-auth'
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },

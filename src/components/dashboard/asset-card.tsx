@@ -1,11 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { Asset } from '@prisma/client'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { motion } from 'framer-motion'
 import {
   Wallet,
   CheckCircle2,
@@ -17,9 +13,13 @@ import {
   Sparkles,
   TrendingUp,
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 
 interface AssetCardProps {
@@ -96,7 +96,7 @@ const containerVariants = {
     y: 0,
     transition: {
       duration: 0.4,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as any,
     },
   },
 }
@@ -108,7 +108,7 @@ const cardVariants = {
     scale: 1,
     transition: {
       duration: 0.3,
-      ease: [0.25, 0.4, 0.25, 1],
+      ease: [0.25, 0.4, 0.25, 1] as any,
     },
   },
 }
@@ -513,7 +513,7 @@ export function AssetCard({ asset }: AssetCardProps) {
                   <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium">
                     <Users className="w-4 h-4" />
                     <span className="font-semibold">
-                      {asset.totalPurchases || asset.totalPledges || 0}
+                      {asset.totalPurchases || 0}
                     </span>
                   </span>
                   {asset.totalRevenue > 0 && (
