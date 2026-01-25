@@ -390,6 +390,75 @@
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  /* Animation utilities */
+  .animate-in {
+    animation: animate-in 0.6s ease-out;
+  }
+
+  @keyframes animate-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .slide-in-from-bottom-4 {
+    animation: slide-in-from-bottom-4 0.6s ease-out;
+  }
+
+  @keyframes slide-in-from-bottom-4 {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .delay-75 {
+    animation-delay: 75ms;
+  }
+
+  .delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+
+  .delay-1000 {
+    animation-delay: 1000ms;
+  }
+
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent;
+  }
+
   /* Safe area support for iOS devices */
   @supports (padding: env(safe-area-inset-bottom)) {
     .h-safe-area-bottom {
