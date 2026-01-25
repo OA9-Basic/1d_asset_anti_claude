@@ -1,51 +1,58 @@
-'use client'
+'use client';
 
-import { Loader2, ArrowLeft, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Loader2, ArrowLeft, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function SignInPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-  })
-  const [error, setError] = useState('')
+  });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
       const res = await fetch('/api/auth/sign-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (res.ok) {
-        router.push('/')
-        router.refresh()
+        router.push('/');
+        router.refresh();
       } else {
-        setError(data.error || 'Sign in failed. Please try again.')
+        setError(data.error || 'Sign in failed. Please try again.');
       }
     } catch (error) {
-      console.error('Sign in error:', error)
-      setError('An unexpected error occurred. Please try again.')
+      console.error('Sign in error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-background">
@@ -72,9 +79,7 @@ export default function SignInPage() {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-            <CardDescription>
-              Sign in to your account to continue
-            </CardDescription>
+            <CardDescription>Sign in to your account to continue</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -145,9 +150,7 @@ export default function SignInPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  New to Digital Assets?
-                </span>
+                <span className="bg-card px-2 text-muted-foreground">New to Digital Assets?</span>
               </div>
             </div>
 
@@ -171,5 +174,5 @@ export default function SignInPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

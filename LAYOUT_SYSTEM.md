@@ -5,6 +5,7 @@ Complete layout system with full frontend-backend connectivity for the Digital A
 ## Overview
 
 The layout system provides two distinct layouts:
+
 - **Protected App Layout** (`(app)`): For authenticated users with sidebar, header, and mobile navigation
 - **Public Layout** (`(public)`): For marketing/public pages with transparent header and footer
 
@@ -36,6 +37,7 @@ src/
 ### 1. AppSidebar (`app-sidebar.tsx`)
 
 **Features:**
+
 - Collapsible sidebar with state management
 - Navigation items with active route highlighting
 - User profile section at bottom
@@ -43,6 +45,7 @@ src/
 - Responsive design (auto-collapses on mobile)
 
 **Navigation Routes:**
+
 - Dashboard (`/dashboard`)
 - Available Assets (`/marketplace/available`)
 - Funding Assets (`/marketplace/funding`)
@@ -57,6 +60,7 @@ Automatically included in `(app)/layout.tsx` - no manual import needed.
 ### 2. AppHeader (`app-header.tsx`)
 
 **Features:**
+
 - Dynamic breadcrumbs from current route
 - Wallet balance display fetched from `/api/wallet/balance`
 - User avatar with dropdown menu
@@ -64,6 +68,7 @@ Automatically included in `(app)/layout.tsx` - no manual import needed.
 - Glassmorphism effect
 
 **API Integration:**
+
 - Fetches wallet balance on mount
 - Sign out via `/api/auth/sign-out`
 - Uses `useAuth()` hook for user data
@@ -74,6 +79,7 @@ Automatically included in `(app)/layout.tsx` - no manual import needed.
 ### 3. MobileNav (`mobile-nav.tsx`)
 
 **Features:**
+
 - Bottom navigation bar for mobile devices
 - 5 main items: Dashboard, Marketplace, My Assets, Wallet, Create
 - Active state highlighting with motion animations
@@ -86,6 +92,7 @@ Automatically included in `(app)/layout.tsx` - no manual import needed.
 ### 4. Protected App Layout (`(app)/layout.tsx`)
 
 **Features:**
+
 - Authentication check using `useAuth()` hook
 - Redirects to `/auth/sign-in` if not authenticated
 - Includes sidebar, header, and main content area
@@ -111,6 +118,7 @@ export default function DashboardPage() {
 ### 5. Public Layout (`(public)/layout.tsx`)
 
 **Features:**
+
 - Transparent/glassmorphism header using `MainNav`
 - Full-width marketing layout
 - Enhanced footer with social links
@@ -139,32 +147,34 @@ export default function HomePage() {
 **Endpoint:** `GET /api/wallet/balance`
 
 **Response:**
+
 ```typescript
 {
-  balance: number              // Total available balance
-  withdrawableBalance: number  // Amount that can be withdrawn
-  storeCredit: number         // Non-withdrawable credit
-  totalDeposited: number      // Total lifetime deposits
-  totalWithdrawn: number      // Total lifetime withdrawals
-  totalContributed: number    // Total contributions made
-  totalProfitReceived: number // Total profit sharing received
+  balance: number; // Total available balance
+  withdrawableBalance: number; // Amount that can be withdrawn
+  storeCredit: number; // Non-withdrawable credit
+  totalDeposited: number; // Total lifetime deposits
+  totalWithdrawn: number; // Total lifetime withdrawals
+  totalContributed: number; // Total contributions made
+  totalProfitReceived: number; // Total profit sharing received
 }
 ```
 
 **Usage in AppHeader:**
+
 ```typescript
-const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null)
+const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null);
 
 useEffect(() => {
   async function fetchBalance() {
-    const res = await fetch('/api/wallet/balance')
+    const res = await fetch('/api/wallet/balance');
     if (res.ok) {
-      const data = await res.json()
-      setWalletBalance(data)
+      const data = await res.json();
+      setWalletBalance(data);
     }
   }
-  fetchBalance()
-}, [user])
+  fetchBalance();
+}, [user]);
 ```
 
 ### Authentication API
@@ -200,6 +210,7 @@ Place these in `src/app/(app)/`:
 ```
 
 **Example:**
+
 ```typescript
 // src/app/(app)/marketplace/available/page.tsx
 export default function AvailableAssetsPage() {
@@ -244,33 +255,35 @@ auth/
 ### Colors (Purple/Violet Theme)
 
 ```css
---primary: 262 83% 58%;           /* Violet */
---gradient-from: 262 83% 58%;     /* From violet */
---gradient-to: 276 77% 53%;       /* To purple */
+--primary: 262 83% 58%; /* Violet */
+--gradient-from: 262 83% 58%; /* From violet */
+--gradient-to: 276 77% 53%; /* To purple */
 ```
 
 ### Gradient Classes
 
 ```tsx
-className="bg-gradient-to-r from-violet-500 to-purple-600"
-className="bg-gradient-to-br from-violet-500/10 to-purple-600/10"
+className = 'bg-gradient-to-r from-violet-500 to-purple-600';
+className = 'bg-gradient-to-br from-violet-500/10 to-purple-600/10';
 ```
 
 ### Glassmorphism Effect
 
 ```tsx
-className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+className = 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60';
 ```
 
 ## Mobile Responsiveness
 
 ### Breakpoints
+
 - Mobile: < 768px (sidebar hidden, bottom nav visible)
 - Desktop: >= 768px (sidebar visible, bottom nav hidden)
 
 ### Safe Area Support (iOS)
 
 Added to `globals.css`:
+
 ```css
 .h-safe-area-bottom {
   height: env(safe-area-inset-bottom);
@@ -284,23 +297,27 @@ Added to `globals.css`:
 ## State Management
 
 ### Auth State
+
 ```typescript
-const { user, isLoading } = useAuth()
+const { user, isLoading } = useAuth();
 ```
+
 - `user`: User object or null
 - `isLoading`: Boolean for loading state
 
 ### Toast Notifications
+
 ```typescript
-const { toast } = useToast()
+const { toast } = useToast();
 
 toast({
   title: 'Success',
   description: 'Action completed successfully',
-})
+});
 ```
 
 ### Sidebar State
+
 Managed internally in `AppSidebar` component with localStorage persistence (can be added).
 
 ## Animation Library
@@ -312,8 +329,9 @@ npm install framer-motion
 ```
 
 **Example:**
+
 ```tsx
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 
 <motion.div
   initial={{ opacity: 0, y: 20 }}
@@ -321,7 +339,7 @@ import { motion } from 'framer-motion'
   transition={{ duration: 0.5 }}
 >
   Content
-</motion.div>
+</motion.div>;
 ```
 
 ## TypeScript Interfaces
@@ -329,22 +347,22 @@ import { motion } from 'framer-motion'
 ```typescript
 // User
 interface User {
-  id: string
-  email: string
-  name?: string | null
-  image?: string | null
-  role?: string
+  id: string;
+  email: string;
+  name?: string | null;
+  image?: string | null;
+  role?: string;
 }
 
 // Wallet Balance
 interface WalletBalance {
-  balance: number
-  withdrawableBalance: number
-  storeCredit: number
-  totalDeposited: number
-  totalWithdrawn: number
-  totalContributed: number
-  totalProfitReceived: number
+  balance: number;
+  withdrawableBalance: number;
+  storeCredit: number;
+  totalDeposited: number;
+  totalWithdrawn: number;
+  totalContributed: number;
+  totalProfitReceived: number;
 }
 ```
 
@@ -357,6 +375,7 @@ interface WalletBalance {
 3. The `(app)/layout.tsx` will automatically wrap your content
 
 **Example:**
+
 ```bash
 # Before
 src/app/dashboard/page.tsx
@@ -384,21 +403,25 @@ src/app/(app)/dashboard/page.tsx
 ## Troubleshooting
 
 ### Sidebar not showing on desktop
+
 - Check that file is in `(app)` directory
 - Verify `useAuth()` is returning a user
 - Check browser console for errors
 
 ### Wallet balance not loading
+
 - Verify `/api/wallet/balance` endpoint is working
 - Check user has a wallet record in database
 - Check browser network tab for API errors
 
 ### Mobile nav not showing
+
 - Ensure viewport meta tag is set
 - Check CSS z-index conflicts
 - Verify file is in `(app)` directory
 
 ### Routes not protected
+
 - Ensure file is in `(app)` directory, not `(public)`
 - Check that `useAuth()` redirect is working
 - Verify user is actually authenticated
@@ -421,6 +444,7 @@ All dependencies are already installed:
 ## Future Enhancements
 
 Potential improvements:
+
 1. Add localStorage persistence for sidebar collapsed state
 2. Add keyboard shortcuts for navigation
 3. Add search functionality in sidebar

@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -10,23 +10,23 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
-  DollarSign
-} from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+  DollarSign,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/hooks/use-auth'
-import { sidebarStagger, sidebarItem } from '@/lib/animations'
-import { cn } from '@/lib/utils'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
+import { sidebarStagger, sidebarItem } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 
 interface NavItem {
-  title: string
-  href: string
-  icon: typeof LayoutDashboard
-  badge?: number
+  title: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  badge?: number;
 }
 
 const navigation: NavItem[] = [
@@ -37,27 +37,27 @@ const navigation: NavItem[] = [
   { title: 'Wallet', href: '/wallet', icon: Wallet },
   { title: 'Create Asset', href: '/create', icon: PlusCircle },
   { title: 'Settings', href: '/settings', icon: Settings },
-]
+];
 
 export function AppSidebar() {
-  const pathname = usePathname()
-  const { user } = useAuth()
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const pathname = usePathname();
+  const { user } = useAuth();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile screen size
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      setIsMobile(window.innerWidth < 768);
       if (window.innerWidth < 768) {
-        setIsCollapsed(true)
+        setIsCollapsed(true);
       }
-    }
+    };
 
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const getUserInitials = () => {
     if (user?.name) {
@@ -66,13 +66,13 @@ export function AppSidebar() {
         .map((n) => n[0])
         .join('')
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2);
     }
-    return user?.email?.slice(0, 2).toUpperCase() || 'U'
-  }
+    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  };
 
-  const sidebarWidth = isCollapsed ? 'w-20' : 'w-64'
-  const sidebarItemClass = isCollapsed ? 'justify-center px-3' : 'justify-start px-4'
+  const sidebarWidth = isCollapsed ? 'w-20' : 'w-64';
+  const sidebarItemClass = isCollapsed ? 'justify-center px-3' : 'justify-start px-4';
 
   return (
     <>
@@ -120,29 +120,32 @@ export function AppSidebar() {
           className="flex-1 overflow-y-auto py-4 px-2 space-y-1"
         >
           {navigation.map((item, index) => {
-            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
-            const Icon = item.icon
+            const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+            const Icon = item.icon;
 
             return (
               <motion.div key={item.href} variants={sidebarItem}>
                 <Link href={item.href} className="block">
-                  <motion.div
-                    whileHover={{ scale: 1.02, x: 4 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
+                  <motion.div whileHover={{ scale: 1.02, x: 4 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       variant={isActive ? 'secondary' : 'ghost'}
                       className={cn(
                         'w-full h-10 gap-3 relative group',
                         sidebarItemClass,
-                        isActive && 'bg-gradient-to-r from-violet-500/10 to-purple-600/10 text-violet-700 dark:text-violet-400'
+                        isActive &&
+                          'bg-gradient-to-r from-violet-500/10 to-purple-600/10 text-violet-700 dark:text-violet-400'
                       )}
                     >
                       <motion.div
                         animate={isActive ? { rotate: [0, -10, 10, -10, 0] } : {}}
                         transition={{ duration: 0.5 }}
                       >
-                        <Icon className={cn('h-5 w-5 shrink-0', isActive && 'text-violet-600 dark:text-violet-400')} />
+                        <Icon
+                          className={cn(
+                            'h-5 w-5 shrink-0',
+                            isActive && 'text-violet-600 dark:text-violet-400'
+                          )}
+                        />
                       </motion.div>
                       <AnimatePresence mode="wait">
                         {!isCollapsed && (
@@ -180,7 +183,7 @@ export function AppSidebar() {
                   </motion.div>
                 </Link>
               </motion.div>
-            )
+            );
           })}
         </motion.nav>
 
@@ -195,15 +198,9 @@ export function AppSidebar() {
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 variant="ghost"
-                className={cn(
-                  'w-full h-12 gap-3 relative group',
-                  sidebarItemClass
-                )}
+                className={cn('w-full h-12 gap-3 relative group', sidebarItemClass)}
               >
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                >
+                <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6 }}>
                   <Avatar className="h-8 w-8 shrink-0">
                     <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-xs font-medium">
                       {getUserInitials()}
@@ -279,5 +276,5 @@ export function AppSidebar() {
         />
       )}
     </>
-  )
+  );
 }

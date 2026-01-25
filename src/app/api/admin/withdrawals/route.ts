@@ -1,41 +1,41 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 // Helper: Verify admin role
 async function verifyAdmin(req: NextRequest) {
-  const userId = await getUserFromToken(req)
+  const userId = await getUserFromToken(req);
 
   if (!userId) {
-    return null
+    return null;
   }
 
   const user = await db.user.findUnique({
     where: { id: userId },
-  })
+  });
 
   if (!user || user.role !== 'ADMIN') {
-    return null
+    return null;
   }
 
-  return user
+  return user;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const adminUser = await verifyAdmin(req)
+    const adminUser = await verifyAdmin(req);
 
     if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url)
-    const status = searchParams.get('status')
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status');
 
-    const where: any = {}
+    const where: any = {};
     if (status) {
-      where.status = status
+      where.status = status;
     }
 
     const withdrawals = await db.withdrawalRequest.findMany({
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: { createdAt: 'desc' },
-    })
+    });
 
     return NextResponse.json({
       withdrawals: withdrawals.map((w) => ({
@@ -70,10 +70,9 @@ export async function GET(req: NextRequest) {
         processedAt: w.processedAt?.toISOString(),
         user: w.wallet.user,
       })),
-    })
-
+    });
   } catch (error) {
-    console.error('Withdrawals list error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Withdrawals list error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

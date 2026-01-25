@@ -1,42 +1,49 @@
-'use client'
+'use client';
 
-import { Loader2, ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Loader2, ArrowLeft, Sparkles, CheckCircle2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-  })
-  const [error, setError] = useState('')
+  });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError('');
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError('Passwords do not match');
+      return;
     }
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters')
-      return
+      setError('Password must be at least 8 characters');
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const res = await fetch('/api/auth/sign-up', {
@@ -47,30 +54,30 @@ export default function SignUpPage() {
           email: formData.email,
           password: formData.password,
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (res.ok) {
-        router.push('/')
-        router.refresh()
+        router.push('/');
+        router.refresh();
       } else {
-        setError(data.error || 'Sign up failed. Please try again.')
+        setError(data.error || 'Sign up failed. Please try again.');
       }
     } catch (error) {
-      console.error('Sign up error:', error)
-      setError('An unexpected error occurred. Please try again.')
+      console.error('Sign up error:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const passwordRequirements = [
     { text: 'At least 8 characters', met: formData.password.length >= 8 },
     { text: 'Contains uppercase letter', met: /[A-Z]/.test(formData.password) },
     { text: 'Contains lowercase letter', met: /[a-z]/.test(formData.password) },
     { text: 'Contains number or symbol', met: /[0-9!@#$%^&*]/.test(formData.password) },
-  ]
+  ];
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-background">
@@ -153,7 +160,9 @@ export default function SignUpPage() {
                   <div className="space-y-1 mt-2 p-3 rounded-lg bg-muted/50">
                     {passwordRequirements.map((req, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs">
-                        <CheckCircle2 className={`h-3.5 w-3.5 ${req.met ? 'text-green-500' : 'text-muted-foreground'}`} />
+                        <CheckCircle2
+                          className={`h-3.5 w-3.5 ${req.met ? 'text-green-500' : 'text-muted-foreground'}`}
+                        />
                         <span className={req.met ? 'text-green-600' : 'text-muted-foreground'}>
                           {req.text}
                         </span>
@@ -183,7 +192,11 @@ export default function SignUpPage() {
               <Button
                 type="submit"
                 className="w-full h-11 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow"
-                disabled={isLoading || formData.password.length < 8 || formData.password !== formData.confirmPassword}
+                disabled={
+                  isLoading ||
+                  formData.password.length < 8 ||
+                  formData.password !== formData.confirmPassword
+                }
               >
                 {isLoading ? (
                   <>
@@ -206,9 +219,7 @@ export default function SignUpPage() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Already have an account?
-                </span>
+                <span className="bg-card px-2 text-muted-foreground">Already have an account?</span>
               </div>
             </div>
 
@@ -232,5 +243,5 @@ export default function SignUpPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

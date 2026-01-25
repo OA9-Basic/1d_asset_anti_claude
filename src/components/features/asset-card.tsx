@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
-import { Asset } from '@prisma/client'
-import { Wallet, CheckCircle2, Clock, Users, ShoppingCart, TrendingUp, Star } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Asset } from '@prisma/client';
+import { Wallet, CheckCircle2, Clock, Users, ShoppingCart, TrendingUp, Star } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 interface AssetCardProps {
   asset: Asset & {
     _count?: {
-      pledges: number
-    }
-  }
+      pledges: number;
+    };
+  };
 }
 
 const statusConfig = {
@@ -62,50 +62,44 @@ const statusConfig = {
     icon: Clock,
     className: 'status-rejected',
   },
-}
+};
 
 export function AssetCard({ asset }: AssetCardProps) {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const statusInfo = statusConfig[asset.status]
-  const StatusIcon = statusInfo.icon
+  const statusInfo = statusConfig[asset.status];
+  const StatusIcon = statusInfo.icon;
 
   // Calculate progress including platform fee
-  const platformFee = asset.platformFee || 0.15
-  const targetWithFee = asset.targetPrice * (1 + platformFee)
-  const progressPercent = Math.min(
-    (Number(asset.currentCollected) / targetWithFee) * 100,
-    100
-  )
-  const remainingAmount = Math.max(
-    targetWithFee - Number(asset.currentCollected),
-    0
-  )
+  const platformFee = asset.platformFee || 0.15;
+  const targetWithFee = asset.targetPrice * (1 + platformFee);
+  const progressPercent = Math.min((Number(asset.currentCollected) / targetWithFee) * 100, 100);
+  const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0);
 
   const handleAction = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
     if (asset.status === 'COLLECTING') {
-      router.push(`/assets/${asset.id}`)
+      router.push(`/assets/${asset.id}`);
     } else if (asset.status === 'AVAILABLE' || asset.status === 'PURCHASED') {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         const res = await fetch(`/api/assets/${asset.id}/purchase`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: 1 }),
-        })
+        });
 
         if (res.ok) {
-          router.push(`/assets/${asset.id}?access=true`)
+          router.push(`/assets/${asset.id}?access=true`);
         }
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-  }
+  };
 
   const getActionButton = () => {
     switch (asset.status) {
@@ -119,7 +113,7 @@ export function AssetCard({ asset }: AssetCardProps) {
             <Wallet className="w-4 h-4 mr-2" />
             Contribute Now
           </Button>
-        )
+        );
       case 'AVAILABLE':
       case 'PURCHASED':
         return (
@@ -137,19 +131,15 @@ export function AssetCard({ asset }: AssetCardProps) {
               </>
             )}
           </Button>
-        )
+        );
       default:
         return (
-          <Button
-            className="w-full h-10"
-            variant="outline"
-            disabled
-          >
+          <Button className="w-full h-10" variant="outline" disabled>
             {statusInfo.label}
           </Button>
-        )
+        );
     }
-  }
+  };
 
   return (
     <Link href={`/assets/${asset.id}`} className="block group">
@@ -200,9 +190,7 @@ export function AssetCard({ asset }: AssetCardProps) {
               <Badge variant="outline" className="text-xs">
                 {asset.type}
               </Badge>
-              <span className="text-xs text-muted-foreground">
-                {asset.deliveryType}
-              </span>
+              <span className="text-xs text-muted-foreground">{asset.deliveryType}</span>
             </div>
           </div>
 
@@ -210,20 +198,14 @@ export function AssetCard({ asset }: AssetCardProps) {
           {asset.status === 'COLLECTING' && (
             <div className="space-y-3 p-4 rounded-xl bg-muted/50 border">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Raised
-                </span>
+                <span className="text-muted-foreground">Raised</span>
                 <span className="font-bold text-lg text-gradient">
                   ${asset.currentCollected.toFixed(0)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">
-                  Goal
-                </span>
-                <span className="font-medium">
-                  ${targetWithFee.toFixed(0)}
-                </span>
+                <span className="text-muted-foreground">Goal</span>
+                <span className="font-medium">${targetWithFee.toFixed(0)}</span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
@@ -275,18 +257,15 @@ export function AssetCard({ asset }: AssetCardProps) {
               </span>
               {asset.totalRevenue > 0 && (
                 <span className="flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
-                  ${asset.totalRevenue.toFixed(0)}
+                  <TrendingUp className="w-4 h-4 text-green-500" />${asset.totalRevenue.toFixed(0)}
                 </span>
               )}
             </div>
           </div>
         </CardContent>
 
-        <CardFooter className="p-5 pt-0">
-          {getActionButton()}
-        </CardFooter>
+        <CardFooter className="p-5 pt-0">{getActionButton()}</CardFooter>
       </Card>
     </Link>
-  )
+  );
 }

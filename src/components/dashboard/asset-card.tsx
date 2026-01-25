@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { Asset } from '@prisma/client'
-import { motion } from 'framer-motion'
+import { Asset } from '@prisma/client';
+import { motion } from 'framer-motion';
 import {
   Wallet,
   CheckCircle2,
@@ -12,22 +12,22 @@ import {
   DollarSign,
   Sparkles,
   TrendingUp,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { useToast } from '@/hooks/use-toast'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 interface AssetCardProps {
   asset: Asset & {
     _count?: {
-      pledges: number
-    }
-  }
+      pledges: number;
+    };
+  };
 }
 
 const statusConfig = {
@@ -87,7 +87,7 @@ const statusConfig = {
       'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800',
     gradient: 'from-red-500 to-rose-500',
   },
-}
+};
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -99,7 +99,7 @@ const containerVariants = {
       ease: [0.25, 0.4, 0.25, 1] as any,
     },
   },
-}
+};
 
 const cardVariants = {
   hidden: { opacity: 0, scale: 0.95 },
@@ -111,31 +111,28 @@ const cardVariants = {
       ease: [0.25, 0.4, 0.25, 1] as any,
     },
   },
-}
+};
 
 export function AssetCard({ asset }: AssetCardProps) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
-  const [imageError, setImageError] = useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
-  const statusInfo = statusConfig[asset.status]
-  const StatusIcon = statusInfo.icon
+  const statusInfo = statusConfig[asset.status];
+  const StatusIcon = statusInfo.icon;
 
   // Calculate progress including platform fee
-  const platformFee = asset.platformFee || 0.15
-  const targetWithFee = asset.targetPrice * (1 + platformFee)
-  const progressPercent = Math.min(
-    (Number(asset.currentCollected) / targetWithFee) * 100,
-    100
-  )
-  const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0)
+  const platformFee = asset.platformFee || 0.15;
+  const targetWithFee = asset.targetPrice * (1 + platformFee);
+  const progressPercent = Math.min((Number(asset.currentCollected) / targetWithFee) * 100, 100);
+  const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0);
 
   const handleContribute = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const res = await fetch('/api/contribute', {
         method: 'POST',
@@ -144,78 +141,78 @@ export function AssetCard({ asset }: AssetCardProps) {
           assetId: asset.id,
           amount: 1, // Default $1 contribution
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Contribution failed')
+        throw new Error(data.error || 'Contribution failed');
       }
 
       toast({
         title: 'Contribution Successful!',
         description: `You contributed $1 to ${asset.title}. ${data.excessAmount ? `$${data.excessAmount.toFixed(2)} was added to your store credit.` : ''}`,
         variant: 'default',
-      })
+      });
 
       // Redirect to asset page or refresh
-      router.push(`/assets/${asset.id}`)
+      router.push(`/assets/${asset.id}`);
     } catch (error) {
-      console.error('Contribution error:', error)
+      console.error('Contribution error:', error);
       toast({
         title: 'Contribution Failed',
         description: error instanceof Error ? error.message : 'An error occurred',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handlePurchase = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const res = await fetch(`/api/assets/${asset.id}/purchase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: 1 }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Purchase failed')
+        throw new Error(data.error || 'Purchase failed');
       }
 
       toast({
         title: 'Purchase Successful!',
         description: `You now have access to ${asset.title}`,
         variant: 'default',
-      })
+      });
 
-      router.push(`/assets/${asset.id}?access=true`)
+      router.push(`/assets/${asset.id}?access=true`);
     } catch (error) {
-      console.error('Purchase error:', error)
+      console.error('Purchase error:', error);
       toast({
         title: 'Purchase Failed',
         description: error instanceof Error ? error.message : 'An error occurred',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleAction = (e: React.MouseEvent) => {
     if (asset.status === 'COLLECTING') {
-      router.push(`/assets/${asset.id}`)
+      router.push(`/assets/${asset.id}`);
     } else if (asset.status === 'AVAILABLE') {
-      handlePurchase(e)
+      handlePurchase(e);
     }
-  }
+  };
 
   const getActionButton = () => {
     switch (asset.status) {
@@ -244,7 +241,7 @@ export function AssetCard({ asset }: AssetCardProps) {
               )}
             </Button>
           </motion.div>
-        )
+        );
       case 'AVAILABLE':
         return (
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -270,7 +267,7 @@ export function AssetCard({ asset }: AssetCardProps) {
               )}
             </Button>
           </motion.div>
-        )
+        );
       case 'PURCHASED':
         return (
           <Button
@@ -280,7 +277,7 @@ export function AssetCard({ asset }: AssetCardProps) {
             <CheckCircle2 className="w-5 h-5 mr-2" />
             View Asset
           </Button>
-        )
+        );
       default:
         return (
           <Button
@@ -291,17 +288,12 @@ export function AssetCard({ asset }: AssetCardProps) {
             <StatusIcon className="w-5 h-5 mr-2" />
             {statusInfo.label}
           </Button>
-        )
+        );
     }
-  }
+  };
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      layout
-    >
+    <motion.div variants={containerVariants} initial="hidden" animate="visible" layout>
       <Link href={`/assets/${asset.id}`} className="block">
         <motion.div
           variants={cardVariants}
@@ -378,8 +370,7 @@ export function AssetCard({ asset }: AssetCardProps) {
                   transition={{ delay: 0.2 }}
                 >
                   <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full shadow-lg font-bold text-lg">
-                    <DollarSign className="w-4 h-4 inline-block mr-1" />
-                    1
+                    <DollarSign className="w-4 h-4 inline-block mr-1" />1
                   </div>
                 </motion.div>
               )}
@@ -392,10 +383,7 @@ export function AssetCard({ asset }: AssetCardProps) {
                   {asset.title}
                 </h3>
                 <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className="text-xs font-medium px-2.5 py-1 rounded-full"
-                  >
+                  <Badge variant="outline" className="text-xs font-medium px-2.5 py-1 rounded-full">
                     {asset.type}
                   </Badge>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -422,9 +410,7 @@ export function AssetCard({ asset }: AssetCardProps) {
                       </p>
                     </div>
                     <div className="space-y-1 text-right">
-                      <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                        Goal
-                      </p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Goal</p>
                       <p className="text-2xl font-bold text-slate-700 dark:text-slate-300">
                         ${targetWithFee.toFixed(0)}
                       </p>
@@ -483,9 +469,7 @@ export function AssetCard({ asset }: AssetCardProps) {
                     </div>
                     <div className="flex-1">
                       <p className="font-bold text-green-700 dark:text-green-400 text-lg">
-                        {asset.status === 'AVAILABLE'
-                          ? 'Instant Access'
-                          : 'Fully Funded'}
+                        {asset.status === 'AVAILABLE' ? 'Instant Access' : 'Fully Funded'}
                       </p>
                       <p className="text-sm text-slate-600 dark:text-slate-400">
                         {asset.totalPurchases || 0} people have access
@@ -512,16 +496,12 @@ export function AssetCard({ asset }: AssetCardProps) {
                 <div className="flex items-center gap-4 text-sm">
                   <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium">
                     <Users className="w-4 h-4" />
-                    <span className="font-semibold">
-                      {asset.totalPurchases || 0}
-                    </span>
+                    <span className="font-semibold">{asset.totalPurchases || 0}</span>
                   </span>
                   {asset.totalRevenue > 0 && (
                     <span className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
                       <TrendingUp className="w-4 h-4" />
-                      <span className="font-semibold">
-                        ${asset.totalRevenue.toFixed(0)}
-                      </span>
+                      <span className="font-semibold">${asset.totalRevenue.toFixed(0)}</span>
                     </span>
                   )}
                 </div>
@@ -540,5 +520,5 @@ export function AssetCard({ asset }: AssetCardProps) {
         </motion.div>
       </Link>
     </motion.div>
-  )
+  );
 }

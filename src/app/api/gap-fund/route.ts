@@ -1,19 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 const gapFundSchema = z.object({
   assetId: z.string().cuid(),
-})
+});
 
 export async function POST(req: NextRequest) {
   // Gap funding feature is not yet implemented - requires gapLoan table in Prisma schema
-  return NextResponse.json({
-    error: 'Gap funding feature is not yet available',
-    message: 'This feature requires database schema updates'
-  }, { status: 501 })
+  return NextResponse.json(
+    {
+      error: 'Gap funding feature is not yet available',
+      message: 'This feature requires database schema updates',
+    },
+    { status: 501 }
+  );
 
   /*
   try {

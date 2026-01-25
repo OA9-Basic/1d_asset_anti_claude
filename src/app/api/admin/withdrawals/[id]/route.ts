@@ -1,45 +1,42 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 const processWithdrawalSchema = z.object({
   status: z.enum(['PROCESSING', 'COMPLETED', 'REJECTED']),
   adminNotes: z.string().optional(),
   rejectionReason: z.string().optional(),
   txHash: z.string().optional(),
-})
+});
 
 // Helper: Verify admin role
 async function verifyAdmin(req: NextRequest) {
-  const userId = await getUserFromToken(req)
+  const userId = await getUserFromToken(req);
 
   if (!userId) {
-    return null
+    return null;
   }
 
   const user = await db.user.findUnique({
     where: { id: userId },
-  })
+  });
 
   if (!user || user.role !== 'ADMIN') {
-    return null
+    return null;
   }
 
-  return user
+  return user;
 }
 
 // GET - Get withdrawal details
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const adminUser = await verifyAdmin(req)
+    const adminUser = await verifyAdmin(req);
 
     if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 401 });
     }
 
     const withdrawal = await db.withdrawalRequest.findUnique({
@@ -58,34 +55,30 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!withdrawal) {
-      return NextResponse.json({ error: 'Withdrawal not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Withdrawal not found' }, { status: 404 });
     }
 
-    return NextResponse.json(withdrawal)
-
+    return NextResponse.json(withdrawal);
   } catch (error) {
-    console.error('Withdrawal fetch error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Withdrawal fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 // PATCH - Process withdrawal (approve/reject)
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const adminUser = await verifyAdmin(req)
+    const adminUser = await verifyAdmin(req);
 
     if (!adminUser) {
-      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized - Admin only' }, { status: 401 });
     }
 
-    const body = await req.json()
-    const { status, adminNotes, rejectionReason, txHash } = processWithdrawalSchema.parse(body)
+    const body = await req.json();
+    const { status, adminNotes, rejectionReason, txHash } = processWithdrawalSchema.parse(body);
 
     const result = await db.$transaction(async (tx) => {
       const withdrawal = await tx.withdrawalRequest.findUnique({
@@ -93,17 +86,17 @@ export async function PATCH(
         include: {
           wallet: true,
         },
-      })
+      });
 
       if (!withdrawal) {
-        throw new Error('Withdrawal not found')
+        throw new Error('Withdrawal not found');
       }
 
       if (withdrawal.status !== 'PENDING' && withdrawal.status !== 'PROCESSING') {
-        throw new Error(`Withdrawal is ${withdrawal.status.toLowerCase()}, cannot update`)
+        throw new Error(`Withdrawal is ${withdrawal.status.toLowerCase()}, cannot update`);
       }
 
-      let updatedWithdrawal: any
+      let updatedWithdrawal: any;
 
       if (status === 'COMPLETED') {
         // Mark as completed
@@ -114,7 +107,7 @@ export async function PATCH(
             adminNotes,
             processedAt: new Date(),
           },
-        })
+        });
 
         // Final transaction record
         await tx.transaction.create({
@@ -133,7 +126,7 @@ export async function PATCH(
               walletAddress: withdrawal.walletAddress,
             },
           },
-        })
+        });
 
         // Update wallet totals
         await tx.wallet.update({
@@ -142,8 +135,7 @@ export async function PATCH(
             lockedBalance: { decrement: withdrawal.amount },
             totalWithdrawn: { increment: withdrawal.amount },
           },
-        })
-
+        });
       } else if (status === 'REJECTED') {
         // Reject and restore balance
         updatedWithdrawal = await tx.withdrawalRequest.update({
@@ -154,7 +146,7 @@ export async function PATCH(
             rejectionReason: rejectionReason || 'No reason provided',
             processedAt: new Date(),
           },
-        })
+        });
 
         // Restore withdrawable balance
         await tx.wallet.update({
@@ -163,7 +155,7 @@ export async function PATCH(
             withdrawableBalance: { increment: withdrawal.amount },
             lockedBalance: { decrement: withdrawal.amount },
           },
-        })
+        });
 
         // Create reversal transaction
         await tx.transaction.create({
@@ -178,8 +170,7 @@ export async function PATCH(
             referenceType: 'WITHDRAWAL_REVERSAL',
             description: `Withdrawal rejected: ${rejectionReason || 'Admin rejected'}`,
           },
-        })
-
+        });
       } else {
         // PROCESSING status
         updatedWithdrawal = await tx.withdrawalRequest.update({
@@ -188,27 +179,29 @@ export async function PATCH(
             status: 'PROCESSING',
             adminNotes,
           },
-        })
+        });
       }
 
-      return updatedWithdrawal
-    })
+      return updatedWithdrawal;
+    });
 
     return NextResponse.json({
       success: true,
       withdrawal: result,
       message: `Withdrawal ${status.toLowerCase()}`,
-    })
-
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation failed', details: error.errors }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation failed', details: error.errors },
+        { status: 400 }
+      );
     }
     if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    console.error('Withdrawal processing error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Withdrawal processing error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

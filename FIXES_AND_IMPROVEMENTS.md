@@ -3,6 +3,7 @@
 ## Date: January 22, 2026
 
 ## Overview
+
 This document outlines all the critical fixes and improvements made to the 1DollarAsset crowdfunding platform.
 
 ---
@@ -10,20 +11,24 @@ This document outlines all the critical fixes and improvements made to the 1Doll
 ## 🔴 CRITICAL FIXES
 
 ### 1. **Fixed Immediate Refund Bug in Asset Processing**
+
 **File:** `src/lib/asset-processing.ts`
 
 **Problem:**
+
 - The system was immediately refunding excess contributions to contributors when the asset was processed
 - This violated the core business model where excess contributions should remain as investments
 - Contributors were supposed to be gradually refunded through profit distribution from future purchases
 
 **Solution:**
+
 - Removed the immediate refund logic (lines 59-102)
 - Contributors now only get access to the asset when processed
 - Their excess amounts remain as investments tracked in the `Contribution.excessAmount` field
 - Refunds now happen gradually through the profit distribution system
 
 **Impact:**
+
 - ✅ Correct business model implementation
 - ✅ Contributors effectively pay $1 for the product (after gradual refunds)
 - ✅ Platform generates sustainable revenue from future purchases
@@ -31,14 +36,17 @@ This document outlines all the critical fixes and improvements made to the 1Doll
 ---
 
 ### 2. **Implemented Smart Profit Distribution**
+
 **File:** `src/lib/profit-distribution.ts`
 
 **Problem:**
+
 - Profit distribution didn't check if contributors had already been fully refunded
 - Contributors could receive more profit than their excess contribution
 - No mechanism to stop distributing once fully refunded
 
 **Solution:**
+
 - Added filtering to only distribute to contributors who haven't been fully refunded
 - Calculate shares based on remaining owed amounts, not original excess
 - Cap distributions at what's still owed to each contributor
@@ -46,30 +54,32 @@ This document outlines all the critical fixes and improvements made to the 1Doll
 - When all investors are refunded, remaining profits go to the platform
 
 **Code Changes:**
+
 ```typescript
 // Filter to only those who still need refunds
-const activeInvestors = contributions.filter(c => c.totalProfitReceived < c.excessAmount)
+const activeInvestors = contributions.filter((c) => c.totalProfitReceived < c.excessAmount);
 
 // Calculate share based on remaining owed amount
-const remainingOwed = contribution.excessAmount - contribution.totalProfitReceived
-const shareRatio = remainingOwed / totalRemainingOwed
-let shareAmount = contributorProfit * shareRatio
+const remainingOwed = contribution.excessAmount - contribution.totalProfitReceived;
+const shareRatio = remainingOwed / totalRemainingOwed;
+let shareAmount = contributorProfit * shareRatio;
 
 // Cap at remaining owed amount
-shareAmount = Math.min(shareAmount, remainingOwed)
+shareAmount = Math.min(shareAmount, remainingOwed);
 
 // Mark as fully refunded when complete
-const isFullyRefunded = newTotalProfitReceived >= contribution.excessAmount
+const isFullyRefunded = newTotalProfitReceived >= contribution.excessAmount;
 await tx.contribution.update({
   where: { id: contribution.id },
   data: {
     totalProfitReceived: newTotalProfitReceived,
     status: isFullyRefunded ? 'CONVERTED_TO_INVESTMENT' : 'ACTIVE',
   },
-})
+});
 ```
 
 **Impact:**
+
 - ✅ Contributors are fairly refunded based on their investment
 - ✅ No over-refunding
 - ✅ Platform profits increase over time as investors are paid back
@@ -78,14 +88,17 @@ await tx.contribution.update({
 ---
 
 ### 3. **Enhanced Security in Purchase Route**
+
 **File:** `src/app/api/assets/[id]/purchase/route.ts`
 
 **Problem:**
+
 - Contributors could potentially purchase the asset again
 - This would allow them to get profit sharing on their own contribution (exploit)
 - Access check wasn't comprehensive enough
 
 **Solution:**
+
 - Added dual security checks:
   1. Check if user already has access (via purchase record)
   2. Check if user has contributed (even if asset not yet processed)
@@ -93,16 +106,20 @@ await tx.contribution.update({
 - Clear error messages explaining why purchase is blocked
 
 **Code Changes:**
+
 ```typescript
 // SECURITY: Check if user already has access through contribution or purchase
-const accessCheck = await checkUserAssetAccess(userId, assetId)
+const accessCheck = await checkUserAssetAccess(userId, assetId);
 
 if (accessCheck.hasAccess) {
-  return NextResponse.json({
-    error: 'You already have access to this asset',
-    hasAccess: true,
-    accessType: accessCheck.accessType,
-  }, { status: 400 })
+  return NextResponse.json(
+    {
+      error: 'You already have access to this asset',
+      hasAccess: true,
+      accessType: accessCheck.accessType,
+    },
+    { status: 400 }
+  );
 }
 
 // SECURITY: Also check if user has contributed (even if asset not yet processed)
@@ -112,19 +129,24 @@ const contribution = await db.contribution.findFirst({
     assetId,
     status: { in: ['ACTIVE', 'CONVERTED_TO_INVESTMENT'] },
   },
-})
+});
 
 if (contribution) {
-  return NextResponse.json({
-    error: 'You have already contributed to this asset. You will get access once it is processed.',
-    hasContributed: true,
-    contributionAmount: contribution.amount,
-    excessAmount: contribution.excessAmount,
-  }, { status: 400 })
+  return NextResponse.json(
+    {
+      error:
+        'You have already contributed to this asset. You will get access once it is processed.',
+      hasContributed: true,
+      contributionAmount: contribution.amount,
+      excessAmount: contribution.excessAmount,
+    },
+    { status: 400 }
+  );
 }
 ```
 
 **Impact:**
+
 - ✅ Prevents exploit where contributors buy again for profit sharing
 - ✅ Maintains system integrity
 - ✅ Clear user feedback
@@ -132,14 +154,17 @@ if (contribution) {
 ---
 
 ### 4. **Improved Access Check Logic**
+
 **File:** `src/lib/asset-processing.ts` - `checkUserAssetAccess()` function
 
 **Problem:**
+
 - Function returned access for contributors even before asset was processed
 - Didn't distinguish between processed and unprocessed contributors
 - Could cause confusion about when access is actually granted
 
 **Solution:**
+
 - Restructured the access check logic:
   1. First check for purchase records (includes processed contributors)
   2. Then check for contributions
@@ -147,12 +172,13 @@ if (contribution) {
   4. If contributor but asset is COLLECTING/PURCHASED, return pending status
 
 **Code Changes:**
+
 ```typescript
 export async function checkUserAssetAccess(userId: string, assetId: string) {
   // Check if user has a purchase record (includes both direct purchases and processed contributors)
   const purchase = await db.assetPurchase.findFirst({
     where: { userId, assetId },
-  })
+  });
 
   if (purchase) {
     return {
@@ -161,7 +187,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       purchaseAmount: purchase.purchaseAmount,
       accessKey: purchase.deliveryAccessKey,
       expiry: purchase.deliveryExpiry,
-    }
+    };
   }
 
   // Check if user contributed (for assets not yet processed)
@@ -171,20 +197,20 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       assetId,
       status: { in: ['ACTIVE', 'CONVERTED_TO_INVESTMENT'] },
     },
-  })
+  });
 
   if (contribution) {
     const asset = await db.asset.findUnique({
       where: { id: assetId },
       select: { status: true },
-    })
+    });
 
     // If asset is AVAILABLE, contributor should have a purchase record
     if (asset?.status === 'AVAILABLE') {
       return {
         hasAccess: false,
         message: 'Asset processed but access not granted. Contact support.',
-      }
+      };
     }
 
     // Asset is still in COLLECTING or PURCHASED status
@@ -194,14 +220,15 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       contributionAmount: contribution.amount,
       excessAmount: contribution.excessAmount,
       message: 'You have contributed. Access will be granted once the asset is processed.',
-    }
+    };
   }
 
-  return { hasAccess: false }
+  return { hasAccess: false };
 }
 ```
 
 **Impact:**
+
 - ✅ Clear distinction between pending and active access
 - ✅ Better error detection
 - ✅ Improved user experience
@@ -250,18 +277,21 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 **Target with fee:** $115 (100 + 15%)
 
 **Contributors:**
+
 - User A: Contributes $1 → excess: $0
 - User B: Contributes $60 → excess: $59
 - User C: Contributes $54 → excess: $53
 - **Total:** $115 ✅ Fully funded
 
 **Processing:**
+
 - All three users get access via `AssetPurchase` records
 - User B has $59 investment
 - User C has $53 investment
 - Total investment pool: $112
 
 **Future Purchases:**
+
 - User D buys for $1
 - Platform fee: $0.15
 - Profit to distribute: $0.85
@@ -269,11 +299,13 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - User C gets: $0.85 × (53/112) = $0.40
 
 **After 132 purchases:**
+
 - User B fully refunded ($59)
 - User C fully refunded ($53)
 - All future profits go to platform
 
 **Effective Prices:**
+
 - User A: Paid $1, got access = $1 per asset ✅
 - User B: Paid $60, got refunded $59 = $1 per asset ✅
 - User C: Paid $54, got refunded $53 = $1 per asset ✅
@@ -284,22 +316,26 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 ## 🔒 SECURITY IMPROVEMENTS
 
 ### 1. **Contribution Validation**
+
 - Minimum $1 contribution enforced
 - Balance checks before deduction
 - Transaction-based operations for atomicity
 
 ### 2. **Purchase Validation**
+
 - Only AVAILABLE assets can be purchased
 - Amount validation (must match target price)
 - Duplicate purchase prevention
 - Contributor purchase prevention
 
 ### 3. **Admin Authorization**
+
 - All admin routes check user role
 - Only ADMIN role can process assets
 - Only ADMIN role can approve/reject requests
 
 ### 4. **Access Control**
+
 - Proper access checks before content delivery
 - Expiry dates on access keys
 - Access tracking (last accessed, access count)
@@ -311,6 +347,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 ### Key Fields:
 
 **Contribution:**
+
 - `amount`: Total contributed
 - `excessAmount`: Amount over base price (investment)
 - `profitShareRatio`: Share of profits (calculated when funded)
@@ -319,6 +356,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - `isInvestment`: Boolean flag for investors
 
 **Asset:**
+
 - `targetPrice`: Base price of asset
 - `platformFee`: Platform fee percentage (default 0.15)
 - `currentCollected`: Total collected so far
@@ -328,6 +366,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - `totalProfitDistributed`: Total profit distributed to investors
 
 **Wallet:**
+
 - `balance`: Available balance for contributions/purchases
 - `withdrawableBalance`: Balance that can be withdrawn (from refunds)
 - `storeCredit`: Store credit balance
@@ -338,6 +377,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 ## 🎯 REMAINING TASKS
 
 ### High Priority:
+
 1. ✅ Fix immediate refund bug - **DONE**
 2. ✅ Implement smart profit distribution - **DONE**
 3. ✅ Add security checks in purchase route - **DONE**
@@ -347,6 +387,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 7. ⏳ Add comprehensive error handling
 
 ### Medium Priority:
+
 1. Add email notifications for contributors
 2. Implement voting system for asset requests
 3. Add analytics dashboard for admin
@@ -354,6 +395,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 5. Add cryptocurrency payment integration
 
 ### Low Priority:
+
 1. Add asset categories and filtering
 2. Implement search functionality
 3. Add user profiles and contribution history
@@ -365,6 +407,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 ## 🧪 TESTING CHECKLIST
 
 ### Contribution Flow:
+
 - [ ] User can contribute to COLLECTING asset
 - [ ] Contribution deducts from wallet balance
 - [ ] Excess amount calculated correctly
@@ -373,6 +416,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - [ ] Insufficient balance handled correctly
 
 ### Processing Flow:
+
 - [ ] Admin can see funded assets
 - [ ] Admin can process PURCHASED assets
 - [ ] Contributors get AssetPurchase records
@@ -381,6 +425,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - [ ] Processing summary shows correct data
 
 ### Purchase Flow:
+
 - [ ] User can purchase AVAILABLE assets
 - [ ] Purchase deducts from wallet balance
 - [ ] Contributors cannot purchase
@@ -389,6 +434,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - [ ] Profit distribution triggered
 
 ### Profit Distribution:
+
 - [ ] Profits distributed to active investors only
 - [ ] Distribution proportional to remaining owed
 - [ ] Contributions marked as fully refunded when complete
@@ -396,6 +442,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - [ ] totalProfitReceived updated correctly
 
 ### Security:
+
 - [ ] Non-admin cannot access admin routes
 - [ ] Contributors cannot purchase assets they contributed to
 - [ ] Amount validation prevents exploitation
@@ -407,12 +454,14 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 ## 📚 API ENDPOINTS
 
 ### Public:
+
 - `POST /api/auth/sign-up` - User registration
 - `POST /api/auth/sign-in` - User login
 - `GET /api/assets` - List assets
 - `GET /api/assets/[id]` - Get asset details
 
 ### Authenticated:
+
 - `POST /api/contribute` - Contribute to asset
 - `POST /api/assets/[id]/purchase` - Purchase asset
 - `GET /api/wallet/balance` - Get wallet balance
@@ -422,6 +471,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
 - `POST /api/asset-requests/[id]/vote` - Vote on request
 
 ### Admin Only:
+
 - `GET /api/admin/assets/funded` - Get funded assets
 - `POST /api/admin/assets/[id]/process` - Process funded asset
 - `GET /api/admin/asset-requests` - Get all requests

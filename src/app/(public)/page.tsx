@@ -7,13 +7,13 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from 'lucide-react'
-import Link from 'next/link'
-import { Suspense } from 'react'
+} from 'lucide-react';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
-import { AssetCard } from '@/components/features/asset-card'
-import { Button } from '@/components/ui/button'
-import { db } from '@/lib/db'
+import { AssetCard } from '@/components/features/asset-card';
+import { Button } from '@/components/ui/button';
+import { db } from '@/lib/db';
 
 async function AssetGrid() {
   const assets = await db.asset.findMany({
@@ -26,7 +26,7 @@ async function AssetGrid() {
       createdAt: 'desc',
     },
     take: 50,
-  })
+  });
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -34,7 +34,7 @@ async function AssetGrid() {
         <AssetCard key={asset.id} asset={asset as any} />
       ))}
     </div>
-  )
+  );
 }
 
 function AssetGridSkeleton() {
@@ -44,10 +44,20 @@ function AssetGridSkeleton() {
         <div key={i} className="h-96 shimmer rounded-xl" />
       ))}
     </div>
-  )
+  );
 }
 
-function StatCard({ icon: Icon, title, value, description }: { icon: any; title: string; value: string; description: string }) {
+function StatCard({
+  icon: Icon,
+  title,
+  value,
+  description,
+}: {
+  icon: any;
+  title: string;
+  value: string;
+  description: string;
+}) {
   return (
     <div className="group relative overflow-hidden rounded-2xl border bg-card p-6 card-hover">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -62,10 +72,18 @@ function StatCard({ icon: Icon, title, value, description }: { icon: any; title:
         <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
     </div>
-  )
+  );
 }
 
-function FeatureCard({ icon: Icon, title, description }: { icon: any; title: string; description: string }) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="group p-6 rounded-2xl border bg-card card-hover">
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-600/10 text-primary mb-4 group-hover:scale-110 transition-transform">
@@ -74,10 +92,18 @@ function FeatureCard({ icon: Icon, title, description }: { icon: any; title: str
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <p className="text-sm text-muted-foreground">{description}</p>
     </div>
-  )
+  );
 }
 
-function HowItWorksStep({ number, title, description }: { number: number; title: string; description: string }) {
+function HowItWorksStep({
+  number,
+  title,
+  description,
+}: {
+  number: number;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="relative group">
       <div className="flex flex-col items-center text-center">
@@ -91,7 +117,7 @@ function HowItWorksStep({ number, title, description }: { number: number; title:
         <p className="text-sm text-muted-foreground max-w-xs">{description}</p>
       </div>
     </div>
-  )
+  );
 }
 
 export default function HomePage() {
@@ -113,9 +139,7 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              Access Premium{' '}
-              <span className="text-gradient">Digital Assets</span>
-              {' '}Together
+              Access Premium <span className="text-gradient">Digital Assets</span> Together
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -125,7 +149,10 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/request">
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow">
+                <Button
+                  size="lg"
+                  className="w-full sm:w-auto bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow"
+                >
                   <PlusCircle className="w-5 h-5 mr-2" />
                   Request an Asset
                 </Button>
@@ -220,7 +247,8 @@ export default function HomePage() {
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="text-3xl font-bold mb-4">Why Choose Us?</h2>
             <p className="text-muted-foreground">
-              We make it easy and affordable to access premium digital assets through community power
+              We make it easy and affordable to access premium digital assets through community
+              power
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -263,13 +291,11 @@ export default function HomePage() {
         <div className="container-custom">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-muted-foreground">
-              Get started in just a few simple steps
-            </p>
+            <p className="text-muted-foreground">Get started in just a few simple steps</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
             {/* Connection lines (desktop) */}
-                <div className="hidden lg:block absolute top-8 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500" />
+            <div className="hidden lg:block absolute top-8 left-[12%] right-[12%] h-0.5 bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500" />
 
             <HowItWorksStep
               number={1}
@@ -301,15 +327,17 @@ export default function HomePage() {
           <div className="relative max-w-3xl mx-auto text-center p-12 rounded-3xl border bg-card/50 backdrop-blur">
             <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5 rounded-3xl" />
             <div className="relative">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Ready to Get Started?
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
               <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-                Join our community today and start accessing premium digital assets at a fraction of the cost
+                Join our community today and start accessing premium digital assets at a fraction of
+                the cost
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/auth/sign-up">
-                  <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700"
+                  >
                     Create Free Account
                   </Button>
                 </Link>
@@ -325,5 +353,5 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

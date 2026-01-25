@@ -1,7 +1,7 @@
-import { betterAuth } from 'better-auth'
-import { prismaAdapter } from 'better-auth/adapters/prisma'
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
 
-import { db } from './db'
+import { db } from './db';
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
@@ -22,6 +22,6 @@ export const auth = betterAuth({
     },
   },
   socialProviders: {},
-})
+});
 
-export type Session = typeof auth.$Infer.Session
+export type Session = typeof auth.$Infer.Session;

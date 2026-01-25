@@ -1,11 +1,12 @@
-import { db } from './db'
+import { generateSecureAccessKey } from './auth';
+import { db } from './db';
 
 export interface ProcessingResult {
-  success: boolean
-  assetId: string
-  message: string
-  contributorsRefunded?: number
-  totalRefunded?: number
+  success: boolean;
+  assetId: string;
+  message: string;
+  contributorsRefunded?: number;
+  totalRefunded?: number;
 }
 
 /**
@@ -20,14 +21,17 @@ export interface ProcessingResult {
  * 5. Contributors get access + refunds based on contribution timing
  */
 export interface DeliveryData {
-  deliveryUrl?: string
-  streamUrl?: string
-  deliveryKey?: string
-  externalAccessUrl?: string
-  externalCredentials?: any
+  deliveryUrl?: string;
+  streamUrl?: string;
+  deliveryKey?: string;
+  externalAccessUrl?: string;
+  externalCredentials?: any;
 }
 
-export async function processFundedAsset(assetId: string, deliveryData: DeliveryData = {}): Promise<ProcessingResult> {
+export async function processFundedAsset(
+  assetId: string,
+  deliveryData: DeliveryData = {}
+): Promise<ProcessingResult> {
   return await db.$transaction(async (tx) => {
     // Get asset with all contributions
     const asset = await tx.asset.findUnique({
@@ -46,23 +50,23 @@ export async function processFundedAsset(assetId: string, deliveryData: Delivery
           },
         },
       },
-    })
+    });
 
     if (!asset) {
-      throw new Error('Asset not found')
+      throw new Error('Asset not found');
     }
 
     if (asset.status !== 'PURCHASED') {
-      throw new Error('Asset must be in PURCHASED status to process')
+      throw new Error('Asset must be in PURCHASED status to process');
     }
 
     // Calculate base price (without platform fee)
-    const basePrice = asset.targetPrice
+    const basePrice = asset.targetPrice;
 
-    let contributorsProcessed = 0
+    let contributorsProcessed = 0;
 
     for (const contribution of asset.contributions) {
-      if (!contribution.user.wallet) continue
+      if (!contribution.user.wallet) continue;
 
       // Create asset purchase record for contributor
       const existingPurchase = await tx.assetPurchase.findFirst({
@@ -70,10 +74,11 @@ export async function processFundedAsset(assetId: string, deliveryData: Delivery
           userId: contribution.userId,
           assetId: assetId,
         },
-      })
+      });
 
       if (!existingPurchase) {
-        const accessKey = Buffer.from(`${contribution.userId}-${assetId}-CONTRIBUTOR-${Date.now()}`).toString('base64')
+        // SECURITY FIX: Use cryptographically secure random key generation
+        const accessKey = generateSecureAccessKey();
 
         await tx.assetPurchase.create({
           data: {
@@ -83,10 +88,10 @@ export async function processFundedAsset(assetId: string, deliveryData: Delivery
             deliveryAccessKey: accessKey,
             deliveryExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
           },
-        })
+        });
       }
 
-      contributorsProcessed++
+      contributorsProcessed++;
     }
 
     // Update asset status to AVAILABLE and save delivery info
@@ -106,9 +111,9 @@ export async function processFundedAsset(assetId: string, deliveryData: Delivery
           contributorsProcessed,
         },
       },
-    })
+    });
 
-    const totalExcessInvestment = asset.contributions.reduce((sum, c) => sum + c.excessAmount, 0)
+    const totalExcessInvestment = asset.contributions.reduce((sum, c) => sum + c.excessAmount, 0);
 
     return {
       success: true,
@@ -116,8 +121,8 @@ export async function processFundedAsset(assetId: string, deliveryData: Delivery
       message: `Asset processed successfully. ${contributorsProcessed} contributors granted access. Total excess investment: $${totalExcessInvestment.toFixed(2)} (will be refunded through profit distribution)`,
       contributorsRefunded: contributorsProcessed,
       totalRefunded: 0,
-    }
-  })
+    };
+  });
 }
 
 /**
@@ -131,7 +136,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       userId,
       assetId,
     },
-  })
+  });
 
   if (purchase) {
     return {
@@ -140,7 +145,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       purchaseAmount: purchase.purchaseAmount,
       accessKey: purchase.deliveryAccessKey,
       expiry: purchase.deliveryExpiry,
-    }
+    };
   }
 
   // Check if user contributed (for assets not yet processed)
@@ -150,14 +155,14 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       assetId,
       status: { in: ['ACTIVE', 'CONVERTED_TO_INVESTMENT'] },
     },
-  })
+  });
 
   if (contribution) {
     // Get asset to check if it's been processed
     const asset = await db.asset.findUnique({
       where: { id: assetId },
       select: { status: true },
-    })
+    });
 
     // If asset is AVAILABLE, contributor should have a purchase record
     // If they don't, something went wrong in processing
@@ -165,7 +170,7 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       return {
         hasAccess: false,
         message: 'Asset processed but access not granted. Contact support.',
-      }
+      };
     }
 
     // Asset is still in COLLECTING or PURCHASED status
@@ -175,12 +180,12 @@ export async function checkUserAssetAccess(userId: string, assetId: string) {
       contributionAmount: contribution.amount,
       excessAmount: contribution.excessAmount,
       message: 'You have contributed. Access will be granted once the asset is processed.',
-    }
+    };
   }
 
   return {
     hasAccess: false,
-  }
+  };
 }
 
 /**
@@ -200,5 +205,5 @@ export function calculateContributorEffectivePrice(
     excess: excessAmount,
     effectivePrice: assetTargetPrice,
     refundEligible: excessAmount > 0 ? excessAmount : 0,
-  }
+  };
 }

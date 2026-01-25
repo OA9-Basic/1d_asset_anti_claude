@@ -1,16 +1,25 @@
-'use client'
+'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, ArrowLeft, PlusCircle, Check, ChevronRight, ChevronLeft, Info, Lightbulb } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Loader2,
+  ArrowLeft,
+  PlusCircle,
+  Check,
+  ChevronRight,
+  ChevronLeft,
+  Info,
+  Lightbulb,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -19,39 +28,58 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 const requestAssetSchema = z.object({
-  title: z.string().min(10, "Title must be at least 10 characters").max(100, "Title cannot exceed 100 characters"),
-  description: z.string().min(50, "Description must be at least 50 characters").max(1000, "Description cannot exceed 1000 characters"),
-  type: z.enum(["COURSE", "AI_MODEL", "SAAS", "SOFTWARE", "TEMPLATE", "CODE", "MODEL_3D", "EBOOK", "OTHER"], {
-    required_error: "Please select an asset type",
+  title: z
+    .string()
+    .min(10, 'Title must be at least 10 characters')
+    .max(100, 'Title cannot exceed 100 characters'),
+  description: z
+    .string()
+    .min(50, 'Description must be at least 50 characters')
+    .max(1000, 'Description cannot exceed 1000 characters'),
+  type: z.enum(
+    ['COURSE', 'AI_MODEL', 'SAAS', 'SOFTWARE', 'TEMPLATE', 'CODE', 'MODEL_3D', 'EBOOK', 'OTHER'],
+    {
+      required_error: 'Please select an asset type',
+    }
+  ),
+  deliveryType: z.enum(['DOWNLOAD', 'STREAM', 'EXTERNAL', 'HYBRID'], {
+    required_error: 'Please select a delivery type',
   }),
-  deliveryType: z.enum(["DOWNLOAD", "STREAM", "EXTERNAL", "HYBRID"], {
-    required_error: "Please select a delivery type",
-  }),
-  estimatedPrice: z.number().min(1, "Price must be at least $1").max(10000, "Price cannot exceed $10,000"),
-  sourceUrl: z.string().url("Must be a valid URL"),
-  whyThisAsset: z.string().min(20, "Please provide at least 20 characters").max(500, "Cannot exceed 500 characters"),
-  additionalNotes: z.string().max(500, "Cannot exceed 500 characters").optional().or(z.literal("")),
-})
+  estimatedPrice: z
+    .number()
+    .min(1, 'Price must be at least $1')
+    .max(10000, 'Price cannot exceed $10,000'),
+  sourceUrl: z.string().url('Must be a valid URL'),
+  whyThisAsset: z
+    .string()
+    .min(20, 'Please provide at least 20 characters')
+    .max(500, 'Cannot exceed 500 characters'),
+  additionalNotes: z.string().max(500, 'Cannot exceed 500 characters').optional().or(z.literal('')),
+});
 
-type RequestAssetFormValues = z.infer<typeof requestAssetSchema>
+type RequestAssetFormValues = z.infer<typeof requestAssetSchema>;
 
 const assetTypes = [
-  { value: 'COURSE', label: 'Online Course', description: 'Video courses, tutorials, training programs' },
+  {
+    value: 'COURSE',
+    label: 'Online Course',
+    description: 'Video courses, tutorials, training programs',
+  },
   { value: 'AI_MODEL', label: 'AI Model', description: 'Machine learning models, AI tools' },
   { value: 'SAAS', label: 'SaaS Subscription', description: 'Software as a Service subscriptions' },
   { value: 'SOFTWARE', label: 'Software', description: 'Desktop applications, tools, utilities' },
@@ -60,20 +88,24 @@ const assetTypes = [
   { value: 'MODEL_3D', label: '3D Model', description: '3D assets, models, textures' },
   { value: 'EBOOK', label: 'E-Book', description: 'Digital books, guides, documentation' },
   { value: 'OTHER', label: 'Other', description: 'Any other type of digital asset' },
-]
+];
 
 const deliveryTypes = [
   { value: 'DOWNLOAD', label: 'Direct Download', description: 'File download (ZIP, PDF, etc.)' },
   { value: 'STREAM', label: 'Streaming', description: 'Video/audio streaming access' },
-  { value: 'EXTERNAL', label: 'External Platform', description: 'Access on external website/platform' },
+  {
+    value: 'EXTERNAL',
+    label: 'External Platform',
+    description: 'Access on external website/platform',
+  },
   { value: 'HYBRID', label: 'Hybrid', description: 'Multiple delivery formats' },
-]
+];
 
 const steps = [
   { id: 1, title: 'Basic Info', description: 'Asset details' },
   { id: 2, title: 'Details', description: 'More information' },
   { id: 3, title: 'Review', description: 'Preview & submit' },
-]
+];
 
 const slideVariants = {
   enter: (direction: number) => ({
@@ -88,15 +120,15 @@ const slideVariants = {
     x: direction < 0 ? 50 : -50,
     opacity: 0,
   }),
-}
+};
 
 export default function RequestAssetPage() {
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const { toast } = useToast()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
-  const [direction, setDirection] = useState(0)
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [direction, setDirection] = useState(0);
 
   const form = useForm<RequestAssetFormValues>({
     resolver: zodResolver(requestAssetSchema),
@@ -111,47 +143,48 @@ export default function RequestAssetPage() {
       additionalNotes: '',
     },
     mode: 'onChange',
-  })
+  });
 
-  const watchedValues = form.watch()
+  const watchedValues = form.watch();
 
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   if (!user) {
-    router.push('/auth/sign-in')
-    return null
+    router.push('/auth/sign-in');
+    return null;
   }
 
   const handleNext = async () => {
-    const fieldsToValidate = currentStep === 1
-      ? ['title', 'description', 'type', 'estimatedPrice', 'sourceUrl']
-      : ['deliveryType', 'whyThisAsset', 'additionalNotes']
+    const fieldsToValidate =
+      currentStep === 1
+        ? ['title', 'description', 'type', 'estimatedPrice', 'sourceUrl']
+        : ['deliveryType', 'whyThisAsset', 'additionalNotes'];
 
-    const isValid = await form.trigger(fieldsToValidate as any)
+    const isValid = await form.trigger(fieldsToValidate as any);
     if (isValid) {
-      setDirection(1)
-      setCurrentStep((prev) => Math.min(prev + 1, 3))
+      setDirection(1);
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
     }
-  }
+  };
 
   const handleBack = () => {
-    setDirection(-1)
-    setCurrentStep((prev) => Math.max(prev - 1, 1))
-  }
+    setDirection(-1);
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
 
   const handleSubmit = async (values: RequestAssetFormValues) => {
     if (currentStep !== 3) {
-      handleNext()
-      return
+      handleNext();
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const res = await fetch('/api/asset-requests', {
         method: 'POST',
@@ -168,47 +201,48 @@ export default function RequestAssetPage() {
             additionalNotes: values.additionalNotes,
           },
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
         if (data.details) {
-          const fieldErrors: Record<string, string> = {}
+          const fieldErrors: Record<string, string> = {};
           data.details.forEach((detail: any) => {
-            fieldErrors[detail.path[0]] = detail.message
-          })
+            fieldErrors[detail.path[0]] = detail.message;
+          });
           Object.entries(fieldErrors).forEach(([field, message]) => {
-            form.setError(field as any, { message })
-          })
+            form.setError(field as any, { message });
+          });
         } else {
           toast({
             variant: 'destructive',
             title: 'Error',
             description: data.error || 'Failed to submit request',
-          })
+          });
         }
-        return
+        return;
       }
 
       toast({
         title: 'Request Submitted!',
-        description: 'Your asset request has been submitted for review. The admin will review it shortly.',
-      })
+        description:
+          'Your asset request has been submitted for review. The admin will review it shortly.',
+      });
 
-      router.push('/')
+      router.push('/');
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to submit request',
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const progressPercentage = (currentStep / 3) * 100
+  const progressPercentage = (currentStep / 3) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-background">
@@ -222,7 +256,9 @@ export default function RequestAssetPage() {
             </Link>
             <div>
               <h1 className="text-2xl font-bold">Request Asset</h1>
-              <p className="text-sm text-muted-foreground">Suggest a digital asset to add to the platform</p>
+              <p className="text-sm text-muted-foreground">
+                Suggest a digital asset to add to the platform
+              </p>
             </div>
           </div>
         </div>
@@ -236,14 +272,18 @@ export default function RequestAssetPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Step {currentStep} of 3</span>
-                  <span className="text-sm text-muted-foreground">- {steps[currentStep - 1].title}</span>
+                  <span className="text-sm text-muted-foreground">
+                    - {steps[currentStep - 1].title}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3].map((step) => (
                     <div
                       key={step}
                       className={`h-2 w-8 rounded-full transition-colors ${
-                        step <= currentStep ? 'bg-gradient-to-r from-violet-500 to-purple-600' : 'bg-muted'
+                        step <= currentStep
+                          ? 'bg-gradient-to-r from-violet-500 to-purple-600'
+                          : 'bg-muted'
                       }`}
                     />
                   ))}
@@ -299,7 +339,7 @@ export default function RequestAssetPage() {
                     animate="center"
                     exit="exit"
                     transition={{
-                      x: { type: "spring", stiffness: 300, damping: 30 },
+                      x: { type: 'spring', stiffness: 300, damping: 30 },
                       opacity: { duration: 0.2 },
                     }}
                   >
@@ -373,7 +413,9 @@ export default function RequestAssetPage() {
                                       <SelectItem key={type.value} value={type.value}>
                                         <div>
                                           <div className="font-medium">{type.label}</div>
-                                          <div className="text-xs text-muted-foreground">{type.description}</div>
+                                          <div className="text-xs text-muted-foreground">
+                                            {type.description}
+                                          </div>
                                         </div>
                                       </SelectItem>
                                     ))}
@@ -389,10 +431,14 @@ export default function RequestAssetPage() {
                             name="estimatedPrice"
                             render={({ field }) => (
                               <FormItem className="space-y-2">
-                                <FormLabel className="text-sm font-medium">Estimated Price ($) *</FormLabel>
+                                <FormLabel className="text-sm font-medium">
+                                  Estimated Price ($) *
+                                </FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                      $
+                                    </span>
                                     <Input
                                       type="number"
                                       placeholder="99.00"
@@ -444,7 +490,9 @@ export default function RequestAssetPage() {
                           name="deliveryType"
                           render={({ field }) => (
                             <FormItem className="space-y-2">
-                              <FormLabel className="text-sm font-medium">Preferred Delivery Type *</FormLabel>
+                              <FormLabel className="text-sm font-medium">
+                                Preferred Delivery Type *
+                              </FormLabel>
                               <Select
                                 onValueChange={field.onChange}
                                 value={field.value}
@@ -460,7 +508,9 @@ export default function RequestAssetPage() {
                                     <SelectItem key={type.value} value={type.value}>
                                       <div>
                                         <div className="font-medium">{type.label}</div>
-                                        <div className="text-xs text-muted-foreground">{type.description}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {type.description}
+                                        </div>
                                       </div>
                                     </SelectItem>
                                   ))}
@@ -476,7 +526,9 @@ export default function RequestAssetPage() {
                           name="whyThisAsset"
                           render={({ field }) => (
                             <FormItem className="space-y-2">
-                              <FormLabel className="text-sm font-medium">Why this asset? *</FormLabel>
+                              <FormLabel className="text-sm font-medium">
+                                Why this asset? *
+                              </FormLabel>
                               <FormControl>
                                 <Textarea
                                   placeholder="Explain why this asset would be valuable to the community. Who would benefit from it? What problems does it solve?"
@@ -499,7 +551,9 @@ export default function RequestAssetPage() {
                           name="additionalNotes"
                           render={({ field }) => (
                             <FormItem className="space-y-2">
-                              <FormLabel className="text-sm font-medium">Additional Notes</FormLabel>
+                              <FormLabel className="text-sm font-medium">
+                                Additional Notes
+                              </FormLabel>
                               <FormControl>
                                 <Textarea
                                   placeholder="Any additional information that might help with the review process..."
@@ -544,7 +598,9 @@ export default function RequestAssetPage() {
                         <Card className="bg-muted/30">
                           <CardHeader>
                             <CardTitle className="text-lg">Review Your Request</CardTitle>
-                            <CardDescription>Please review all information before submitting</CardDescription>
+                            <CardDescription>
+                              Please review all information before submitting
+                            </CardDescription>
                           </CardHeader>
                           <CardContent className="space-y-4">
                             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -554,11 +610,19 @@ export default function RequestAssetPage() {
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Type</span>
-                                <p className="font-medium mt-1">{assetTypes.find(t => t.value === watchedValues.type)?.label}</p>
+                                <p className="font-medium mt-1">
+                                  {assetTypes.find((t) => t.value === watchedValues.type)?.label}
+                                </p>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Delivery Type</span>
-                                <p className="font-medium mt-1">{deliveryTypes.find(t => t.value === watchedValues.deliveryType)?.label}</p>
+                                <p className="font-medium mt-1">
+                                  {
+                                    deliveryTypes.find(
+                                      (t) => t.value === watchedValues.deliveryType
+                                    )?.label
+                                  }
+                                </p>
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Estimated Price</span>
@@ -568,23 +632,33 @@ export default function RequestAssetPage() {
 
                             <div>
                               <span className="text-muted-foreground text-sm">Description</span>
-                              <p className="text-sm mt-1 whitespace-pre-wrap">{watchedValues.description}</p>
+                              <p className="text-sm mt-1 whitespace-pre-wrap">
+                                {watchedValues.description}
+                              </p>
                             </div>
 
                             <div>
                               <span className="text-muted-foreground text-sm">Source URL</span>
-                              <p className="text-sm mt-1 text-primary break-all">{watchedValues.sourceUrl}</p>
+                              <p className="text-sm mt-1 text-primary break-all">
+                                {watchedValues.sourceUrl}
+                              </p>
                             </div>
 
                             <div>
                               <span className="text-muted-foreground text-sm">Why this asset</span>
-                              <p className="text-sm mt-1 whitespace-pre-wrap">{watchedValues.whyThisAsset}</p>
+                              <p className="text-sm mt-1 whitespace-pre-wrap">
+                                {watchedValues.whyThisAsset}
+                              </p>
                             </div>
 
                             {watchedValues.additionalNotes && (
                               <div>
-                                <span className="text-muted-foreground text-sm">Additional Notes</span>
-                                <p className="text-sm mt-1 whitespace-pre-wrap">{watchedValues.additionalNotes}</p>
+                                <span className="text-muted-foreground text-sm">
+                                  Additional Notes
+                                </span>
+                                <p className="text-sm mt-1 whitespace-pre-wrap">
+                                  {watchedValues.additionalNotes}
+                                </p>
                               </div>
                             )}
                           </CardContent>
@@ -706,5 +780,5 @@ export default function RequestAssetPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

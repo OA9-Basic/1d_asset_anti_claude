@@ -1,24 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 const pledgeSchema = z.object({
   assetId: z.string().cuid(),
-  amount: z.string().or(z.number()).transform((val) => {
-    const num = typeof val === 'string' ? parseFloat(val) : val
-    if (isNaN(num) || num <= 0) throw new Error('Invalid amount')
-    return num
-  }),
-})
+  amount: z
+    .string()
+    .or(z.number())
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseFloat(val) : val;
+      if (isNaN(num) || num <= 0) throw new Error('Invalid amount');
+      return num;
+    }),
+});
 
 export async function POST(req: NextRequest) {
   // Pledge feature is not yet implemented - requires pledge table in Prisma schema
-  return NextResponse.json({
-    error: 'Pledge feature is not yet available',
-    message: 'This feature requires database schema updates'
-  }, { status: 501 })
+  return NextResponse.json(
+    {
+      error: 'Pledge feature is not yet available',
+      message: 'This feature requires database schema updates',
+    },
+    { status: 501 }
+  );
 
   /*
   try {

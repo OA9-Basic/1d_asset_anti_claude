@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertCircle,
   ArrowDownCircle,
@@ -19,62 +19,77 @@ import {
   TrendingUp,
   Wallet,
   XCircle,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import useSWR from 'swr'
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { useAuth } from '@/hooks/use-auth'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  buttonTap,
-  modalScaleUp,
-  staggerContainer,
-  staggerItem,
-} from '@/lib/animations'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useAuth } from '@/hooks/use-auth';
+import { buttonTap, modalScaleUp, staggerContainer, staggerItem } from '@/lib/animations';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface BalanceData {
-  balance: number
-  withdrawableBalance: number
-  storeCredit: number
-  totalDeposited: number
-  totalWithdrawn: number
-  totalContributed: number
-  totalProfitReceived: number
+  balance: number;
+  withdrawableBalance: number;
+  storeCredit: number;
+  totalDeposited: number;
+  totalWithdrawn: number;
+  totalContributed: number;
+  totalProfitReceived: number;
 }
 
 interface Transaction {
-  id: string
-  type: string
-  status: string
-  amount: number
-  balanceBefore: number
-  balanceAfter: number
-  description: string
-  createdAt: string
+  id: string;
+  type: string;
+  status: string;
+  amount: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  description: string;
+  createdAt: string;
 }
 
 interface TransactionsData {
-  transactions: Transaction[]
+  transactions: Transaction[];
 }
 
 // Credit Card Visual Component
 function CreditCard({ balance, user }: { balance: number; user: any }) {
-  const [showNumber, setShowNumber] = useState(false)
+  const [showNumber, setShowNumber] = useState(false);
 
   // Generate a mock card number based on user ID
-  const cardNumber = showNumber ? '4532 •••• •••• 1234' : '•••• •••• •••• ••••'
-  const _lastFour = '1234'
-  const expiryDate = '12/28'
+  const cardNumber = showNumber ? '4532 •••• •••• 1234' : '•••• •••• •••• ••••';
+  const _lastFour = '1234';
+  const expiryDate = '12/28';
 
   return (
     <motion.div
@@ -142,9 +157,7 @@ function CreditCard({ balance, user }: { balance: number; user: any }) {
               <div>
                 <p className="text-violet-100 text-xs font-medium mb-2">Card Number</p>
                 <div className="flex items-center gap-6">
-                  <p className="text-xl text-white tracking-widest font-mono">
-                    {cardNumber}
-                  </p>
+                  <p className="text-xl text-white tracking-widest font-mono">{cardNumber}</p>
                   <motion.button
                     whileHover={{ scale: 1.2 }}
                     whileTap={{ scale: 0.9 }}
@@ -184,7 +197,7 @@ function CreditCard({ balance, user }: { balance: number; user: any }) {
         </div>
       </div>
     </motion.div>
-  )
+  );
 }
 
 // Transaction Status Badge
@@ -205,17 +218,17 @@ function TransactionStatus({ status }: { status: string }) {
       className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
       icon: XCircle,
     },
-  }
+  };
 
-  const config = statusConfig[status] || statusConfig.PENDING
-  const StatusIcon = config.icon
+  const config = statusConfig[status] || statusConfig.PENDING;
+  const StatusIcon = config.icon;
 
   return (
     <Badge className={config.className}>
       <StatusIcon className="w-3 h-3 mr-1" />
       {config.label}
     </Badge>
-  )
+  );
 }
 
 // Transaction Type Badge
@@ -256,17 +269,21 @@ function TransactionType({ type }: { type: string }) {
       className: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
       icon: CheckCircle2,
     },
-  }
+  };
 
-  const config = typeConfig[type] || { label: type, className: 'bg-gray-100 text-gray-700', icon: DollarSign }
-  const TypeIcon = config.icon
+  const config = typeConfig[type] || {
+    label: type,
+    className: 'bg-gray-100 text-gray-700',
+    icon: DollarSign,
+  };
+  const TypeIcon = config.icon;
 
   return (
     <div className="flex items-center gap-2">
       <TypeIcon className="w-4 h-4 text-muted-foreground" />
       <span className="text-sm">{config.label}</span>
     </div>
-  )
+  );
 }
 
 // Stat Row Component
@@ -276,10 +293,10 @@ function StatRow({
   valueClassName = '',
   delay,
 }: {
-  label: string
-  value: string | number
-  valueClassName?: string
-  delay?: number
+  label: string;
+  value: string | number;
+  valueClassName?: string;
+  delay?: number;
 }) {
   return (
     <motion.div
@@ -298,44 +315,52 @@ function StatRow({
         {value}
       </motion.span>
     </motion.div>
-  )
+  );
 }
 
 export default function WalletPage() {
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const [depositOpen, setDepositOpen] = useState(false)
-  const [withdrawOpen, setWithdrawOpen] = useState(false)
-  const [depositAmount, setDepositAmount] = useState('')
-  const [withdrawAmount, setWithdrawAmount] = useState('')
-  const [cryptoCurrency, setCryptoCurrency] = useState('MOCK')
-  const [walletAddress, setWalletAddress] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [typeFilter, setTypeFilter] = useState<string>('all')
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [cryptoCurrency, setCryptoCurrency] = useState('MOCK');
+  const [walletAddress, setWalletAddress] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
 
-  const { data: balanceData, error: balanceError, isLoading: balanceLoading, mutate: mutateBalance } =
-    useSWR<BalanceData>(user ? '/api/wallet/balance' : null, fetcher, {
-      revalidateOnFocus: true,
-      dedupingInterval: 30000,
-    })
+  const {
+    data: balanceData,
+    error: balanceError,
+    isLoading: balanceLoading,
+    mutate: mutateBalance,
+  } = useSWR<BalanceData>(user ? '/api/wallet/balance' : null, fetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 30000,
+  });
 
-  const { data: transactionsData, error: transactionsError, isLoading: transactionsLoading, mutate: mutateTransactions } =
-    useSWR<TransactionsData>(user ? '/api/wallet/transactions' : null, fetcher, {
-      revalidateOnFocus: true,
-      dedupingInterval: 30000,
-    })
+  const {
+    data: transactionsData,
+    error: transactionsError,
+    isLoading: transactionsLoading,
+    mutate: mutateTransactions,
+  } = useSWR<TransactionsData>(user ? '/api/wallet/transactions' : null, fetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 30000,
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth/sign-in')
+      router.push('/auth/sign-in');
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router]);
 
   const handleDeposit = async () => {
-    if (!depositAmount || parseFloat(depositAmount) <= 0) return
+    if (!depositAmount || parseFloat(depositAmount) <= 0) return;
 
-    setIsProcessing(true)
+    setIsProcessing(true);
     try {
       const res = await fetch('/api/wallet/deposit', {
         method: 'POST',
@@ -344,29 +369,29 @@ export default function WalletPage() {
           amount: parseFloat(depositAmount),
           cryptoCurrency,
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (res.ok) {
-        setDepositOpen(false)
-        setDepositAmount('')
-        mutateBalance()
-        mutateTransactions()
+        setDepositOpen(false);
+        setDepositAmount('');
+        mutateBalance();
+        mutateTransactions();
       } else {
-        alert(data.error || 'Deposit failed')
+        alert(data.error || 'Deposit failed');
       }
     } catch {
-      alert('An error occurred')
+      alert('An error occurred');
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleWithdraw = async () => {
-    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || !walletAddress) return
+    if (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || !walletAddress) return;
 
-    setIsProcessing(true)
+    setIsProcessing(true);
     try {
       const res = await fetch('/api/wallet/withdraw', {
         method: 'POST',
@@ -376,39 +401,40 @@ export default function WalletPage() {
           cryptoCurrency,
           walletAddress,
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (res.ok) {
-        setWithdrawOpen(false)
-        setWithdrawAmount('')
-        setWalletAddress('')
-        mutateBalance()
-        mutateTransactions()
+        setWithdrawOpen(false);
+        setWithdrawAmount('');
+        setWalletAddress('');
+        mutateBalance();
+        mutateTransactions();
       } else {
-        alert(data.error || 'Withdrawal failed')
+        alert(data.error || 'Withdrawal failed');
       }
     } catch {
-      alert('An error occurred')
+      alert('An error occurred');
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   // Filter transactions
-  const filteredTransactions = transactionsData?.transactions?.filter((tx) => {
-    if (statusFilter !== 'all' && tx.status !== statusFilter) return false
-    if (typeFilter !== 'all' && tx.type !== typeFilter) return false
-    return true
-  }) || []
+  const filteredTransactions =
+    transactionsData?.transactions?.filter((tx) => {
+      if (statusFilter !== 'all' && tx.status !== statusFilter) return false;
+      if (typeFilter !== 'all' && tx.type !== typeFilter) return false;
+      return true;
+    }) || [];
 
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   return (
@@ -435,8 +461,8 @@ export default function WalletPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  mutateBalance()
-                  mutateTransactions()
+                  mutateBalance();
+                  mutateTransactions();
                 }}
                 disabled={balanceLoading || transactionsLoading}
               >
@@ -465,8 +491,8 @@ export default function WalletPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      mutateBalance()
-                      mutateTransactions()
+                      mutateBalance();
+                      mutateTransactions();
                     }}
                     className="mt-2"
                   >
@@ -652,7 +678,9 @@ export default function WalletPage() {
                               <TableCell>
                                 <TransactionType type={transaction.type} />
                               </TableCell>
-                              <TableCell className="max-w-xs truncate">{transaction.description}</TableCell>
+                              <TableCell className="max-w-xs truncate">
+                                {transaction.description}
+                              </TableCell>
                               <TableCell className="text-right">
                                 <span
                                   className={`font-semibold ${
@@ -700,76 +728,73 @@ export default function WalletPage() {
       <AnimatePresence>
         <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
           <DialogContent className="sm:max-w-md">
-            <motion.div
-              variants={modalScaleUp}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
+            <motion.div variants={modalScaleUp} initial="initial" animate="animate" exit="exit">
               <DialogHeader>
                 <DialogTitle>Deposit Funds</DialogTitle>
                 <DialogDescription>Add funds to your wallet using cryptocurrency</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="deposit-amount">Amount</Label>
-              <Input
-                id="deposit-amount"
-                type="number"
-                placeholder="100.00"
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-                min="1"
-                step="0.01"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="crypto-currency">Cryptocurrency</Label>
-              <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
-                <SelectTrigger id="crypto-currency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MOCK">MOCK (Test Mode)</SelectItem>
-                  <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
-                  <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-                  <SelectItem value="USDT">Tether (USDT)</SelectItem>
-                  <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
-                  <SelectItem value="XMR">Monero (XMR)</SelectItem>
-                  <SelectItem value="LTC">Litecoin (LTC)</SelectItem>
-                  <SelectItem value="BCH">Bitcoin Cash (BCH)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {cryptoCurrency === 'MOCK' && (
-              <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm">
-                <p className="font-medium mb-1">Test Mode</p>
-                <p className="text-xs">This will add test funds to your wallet for development purposes.</p>
+                <div className="space-y-2">
+                  <Label htmlFor="deposit-amount">Amount</Label>
+                  <Input
+                    id="deposit-amount"
+                    type="number"
+                    placeholder="100.00"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    min="1"
+                    step="0.01"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="crypto-currency">Cryptocurrency</Label>
+                  <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
+                    <SelectTrigger id="crypto-currency">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MOCK">MOCK (Test Mode)</SelectItem>
+                      <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
+                      <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
+                      <SelectItem value="USDT">Tether (USDT)</SelectItem>
+                      <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
+                      <SelectItem value="XMR">Monero (XMR)</SelectItem>
+                      <SelectItem value="LTC">Litecoin (LTC)</SelectItem>
+                      <SelectItem value="BCH">Bitcoin Cash (BCH)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {cryptoCurrency === 'MOCK' && (
+                  <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm">
+                    <p className="font-medium mb-1">Test Mode</p>
+                    <p className="text-xs">
+                      This will add test funds to your wallet for development purposes.
+                    </p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDepositOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleDeposit}
-              disabled={isProcessing || !depositAmount || parseFloat(depositAmount) <= 0}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <ArrowDownCircle className="w-4 h-4 mr-2" />
-                  Deposit
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDepositOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleDeposit}
+                  disabled={isProcessing || !depositAmount || parseFloat(depositAmount) <= 0}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowDownCircle className="w-4 h-4 mr-2" />
+                      Deposit
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
             </motion.div>
           </DialogContent>
         </Dialog>
@@ -779,96 +804,94 @@ export default function WalletPage() {
       <AnimatePresence>
         <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
           <DialogContent className="sm:max-w-md">
-            <motion.div
-              variants={modalScaleUp}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-            >
+            <motion.div variants={modalScaleUp} initial="initial" animate="animate" exit="exit">
               <DialogHeader>
                 <DialogTitle>Withdraw Funds</DialogTitle>
-                <DialogDescription>Withdraw funds from your wallet to cryptocurrency</DialogDescription>
+                <DialogDescription>
+                  Withdraw funds from your wallet to cryptocurrency
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="withdraw-amount">Amount</Label>
-              <Input
-                id="withdraw-amount"
-                type="number"
-                placeholder="100.00"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                min="1"
-                step="0.01"
-              />
-              <p className="text-xs text-muted-foreground">
-                Available: ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="withdraw-crypto">Cryptocurrency</Label>
-              <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
-                <SelectTrigger id="withdraw-crypto">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
-                  <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-                  <SelectItem value="USDT">Tether (USDT)</SelectItem>
-                  <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
-                  <SelectItem value="XMR">Monero (XMR)</SelectItem>
-                  <SelectItem value="LTC">Litecoin (LTC)</SelectItem>
-                  <SelectItem value="BCH">Bitcoin Cash (BCH)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="wallet-address">Wallet Address</Label>
-              <Input
-                id="wallet-address"
-                placeholder="Enter your wallet address"
-                value={walletAddress}
-                onChange={(e) => setWalletAddress(e.target.value)}
-              />
-            </div>
-            <div className="p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm">
-              <p className="font-medium mb-1">Withdrawal Request</p>
-              <p className="text-xs">
-                Your withdrawal will be processed by an admin. Funds will be locked until approval.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setWithdrawOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleWithdraw}
-              disabled={
-                isProcessing ||
-                !withdrawAmount ||
-                parseFloat(withdrawAmount) <= 0 ||
-                !walletAddress
-              }
-              className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <ArrowUpCircle className="w-4 h-4 mr-2" />
-                  Withdraw
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+                <div className="space-y-2">
+                  <Label htmlFor="withdraw-amount">Amount</Label>
+                  <Input
+                    id="withdraw-amount"
+                    type="number"
+                    placeholder="100.00"
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                    min="1"
+                    step="0.01"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Available: ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="withdraw-crypto">Cryptocurrency</Label>
+                  <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
+                    <SelectTrigger id="withdraw-crypto">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
+                      <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
+                      <SelectItem value="USDT">Tether (USDT)</SelectItem>
+                      <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
+                      <SelectItem value="XMR">Monero (XMR)</SelectItem>
+                      <SelectItem value="LTC">Litecoin (LTC)</SelectItem>
+                      <SelectItem value="BCH">Bitcoin Cash (BCH)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="wallet-address">Wallet Address</Label>
+                  <Input
+                    id="wallet-address"
+                    placeholder="Enter your wallet address"
+                    value={walletAddress}
+                    onChange={(e) => setWalletAddress(e.target.value)}
+                  />
+                </div>
+                <div className="p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm">
+                  <p className="font-medium mb-1">Withdrawal Request</p>
+                  <p className="text-xs">
+                    Your withdrawal will be processed by an admin. Funds will be locked until
+                    approval.
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setWithdrawOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleWithdraw}
+                  disabled={
+                    isProcessing ||
+                    !withdrawAmount ||
+                    parseFloat(withdrawAmount) <= 0 ||
+                    !walletAddress
+                  }
+                  className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUpCircle className="w-4 h-4 mr-2" />
+                      Withdraw
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
             </motion.div>
           </DialogContent>
         </Dialog>
       </AnimatePresence>
     </motion.div>
-  )
+  );
 }

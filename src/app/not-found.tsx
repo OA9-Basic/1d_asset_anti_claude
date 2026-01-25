@@ -1,10 +1,17 @@
-'use client'
+'use client';
 
-import { SearchX, Home, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
+import { SearchX, Home, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function NotFound() {
   return (
@@ -21,7 +28,8 @@ export default function NotFound() {
           </div>
           <CardTitle className="text-2xl font-bold">Page Not Found</CardTitle>
           <CardDescription className="text-base">
-            Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved, deleted, or never existed.
+            Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved,
+            deleted, or never existed.
           </CardDescription>
         </CardHeader>
 
@@ -45,7 +53,10 @@ export default function NotFound() {
                 </Link>
               </li>
               <li>
-                <Link href="/auth/sign-up" className="hover:text-primary transition-colors underline">
+                <Link
+                  href="/auth/sign-up"
+                  className="hover:text-primary transition-colors underline"
+                >
                   Create an Account
                 </Link>
               </li>
@@ -93,5 +104,5 @@ export default function NotFound() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

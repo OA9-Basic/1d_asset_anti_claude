@@ -1,60 +1,68 @@
-'use client'
+'use client';
 
-import { Loader2, ThumbsUp, ThumbsDown, GitPullRequest, ExternalLink, Calendar, TrendingUp, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import {
+  Loader2,
+  ThumbsUp,
+  ThumbsDown,
+  GitPullRequest,
+  ExternalLink,
+  Calendar,
+  TrendingUp,
+  Sparkles,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
-
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 interface AssetRequest {
-  id: string
-  title: string
-  description: string
-  type: string
-  deliveryType: string
-  estimatedPrice: number
-  sourceUrl: string
-  status: string
-  upvotes: number
-  downvotes: number
-  score: number
-  createdAt: string
-  thumbnail?: string | null
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  deliveryType: string;
+  estimatedPrice: number;
+  sourceUrl: string;
+  status: string;
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  createdAt: string;
+  thumbnail?: string | null;
   user: {
-    firstName: string | null
-    email: string
-  }
+    firstName: string | null;
+    email: string;
+  };
 }
 
 export default function RequestsPage() {
-  const { user } = useAuth()
-  const { toast } = useToast()
-  const [requests, setRequests] = useState<AssetRequest[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [votingId, setVotingId] = useState<string | null>(null)
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [requests, setRequests] = useState<AssetRequest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [votingId, setVotingId] = useState<string | null>(null);
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch('/api/asset-requests?voting=true')
+      const res = await fetch('/api/asset-requests?voting=true');
       if (res.ok) {
-        const data = await res.json()
-        setRequests(data.requests || [])
+        const data = await res.json();
+        setRequests(data.requests || []);
       }
     } catch (error) {
-      console.error('Failed to fetch requests:', error)
+      console.error('Failed to fetch requests:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchRequests()
-  }, [])
+    fetchRequests();
+  }, []);
 
   const handleVote = async (id: string, type: 'UPVOTE' | 'DOWNVOTE') => {
     if (!user) {
@@ -62,49 +70,49 @@ export default function RequestsPage() {
         title: 'Authentication Required',
         description: 'Please sign in to vote on asset requests',
         variant: 'destructive',
-      })
-      return
+      });
+      return;
     }
 
-    setVotingId(id)
+    setVotingId(id);
     try {
       const res = await fetch(`/api/asset-requests/${id}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ voteType: type }),
-      })
+      });
 
       if (res.ok) {
         toast({
           title: 'Vote Recorded',
           description: `You ${type.toLowerCase()}d this request`,
-        })
-        fetchRequests()
+        });
+        fetchRequests();
       } else {
-        const error = await res.json()
+        const error = await res.json();
         toast({
           title: 'Vote Failed',
           description: error.error || 'Failed to vote',
           variant: 'destructive',
-        })
+        });
       }
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Failed to process vote',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setVotingId(null)
+      setVotingId(null);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   return (
@@ -122,12 +130,15 @@ export default function RequestsPage() {
                 Vote on <span className="text-gradient">Asset Requests</span>
               </h1>
               <p className="text-muted-foreground">
-                Help decide which digital assets should be added to the platform next.
-                Upvote the requests you&apos;d like to see funded.
+                Help decide which digital assets should be added to the platform next. Upvote the
+                requests you&apos;d like to see funded.
               </p>
             </div>
             <Link href="/request">
-              <Button size="lg" className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow"
+              >
                 <GitPullRequest className="w-5 h-5 mr-2" />
                 Submit Request
               </Button>
@@ -146,8 +157,8 @@ export default function RequestsPage() {
               </div>
               <h3 className="text-xl font-semibold mb-2">No Active Votes</h3>
               <p className="text-muted-foreground mb-6 text-center max-w-md">
-                There are currently no asset requests open for voting.
-                Be the first to submit a request!
+                There are currently no asset requests open for voting. Be the first to submit a
+                request!
               </p>
               <Link href="/request">
                 <Button className="bg-gradient-to-r from-violet-500 to-purple-600">
@@ -172,7 +183,10 @@ export default function RequestsPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-3 left-3 right-3 flex justify-between">
-                        <Badge variant="secondary" className="backdrop-blur-sm bg-black/50 text-white border-0">
+                        <Badge
+                          variant="secondary"
+                          className="backdrop-blur-sm bg-black/50 text-white border-0"
+                        >
                           {req.type}
                         </Badge>
                         <Badge className="backdrop-blur-sm bg-green-500/90 text-white border-0">
@@ -222,7 +236,9 @@ export default function RequestsPage() {
                         disabled={votingId === req.id}
                         className="hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/30"
                       >
-                        <ThumbsUp className={`w-4 h-4 ${votingId === req.id ? 'animate-pulse' : ''}`} />
+                        <ThumbsUp
+                          className={`w-4 h-4 ${votingId === req.id ? 'animate-pulse' : ''}`}
+                        />
                         <span className="ml-1">{req.upvotes}</span>
                       </Button>
                       <Button
@@ -232,15 +248,22 @@ export default function RequestsPage() {
                         disabled={votingId === req.id}
                         className="hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30"
                       >
-                        <ThumbsDown className={`w-4 h-4 ${votingId === req.id ? 'animate-pulse' : ''}`} />
+                        <ThumbsDown
+                          className={`w-4 h-4 ${votingId === req.id ? 'animate-pulse' : ''}`}
+                        />
                         <span className="ml-1">{req.downvotes}</span>
                       </Button>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <TrendingUp className={`w-4 h-4 ${req.score > 0 ? 'text-green-500' : req.score < 0 ? 'text-red-500' : 'text-muted-foreground'}`} />
-                      <span className={`text-sm font-bold ${req.score > 0 ? 'text-green-600' : req.score < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
-                        {req.score > 0 ? '+' : ''}{req.score}
+                      <TrendingUp
+                        className={`w-4 h-4 ${req.score > 0 ? 'text-green-500' : req.score < 0 ? 'text-red-500' : 'text-muted-foreground'}`}
+                      />
+                      <span
+                        className={`text-sm font-bold ${req.score > 0 ? 'text-green-600' : req.score < 0 ? 'text-red-600' : 'text-muted-foreground'}`}
+                      >
+                        {req.score > 0 ? '+' : ''}
+                        {req.score}
                       </span>
                     </div>
                   </div>
@@ -263,8 +286,8 @@ export default function RequestsPage() {
                   </div>
                   <h3 className="font-semibold mb-2">Vote for Assets</h3>
                   <p className="text-sm text-muted-foreground">
-                    Upvote the asset requests you&apos;d like to see added to the platform.
-                    Popular requests get priority.
+                    Upvote the asset requests you&apos;d like to see added to the platform. Popular
+                    requests get priority.
                   </p>
                 </CardContent>
               </Card>
@@ -276,8 +299,8 @@ export default function RequestsPage() {
                   </div>
                   <h3 className="font-semibold mb-2">Submit Requests</h3>
                   <p className="text-sm text-muted-foreground">
-                    Don&apos;t see what you&apos;re looking for? Submit a request for any digital asset
-                    you&apos;d like the community to fund together.
+                    Don&apos;t see what you&apos;re looking for? Submit a request for any digital
+                    asset you&apos;d like the community to fund together.
                   </p>
                 </CardContent>
               </Card>
@@ -299,5 +322,5 @@ export default function RequestsPage() {
         </section>
       )}
     </div>
-  )
+  );
 }

@@ -1,45 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 const createAssetSchema = z.object({
   title: z.string().min(1).max(255),
   description: z.string().min(1),
-  targetPrice: z.string().or(z.number()).transform((val) => {
-    const num = typeof val === 'string' ? parseFloat(val) : val
-    if (isNaN(num) || num <= 0) throw new Error('Invalid target price')
-    return num
-  }),
+  targetPrice: z
+    .string()
+    .or(z.number())
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseFloat(val) : val;
+      if (isNaN(num) || num <= 0) throw new Error('Invalid target price');
+      return num;
+    }),
   type: z.enum(['COURSE', 'AI_MODEL', 'SAAS', 'SOFTWARE', 'TEMPLATE', 'OTHER']).optional(),
   thumbnail: z.string().url().optional(),
   metadata: z.record(z.any()).optional().default({}),
   featured: z.boolean().optional().default(false),
-})
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserFromToken(req)
+    const userId = await getUserFromToken(req);
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json()
-    const validatedData = createAssetSchema.parse(body)
+    const body = await req.json();
+    const validatedData = createAssetSchema.parse(body);
 
     const slug = validatedData.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
-      .substring(0, 100)
+      .substring(0, 100);
 
     const existingAsset = await db.asset.findUnique({
       where: { slug },
-    })
+    });
 
-    const finalSlug = existingAsset ? `${slug}-${Date.now().toString(36)}` : slug
+    const finalSlug = existingAsset ? `${slug}-${Date.now().toString(36)}` : slug;
 
     const asset = await db.asset.create({
       data: {
@@ -53,26 +56,34 @@ export async function POST(req: NextRequest) {
         metadata: validatedData.metadata,
         featured: validatedData.featured,
       },
-    })
+    });
 
-    return NextResponse.json({
-      id: asset.id,
-      slug: asset.slug,
-      status: asset.status,
-      targetPrice: asset.targetPrice,
-    }, { status: 201 })
-
+    return NextResponse.json(
+      {
+        id: asset.id,
+        slug: asset.slug,
+        status: asset.status,
+        targetPrice: asset.targetPrice,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({
-        error: 'Validation failed',
-        details: error.errors,
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: error.errors,
+        },
+        { status: 400 }
+      );
     }
 
-    console.error('Asset creation error:', error)
-    return NextResponse.json({
-      error: 'Internal server error',
-    }, { status: 500 })
+    console.error('Asset creation error:', error);
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+      },
+      { status: 500 }
+    );
   }
 }

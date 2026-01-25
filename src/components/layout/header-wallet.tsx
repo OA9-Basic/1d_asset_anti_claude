@@ -1,31 +1,31 @@
-'use client'
+'use client';
 
-import { Wallet, Plus, History } from 'lucide-react'
-import Link from 'next/link'
-import useSWR from 'swr'
+import { Wallet, Plus, History } from 'lucide-react';
+import Link from 'next/link';
+import useSWR from 'swr';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useAuth } from '@/hooks/use-auth'
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/use-auth';
 
 interface WalletResponse {
-  balance: number
-  error?: string
+  balance: number;
+  error?: string;
 }
 
 const fetcher = async (url: string): Promise<WalletResponse> => {
-  const res = await fetch(url)
-  if (!res.ok) throw new Error('Failed to fetch wallet')
-  return res.json()
-}
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch wallet');
+  return res.json();
+};
 
 export function HeaderWallet() {
-  const { user, isLoading: authLoading } = useAuth()
+  const { user, isLoading: authLoading } = useAuth();
 
   const { data, isLoading, error } = useSWR<WalletResponse>(
     user ? '/api/wallet/balance' : null,
@@ -34,10 +34,10 @@ export function HeaderWallet() {
       refreshInterval: 10000,
       revalidateOnFocus: false,
     }
-  )
+  );
 
-  const balance = data?.balance ?? 0
-  const loading = authLoading || isLoading
+  const balance = data?.balance ?? 0;
+  const loading = authLoading || isLoading;
 
   return (
     <DropdownMenu>
@@ -73,12 +73,10 @@ export function HeaderWallet() {
           </>
         ) : (
           <Link href="/auth/sign-in">
-            <DropdownMenuItem>
-              Sign In to View Wallet
-            </DropdownMenuItem>
+            <DropdownMenuItem>Sign In to View Wallet</DropdownMenuItem>
           </Link>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

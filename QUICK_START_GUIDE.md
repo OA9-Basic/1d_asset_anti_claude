@@ -32,13 +32,15 @@ All dependencies are already installed in your project:
 ## 4. Import Options
 
 ### Option A: Direct Import
+
 ```typescript
-import { AssetCard } from '@/components/dashboard/asset-card'
+import { AssetCard } from '@/components/dashboard/asset-card';
 ```
 
 ### Option B: Barrel Export (Recommended)
+
 ```typescript
-import { AssetCard } from '@/components/dashboard'
+import { AssetCard } from '@/components/dashboard';
 ```
 
 ## 5. Basic Usage
@@ -79,13 +81,15 @@ grep -r "features/asset-card" src/
 Replace the import:
 
 **Before:**
+
 ```typescript
-import { AssetCard } from '@/components/features/asset-card'
+import { AssetCard } from '@/components/features/asset-card';
 ```
 
 **After:**
+
 ```typescript
-import { AssetCard } from '@/components/dashboard'
+import { AssetCard } from '@/components/dashboard';
 ```
 
 ### Step 2: Test (2 minutes)
@@ -104,6 +108,7 @@ No database changes or API changes required! The component is fully backward com
 After migration, verify these features work:
 
 ### Visual Features
+
 - [ ] Cards have rounded-2xl corners
 - [ ] Thumbnail has hover zoom effect
 - [ ] Progress bar shows gradient animation
@@ -112,6 +117,7 @@ After migration, verify these features work:
 - [ ] Entrance animations play on page load
 
 ### Functional Features
+
 - [ ] Contribute button works (COLLECTING status)
 - [ ] Purchase button works (AVAILABLE status)
 - [ ] View Asset button works (PURCHASED status)
@@ -120,6 +126,7 @@ After migration, verify these features work:
 - [ ] Error handling works correctly
 
 ### API Integration
+
 - [ ] POST /api/contribute works
 - [ ] POST /api/assets/[id]/purchase works
 - [ ] Success toasts show correct messages
@@ -131,6 +138,7 @@ After migration, verify these features work:
 ### Issue: Cards not rendering
 
 **Solution:**
+
 1. Check console for errors
 2. Verify import path is correct
 3. Ensure asset data has required fields
@@ -138,6 +146,7 @@ After migration, verify these features work:
 ### Issue: Animations not working
 
 **Solution:**
+
 1. Verify framer-motion is installed
 2. Check browser supports CSS animations
 3. Look for JavaScript errors in console
@@ -145,6 +154,7 @@ After migration, verify these features work:
 ### Issue: API calls failing
 
 **Solution:**
+
 1. Check API routes are running
 2. Verify user is authenticated
 3. Check network tab in browser DevTools
@@ -153,6 +163,7 @@ After migration, verify these features work:
 ### Issue: Images not loading
 
 **Solution:**
+
 1. Check image URLs are valid
 2. Verify CORS settings for external images
 3. Component shows fallback placeholder on error
@@ -178,24 +189,22 @@ After migration, verify these features work:
 
 ```typescript
 // Show only COLLECTING assets
-const collectingAssets = assets.filter(a => a.status === 'COLLECTING')
+const collectingAssets = assets.filter((a) => a.status === 'COLLECTING');
 
 // Show only AVAILABLE assets
-const availableAssets = assets.filter(a => a.status === 'AVAILABLE')
+const availableAssets = assets.filter((a) => a.status === 'AVAILABLE');
 ```
 
 ### Add Sorting
 
 ```typescript
 // Sort by most recent
-const sortedAssets = [...assets].sort((a, b) =>
-  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-)
+const sortedAssets = [...assets].sort(
+  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
 
 // Sort by most funded
-const byFunded = [...assets].sort((a, b) =>
-  b.currentCollected - a.currentCollected
-)
+const byFunded = [...assets].sort((a, b) => b.currentCollected - a.currentCollected);
 ```
 
 ## 10. Performance Tips
@@ -222,13 +231,13 @@ async function AssetGrid() {
 
 ```typescript
 // Instead of loading all assets
-const assets = await db.asset.findMany({ take: 50 })
+const assets = await db.asset.findMany({ take: 50 });
 
 // Use pagination
 const assets = await db.asset.findMany({
   take: 12,
-  skip: (page - 1) * 12
-})
+  skip: (page - 1) * 12,
+});
 ```
 
 ## 11. Next Steps

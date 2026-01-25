@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowUpRight,
@@ -16,69 +16,64 @@ import {
   ShoppingCart,
   Star,
   Target,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import useSWR from 'swr'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useAuth } from '@/hooks/use-auth'
-import {
-  buttonTap,
-  hoverLift,
-  staggerContainer,
-  staggerItem,
-} from '@/lib/animations'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/hooks/use-auth';
+import { buttonTap, hoverLift, staggerContainer, staggerItem } from '@/lib/animations';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Asset {
-  id: string
-  title: string
-  description: string
-  type: string
-  deliveryType: string
-  targetPrice: number
-  platformFee: number
-  currentCollected: number
-  status: string
-  totalPurchases: number
-  totalRevenue: number
-  thumbnail: string | null
-  featured: boolean
-  relationship: 'contributing' | 'owned' | 'both'
-  userContribution?: number
-  userExcessAmount?: number
-  profitShareRatio?: number
-  totalProfitReceived?: number
-  purchaseAmount?: number
-  deliveryAccessKey?: string | null
-  deliveryExpiry?: string | null
-  accessCount?: number
-  lastAccessedAt?: string | null
-  purchasedAt?: string
-  contributionId?: string
-  purchaseId?: string
-  progressPercent: number
-  remainingAmount: number
-  targetWithFee: number
-  createdAt: string
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  deliveryType: string;
+  targetPrice: number;
+  platformFee: number;
+  currentCollected: number;
+  status: string;
+  totalPurchases: number;
+  totalRevenue: number;
+  thumbnail: string | null;
+  featured: boolean;
+  relationship: 'contributing' | 'owned' | 'both';
+  userContribution?: number;
+  userExcessAmount?: number;
+  profitShareRatio?: number;
+  totalProfitReceived?: number;
+  purchaseAmount?: number;
+  deliveryAccessKey?: string | null;
+  deliveryExpiry?: string | null;
+  accessCount?: number;
+  lastAccessedAt?: string | null;
+  purchasedAt?: string;
+  contributionId?: string;
+  purchaseId?: string;
+  progressPercent: number;
+  remainingAmount: number;
+  targetWithFee: number;
+  createdAt: string;
 }
 
 interface MyAssetsData {
-  assets: Asset[]
+  assets: Asset[];
   stats: {
-    totalInvested: number
-    assetsOwned: number
-    contributingCount: number
-    ownedCount: number
-    completedCount: number
-  }
+    totalInvested: number;
+    assetsOwned: number;
+    contributingCount: number;
+    ownedCount: number;
+    completedCount: number;
+  };
 }
 
 const statusConfig: Record<string, { label: string; className: string; icon: any }> = {
@@ -117,7 +112,7 @@ const statusConfig: Record<string, { label: string; className: string; icon: any
     className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
     icon: Clock,
   },
-}
+};
 
 // Stat Card Component
 function StatCard({
@@ -127,18 +122,14 @@ function StatCard({
   description,
   delay,
 }: {
-  icon: any
-  title: string
-  value: string | number
-  description: string
-  delay?: number
+  icon: any;
+  title: string;
+  value: string | number;
+  description: string;
+  delay?: number;
 }) {
   return (
-    <motion.div
-      variants={staggerItem}
-      {...hoverLift}
-      className="group"
-    >
+    <motion.div variants={staggerItem} {...hoverLift} className="group">
       <Card className="border-2 card-hover overflow-hidden">
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
@@ -167,13 +158,13 @@ function StatCard({
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
 
 // Asset Card Component
 function MyAssetCard({ asset }: { asset: Asset }) {
-  const statusInfo = statusConfig[asset.status] || statusConfig.REQUESTED
-  const StatusIcon = statusInfo.icon
+  const statusInfo = statusConfig[asset.status] || statusConfig.REQUESTED;
+  const StatusIcon = statusInfo.icon;
 
   const getActionButton = () => {
     if (asset.status === 'COLLECTING') {
@@ -184,7 +175,7 @@ function MyAssetCard({ asset }: { asset: Asset }) {
             Add Contribution
           </Button>
         </Link>
-      )
+      );
     }
 
     if (asset.status === 'AVAILABLE' || asset.status === 'PURCHASED') {
@@ -195,7 +186,7 @@ function MyAssetCard({ asset }: { asset: Asset }) {
             Access Asset
           </Button>
         </Link>
-      )
+      );
     }
 
     return (
@@ -205,14 +196,11 @@ function MyAssetCard({ asset }: { asset: Asset }) {
           <ArrowUpRight className="w-4 h-4 ml-2" />
         </Button>
       </Link>
-    )
-  }
+    );
+  };
 
   return (
-    <motion.div
-      variants={staggerItem}
-      whileHover={{ y: -8, transition: { duration: 0.2 } }}
-    >
+    <motion.div variants={staggerItem} whileHover={{ y: -8, transition: { duration: 0.2 } }}>
       <Card className="overflow-hidden border-2 card-hover h-full flex flex-col">
         <CardHeader className="p-0 relative">
           {asset.thumbnail ? (
@@ -271,9 +259,7 @@ function MyAssetCard({ asset }: { asset: Asset }) {
               <Badge variant="outline" className="text-xs">
                 {asset.type}
               </Badge>
-              <span className="text-xs text-muted-foreground">
-                {asset.deliveryType}
-              </span>
+              <span className="text-xs text-muted-foreground">{asset.deliveryType}</span>
             </div>
           </div>
 
@@ -384,7 +370,7 @@ function MyAssetCard({ asset }: { asset: Asset }) {
         </CardFooter>
       </Card>
     </motion.div>
-  )
+  );
 }
 
 // Loading Skeleton
@@ -399,13 +385,13 @@ function AssetCardSkeleton() {
         <div className="h-10 bg-muted animate-pulse rounded" />
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function MyAssetsPage() {
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const [activeTab, setActiveTab] = useState('all')
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const [activeTab, setActiveTab] = useState('all');
 
   const {
     data: assetsData,
@@ -415,20 +401,20 @@ export default function MyAssetsPage() {
   } = useSWR<MyAssetsData>(user ? `/api/my-assets?filter=${activeTab}` : null, fetcher, {
     revalidateOnFocus: true,
     dedupingInterval: 30000,
-  })
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth/sign-in')
+      router.push('/auth/sign-in');
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router]);
 
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   return (
@@ -588,8 +574,8 @@ export default function MyAssetsPage() {
                     <p className="text-muted-foreground mb-6">
                       {activeTab === 'contributing' && "You're not contributing to any assets yet."}
                       {activeTab === 'owned' && "You don't own any assets yet."}
-                      {activeTab === 'completed' && "No funded assets yet."}
-                      {activeTab === 'all' && "Start contributing to assets to see them here."}
+                      {activeTab === 'completed' && 'No funded assets yet.'}
+                      {activeTab === 'all' && 'Start contributing to assets to see them here.'}
                     </p>
                     <Link href="/assets">
                       <Button className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
@@ -605,5 +591,5 @@ export default function MyAssetsPage() {
         )}
       </div>
     </motion.div>
-  )
+  );
 }

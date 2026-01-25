@@ -1,119 +1,112 @@
-'use client'
+'use client';
 
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Menu,
-  User,
-  Settings,
-  LogOut,
-  Wallet,
-  ChevronRight,
-} from 'lucide-react'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, User, Settings, LogOut, Wallet, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
-import { staggerContainer, staggerItem, hoverScale } from '@/lib/animations'
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { staggerContainer, staggerItem, hoverScale } from '@/lib/animations';
 
 interface WalletBalance {
-  balance: number
-  withdrawableBalance: number
-  storeCredit: number
+  balance: number;
+  withdrawableBalance: number;
+  storeCredit: number;
 }
 
 interface BreadcrumbItem {
-  title: string
-  href: string
+  title: string;
+  href: string;
 }
 
 function getBreadcrumbs(pathname: string): BreadcrumbItem[] {
-  const segments = pathname.split('/').filter(Boolean)
-  const breadcrumbs: BreadcrumbItem[] = []
+  const segments = pathname.split('/').filter(Boolean);
+  const breadcrumbs: BreadcrumbItem[] = [];
 
   // Add home as first breadcrumb
-  breadcrumbs.push({ title: 'Home', href: '/' })
+  breadcrumbs.push({ title: 'Home', href: '/' });
 
   // Build path segments
-  let currentPath = ''
+  let currentPath = '';
   for (let i = 0; i < segments.length; i++) {
-    currentPath += `/${segments[i]}`
+    currentPath += `/${segments[i]}`;
     const title = segments[i]
       .split('-')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
+      .join(' ');
 
-    breadcrumbs.push({ title, href: currentPath })
+    breadcrumbs.push({ title, href: currentPath });
   }
 
-  return breadcrumbs
+  return breadcrumbs;
 }
 
 export function AppHeader() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const { user, isLoading } = useAuth()
-  const { toast } = useToast()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null)
-  const [balanceLoading, setBalanceLoading] = useState(true)
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
+  const { toast } = useToast();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<WalletBalance | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(true);
 
   // Fetch wallet balance
   useEffect(() => {
     async function fetchBalance() {
       if (!user) {
-        setBalanceLoading(false)
-        return
+        setBalanceLoading(false);
+        return;
       }
 
       try {
-        const res = await fetch('/api/wallet/balance')
+        const res = await fetch('/api/wallet/balance');
         if (res.ok) {
-          const data = await res.json()
-          setWalletBalance(data)
+          const data = await res.json();
+          setWalletBalance(data);
         }
       } catch (error) {
-        console.error('Failed to fetch wallet balance:', error)
+        console.error('Failed to fetch wallet balance:', error);
       } finally {
-        setBalanceLoading(false)
+        setBalanceLoading(false);
       }
     }
 
-    fetchBalance()
-  }, [user])
+    fetchBalance();
+  }, [user]);
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch('/api/auth/sign-out', { method: 'POST' })
+      const res = await fetch('/api/auth/sign-out', { method: 'POST' });
       if (res.ok) {
         toast({
           title: 'Signed out successfully',
           description: 'You have been signed out of your account.',
-        })
-        router.push('/auth/sign-in')
-        router.refresh()
+        });
+        router.push('/auth/sign-in');
+        router.refresh();
       } else {
-        throw new Error('Failed to sign out')
+        throw new Error('Failed to sign out');
       }
     } catch (_error) {
-      console.error('Sign out error:', _error)
+      console.error('Sign out error:', _error);
       toast({
         title: 'Sign out failed',
         description: 'There was a problem signing you out. Please try again.',
         variant: 'destructive',
-      })
+      });
     }
-  }
+  };
 
   const getUserInitials = () => {
     if (user?.name) {
@@ -122,12 +115,12 @@ export function AppHeader() {
         .map((n) => n[0])
         .join('')
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2);
     }
-    return user?.email?.slice(0, 2).toUpperCase() || 'U'
-  }
+    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  };
 
-  const _breadcrumbs = getBreadcrumbs(pathname)
+  const _breadcrumbs = getBreadcrumbs(pathname);
 
   return (
     <motion.header
@@ -157,11 +150,7 @@ export function AppHeader() {
           className="flex items-center space-x-2 text-sm text-muted-foreground overflow-hidden"
         >
           {_breadcrumbs.map((crumb, index) => (
-            <motion.div
-              key={crumb.href}
-              variants={staggerItem}
-              className="flex items-center"
-            >
+            <motion.div key={crumb.href} variants={staggerItem} className="flex items-center">
               {index > 0 && <ChevronRight className="h-4 w-4 mx-1" />}
               {index === _breadcrumbs.length - 1 ? (
                 <motion.span
@@ -241,12 +230,8 @@ export function AppHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex flex-col space-y-1.5 p-2">
-                  <p className="text-sm font-medium leading-none">
-                    {user.name || 'User'}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user.email}
-                  </p>
+                  <p className="text-sm font-medium leading-none">{user.name || 'User'}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -319,11 +304,7 @@ export function AppHeader() {
                 { href: '/settings', label: 'Settings' },
               ].map((item) => (
                 <motion.div key={item.href} variants={staggerItem}>
-                  <Link
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block"
-                  >
+                  <Link href={item.href} onClick={() => setMobileMenuOpen(false)} className="block">
                     <Button variant="ghost" className="w-full justify-start">
                       {item.label}
                     </Button>
@@ -335,5 +316,5 @@ export function AppHeader() {
         )}
       </AnimatePresence>
     </motion.header>
-  )
+  );
 }

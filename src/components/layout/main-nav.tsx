@@ -1,48 +1,56 @@
-'use client'
+'use client';
 
-import { Menu, Home, PlusCircle, BarChart3, LogOut, User, Settings, LayoutGrid, GitPullRequest } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import {
+  Menu,
+  Home,
+  PlusCircle,
+  BarChart3,
+  LogOut,
+  User,
+  Settings,
+  LayoutGrid,
+  GitPullRequest,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { HeaderWallet } from '@/components/layout/header-wallet'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
+import { HeaderWallet } from '@/components/layout/header-wallet';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useAuth } from '@/hooks/use-auth'
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/use-auth';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse', href: '/#assets', icon: LayoutGrid },
   { name: 'Request', href: '/request', icon: GitPullRequest },
   { name: 'Create', href: '/create', icon: PlusCircle },
-]
+];
 
-const adminNavigation = [
-  { name: 'Admin', href: '/admin', icon: BarChart3 },
-]
+const adminNavigation = [{ name: 'Admin', href: '/admin', icon: BarChart3 }];
 
 export function MainNav() {
-  const { user, isLoading } = useAuth()
-  const router = useRouter()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const isAdmin = user?.role === 'ADMIN'
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isAdmin = user?.role === 'ADMIN';
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/sign-out', { method: 'POST' })
-      router.push('/')
-      router.refresh()
+      await fetch('/api/auth/sign-out', { method: 'POST' });
+      router.push('/');
+      router.refresh();
     } catch (error) {
-      console.error('Sign out error:', error)
+      console.error('Sign out error:', error);
     }
-  }
+  };
 
   const getUserInitials = () => {
     if (user?.name) {
@@ -51,10 +59,10 @@ export function MainNav() {
         .map((n) => n[0])
         .join('')
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2);
     }
-    return user?.email?.slice(0, 2).toUpperCase() || 'U'
-  }
+    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -64,9 +72,7 @@ export function MainNav() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 text-white font-bold">
             D
           </div>
-          <span className="hidden font-bold sm:inline-block">
-            Digital Assets
-          </span>
+          <span className="hidden font-bold sm:inline-block">Digital Assets</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -79,14 +85,15 @@ export function MainNav() {
               </Button>
             </Link>
           ))}
-          {isAdmin && adminNavigation.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <item.icon className="h-4 w-4" />
-                {item.name}
-              </Button>
-            </Link>
-          ))}
+          {isAdmin &&
+            adminNavigation.map((item) => (
+              <Link key={item.href} href={item.href}>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <item.icon className="h-4 w-4" />
+                  {item.name}
+                </Button>
+              </Link>
+            ))}
         </nav>
 
         {/* Right Side Actions */}
@@ -108,12 +115,8 @@ export function MainNav() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex flex-col space-y-1.5 p-2">
-                  <p className="text-sm font-medium leading-none">
-                    {user.name || 'User'}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user.email}
-                  </p>
+                  <p className="text-sm font-medium leading-none">{user.name || 'User'}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -157,7 +160,10 @@ export function MainNav() {
                 </Button>
               </Link>
               <Link href="/auth/sign-up">
-                <Button size="sm" className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700"
+                >
                   Sign Up
                 </Button>
               </Link>
@@ -188,14 +194,15 @@ export function MainNav() {
                 </Button>
               </Link>
             ))}
-            {isAdmin && adminNavigation.map((item) => (
-              <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start gap-2">
-                  <item.icon className="h-4 w-4" />
-                  {item.name}
-                </Button>
-              </Link>
-            ))}
+            {isAdmin &&
+              adminNavigation.map((item) => (
+                <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-2">
+                    <item.icon className="h-4 w-4" />
+                    {item.name}
+                  </Button>
+                </Link>
+              ))}
             {!user && (
               <>
                 <div className="border-t my-2" />
@@ -215,5 +222,5 @@ export function MainNav() {
         </div>
       )}
     </header>
-  )
+  );
 }

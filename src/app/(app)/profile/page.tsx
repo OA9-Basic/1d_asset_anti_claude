@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   Bell,
   Calendar,
@@ -15,28 +15,31 @@ import {
   Save,
   Shield,
   User,
-} from 'lucide-react'
-import { useState } from 'react'
+} from 'lucide-react';
+import { useState } from 'react';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
-  buttonTap,
-  staggerContainer,
-  staggerItem,
-} from '@/lib/animations'
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { buttonTap, staggerContainer, staggerItem } from '@/lib/animations';
 
 export default function ProfilePage() {
-  const { user } = useAuth()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
@@ -45,44 +48,44 @@ export default function ProfilePage() {
     location: '',
     website: '',
     bio: '',
-  })
+  });
 
   const handleSaveProfile = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const res = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(profileData),
-      })
+      });
 
       if (res.ok) {
         toast({
           title: 'Profile Updated',
           description: 'Your profile has been updated successfully.',
           variant: 'default',
-        })
+        });
       } else {
-        throw new Error('Failed to update profile')
+        throw new Error('Failed to update profile');
       }
     } catch {
       toast({
         title: 'Error',
         description: 'Failed to update profile. Please try again.',
         variant: 'destructive',
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleChangePassword = async () => {
     toast({
       title: 'Coming Soon',
       description: 'Password change feature will be available soon.',
       variant: 'default',
-    })
-  }
+    });
+  };
 
   const getUserInitials = () => {
     if (user?.name) {
@@ -91,42 +94,49 @@ export default function ProfilePage() {
         .map((n) => n[0])
         .join('')
         .toUpperCase()
-        .slice(0, 2)
+        .slice(0, 2);
     }
-    return user?.email?.slice(0, 2).toUpperCase() || 'U'
-  }
+    return user?.email?.slice(0, 2).toUpperCase() || 'U';
+  };
 
   const getUserDisplayName = () => {
-    return user?.name || user?.email?.split('@')[0] || 'User'
-  }
+    return user?.name || user?.email?.split('@')[0] || 'User';
+  };
 
   const getRoleBadge = () => {
     switch (user?.role) {
       case 'ADMIN':
-        return <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Admin</Badge>
+        return (
+          <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+            Admin
+          </Badge>
+        );
       case 'MODERATOR':
-        return <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Moderator</Badge>
+        return (
+          <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+            Moderator
+          </Badge>
+        );
       default:
-        return <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">User</Badge>
+        return (
+          <Badge className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+            User
+          </Badge>
+        );
     }
-  }
+  };
 
   const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return 'N/A'
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    })
-  }
+    });
+  };
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="show"
-      variants={staggerContainer}
-      className="space-y-6"
-    >
+    <motion.div initial="hidden" animate="show" variants={staggerContainer} className="space-y-6">
       {/* Header */}
       <motion.div variants={staggerItem}>
         <h1 className="text-3xl font-bold">Profile Settings</h1>
@@ -223,7 +233,9 @@ export default function ProfilePage() {
                     <Input
                       id="firstName"
                       value={profileData.firstName}
-                      onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
+                      onChange={(e) =>
+                        setProfileData({ ...profileData, firstName: e.target.value })
+                      }
                       placeholder="John"
                     />
                   </div>
@@ -247,7 +259,9 @@ export default function ProfilePage() {
                     disabled
                     className="bg-muted"
                   />
-                  <p className="text-xs text-muted-foreground">Contact support to change your email</p>
+                  <p className="text-xs text-muted-foreground">
+                    Contact support to change your email
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -337,7 +351,9 @@ export default function ProfilePage() {
                       <p className="font-medium">Email Address</p>
                       <p className="text-sm text-muted-foreground">{user?.email}</p>
                     </div>
-                    <Button variant="outline" size="sm">Change</Button>
+                    <Button variant="outline" size="sm">
+                      Change
+                    </Button>
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -357,7 +373,9 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <p className="font-medium">Member Since</p>
-                      <p className="text-sm text-muted-foreground">{formatDate(user?.createdAt as string)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(user?.createdAt as string)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -374,10 +392,22 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
-                  { label: 'Email notifications', desc: 'Receive email updates about your activity' },
-                  { label: 'Asset updates', desc: 'Get notified when assets you contribute to reach milestones' },
-                  { label: 'Marketing emails', desc: 'Receive emails about new features and offers' },
-                  { label: 'Security alerts', desc: 'Get notified about important security events' },
+                  {
+                    label: 'Email notifications',
+                    desc: 'Receive email updates about your activity',
+                  },
+                  {
+                    label: 'Asset updates',
+                    desc: 'Get notified when assets you contribute to reach milestones',
+                  },
+                  {
+                    label: 'Marketing emails',
+                    desc: 'Receive emails about new features and offers',
+                  },
+                  {
+                    label: 'Security alerts',
+                    desc: 'Get notified about important security events',
+                  },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -431,7 +461,9 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="space-y-1">
                       <p className="font-medium">Two-Factor Authentication</p>
-                      <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                      <p className="text-sm text-muted-foreground">
+                        Add an extra layer of security
+                      </p>
                     </div>
                     <Button variant="outline" size="sm" disabled>
                       Enable (Coming Soon)
@@ -460,7 +492,9 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between p-4 border border-destructive/20 rounded-lg">
                   <div className="space-y-1">
                     <p className="font-medium">Delete Account</p>
-                    <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
+                    <p className="text-sm text-muted-foreground">
+                      Permanently delete your account and all data
+                    </p>
                   </div>
                   <Button variant="destructive" size="sm" disabled>
                     Delete Account
@@ -472,5 +506,5 @@ export default function ProfilePage() {
         </Tabs>
       </motion.div>
     </motion.div>
-  )
+  );
 }

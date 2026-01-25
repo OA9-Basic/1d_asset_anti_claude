@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { checkUserAssetAccess } from '@/lib/asset-processing'
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { checkUserAssetAccess } from '@/lib/asset-processing';
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const userId = await getUserFromToken(req)
+    const userId = await getUserFromToken(req);
 
     const asset = await db.asset.findUnique({
       where: { id: params.id },
@@ -43,24 +40,24 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!asset) {
-      return NextResponse.json({ error: 'Asset not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
     }
 
-    let userContribution = null
-    let userPurchase = null
-    let hasAccess = false
-    let accessType = null
+    let userContribution = null;
+    let userPurchase = null;
+    let hasAccess = false;
+    let accessType = null;
 
     if (userId) {
-      userContribution = asset.contributions.find(c => c.userId === userId) || null
-      userPurchase = asset.assetPurchases.find(p => p.userId === userId) || null
+      userContribution = asset.contributions.find((c) => c.userId === userId) || null;
+      userPurchase = asset.assetPurchases.find((p) => p.userId === userId) || null;
 
-      const accessCheck = await checkUserAssetAccess(userId, params.id)
-      hasAccess = accessCheck.hasAccess
-      accessType = accessCheck.accessType || null
+      const accessCheck = await checkUserAssetAccess(userId, params.id);
+      hasAccess = accessCheck.hasAccess;
+      accessType = accessCheck.accessType || null;
     }
 
     return NextResponse.json({
@@ -87,9 +84,9 @@ export async function GET(
       userPurchase,
       hasAccess,
       accessType,
-    })
+    });
   } catch (error) {
-    console.error('Asset fetch error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Asset fetch error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

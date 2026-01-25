@@ -1,23 +1,17 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import {
-  LayoutDashboard,
-  ShoppingBag,
-  Package,
-  Wallet,
-  PlusCircle,
-} from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion';
+import { LayoutDashboard, ShoppingBag, Package, Wallet, PlusCircle } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { buttonTap } from '@/lib/animations'
-import { cn } from '@/lib/utils'
+import { buttonTap } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 
 interface NavItem {
-  title: string
-  href: string
-  icon: typeof LayoutDashboard
+  title: string;
+  href: string;
+  icon: typeof LayoutDashboard;
 }
 
 const navigation: NavItem[] = [
@@ -26,10 +20,10 @@ const navigation: NavItem[] = [
   { title: 'My Assets', href: '/my-assets', icon: Package },
   { title: 'Wallet', href: '/wallet', icon: Wallet },
   { title: 'Create', href: '/create', icon: PlusCircle },
-]
+];
 
 export function MobileNav() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <motion.nav
@@ -44,8 +38,8 @@ export function MobileNav() {
     >
       <div className="flex items-center justify-around h-16 px-2">
         {navigation.map((item, index) => {
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
-          const Icon = item.icon
+          const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+          const Icon = item.icon;
 
           return (
             <motion.div
@@ -75,26 +69,30 @@ export function MobileNav() {
                     animate={isActive ? { scale: [1, 1.2, 1] } : { scale: 1 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Icon className={cn(
-                      'h-5 w-5 relative z-10',
-                      isActive && 'text-violet-600 dark:text-violet-400'
-                    )} />
+                    <Icon
+                      className={cn(
+                        'h-5 w-5 relative z-10',
+                        isActive && 'text-violet-600 dark:text-violet-400'
+                      )}
+                    />
                   </motion.div>
-                  <span className={cn(
-                    'text-[10px] font-medium relative z-10',
-                    isActive && 'text-violet-600 dark:text-violet-400'
-                  )}>
+                  <span
+                    className={cn(
+                      'text-[10px] font-medium relative z-10',
+                      isActive && 'text-violet-600 dark:text-violet-400'
+                    )}
+                  >
                     {item.title}
                   </span>
                 </motion.div>
               </Link>
             </motion.div>
-          )
+          );
         })}
       </div>
 
       {/* Safe area padding for iOS */}
       <div className="h-safe-area-bottom w-full bg-background" />
     </motion.nav>
-  )
+  );
 }

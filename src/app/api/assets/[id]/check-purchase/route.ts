@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const userId = await getUserFromToken(req)
+    const userId = await getUserFromToken(req);
 
     if (!userId) {
-      return NextResponse.json({ hasPurchased: false })
+      return NextResponse.json({ hasPurchased: false });
     }
 
     const purchase = await db.assetPurchase.findFirst({
@@ -19,7 +16,7 @@ export async function GET(
         assetId: params.id,
         userId,
       },
-    })
+    });
 
     // Also check if user has contributed (contributors get access)
     const contribution = await db.contribution.findFirst({
@@ -28,13 +25,13 @@ export async function GET(
         userId,
         status: 'ACTIVE',
       },
-    })
+    });
 
     return NextResponse.json({
       hasPurchased: !!purchase || !!contribution,
-    })
+    });
   } catch (error) {
-    console.error('Check purchase error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Check purchase error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

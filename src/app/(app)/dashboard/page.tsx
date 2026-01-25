@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowDownRight,
@@ -17,18 +17,18 @@ import {
   Vote,
   Wallet,
   Package,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts'
-import useSWR from 'swr'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
+import useSWR from 'swr';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/hooks/use-auth'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/use-auth';
 import {
   buttonTap,
   hoverLift,
@@ -36,77 +36,77 @@ import {
   listItem,
   staggerContainer,
   staggerItem,
-} from '@/lib/animations'
+} from '@/lib/animations';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 // TypeScript Interfaces
 interface DashboardStats {
-  totalContributed: number
-  activeVotes: number
-  assetsOwned: number
-  walletBalance: number
-  withdrawableBalance: number
-  storeCredit: number
+  totalContributed: number;
+  activeVotes: number;
+  assetsOwned: number;
+  walletBalance: number;
+  withdrawableBalance: number;
+  storeCredit: number;
 }
 
 interface Contribution {
-  id: string
-  amount: number
-  assetId: string
-  createdAt: string
+  id: string;
+  amount: number;
+  assetId: string;
+  createdAt: string;
   asset: {
-    id: string
-    title: string
-    thumbnail: string | null
-    type: string
-    status: string
-  }
+    id: string;
+    title: string;
+    thumbnail: string | null;
+    type: string;
+    status: string;
+  };
 }
 
 interface ActivityItem {
-  id: string
-  type: string
-  amount: number
+  id: string;
+  type: string;
+  amount: number;
   user: {
-    id: string
-    name: string
-  }
+    id: string;
+    name: string;
+  };
   asset: {
-    id: string
-    title: string
-    type: string
-    thumbnail: string | null
-  }
-  createdAt: string
+    id: string;
+    title: string;
+    type: string;
+    thumbnail: string | null;
+  };
+  createdAt: string;
 }
 
 interface Asset {
-  id: string
-  title: string
-  description: string
-  type: string
-  deliveryType: string
-  targetPrice: number
-  platformFee: number
-  currentCollected: number
-  status: string
-  totalPurchases: number
-  totalRevenue: number
-  thumbnail: string | null
-  featured: boolean
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  deliveryType: string;
+  targetPrice: number;
+  platformFee: number;
+  currentCollected: number;
+  status: string;
+  totalPurchases: number;
+  totalRevenue: number;
+  thumbnail: string | null;
+  featured: boolean;
 }
 
 interface DashboardData {
-  stats: DashboardStats
-  contributions: Contribution[]
-  purchases: any[]
-  recentActivity: any[]
-  votes: any[]
+  stats: DashboardStats;
+  contributions: Contribution[];
+  purchases: any[];
+  recentActivity: any[];
+  votes: any[];
 }
 
 interface FeaturedAssetsData {
-  assets: Asset[]
+  assets: Asset[];
 }
 
 // Stat Card Component with Sparkline
@@ -120,29 +120,25 @@ function StatCard({
   data,
   delay,
 }: {
-  icon: any
-  title: string
-  value: string | number
-  description: string
-  trend?: 'up' | 'down' | 'neutral'
-  trendValue?: string
-  data?: Array<{ value: number }>
-  delay?: number
+  icon: any;
+  title: string;
+  value: string | number;
+  description: string;
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string;
+  data?: Array<{ value: number }>;
+  delay?: number;
 }) {
   const trendIcon = {
     up: <ArrowUpRight className="w-4 h-4 text-green-500" />,
     down: <ArrowDownRight className="w-4 h-4 text-red-500" />,
     neutral: <Minus className="w-4 h-4 text-muted-foreground" />,
-  }
+  };
 
-  const sparklineData = data || Array.from({ length: 7 }, () => Math.random() * 100)
+  const sparklineData = data || Array.from({ length: 7 }, () => Math.random() * 100);
 
   return (
-    <motion.div
-      variants={staggerItem}
-      {...hoverLift}
-      className="group"
-    >
+    <motion.div variants={staggerItem} {...hoverLift} className="group">
       <Card className="border-2 card-hover overflow-hidden">
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
@@ -161,7 +157,15 @@ function StatCard({
                 className="flex items-center gap-1 text-sm"
               >
                 {trendIcon[trend]}
-                <span className={trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground'}>
+                <span
+                  className={
+                    trend === 'up'
+                      ? 'text-green-500'
+                      : trend === 'down'
+                        ? 'text-red-500'
+                        : 'text-muted-foreground'
+                  }
+                >
                   {trendValue || '0%'}
                 </span>
               </motion.div>
@@ -212,9 +216,9 @@ function StatCard({
                         <div className="bg-background border rounded-lg px-2 py-1 shadow-lg">
                           <p className="text-sm font-medium">{payload[0].value.toFixed(0)}</p>
                         </div>
-                      )
+                      );
                     }
-                    return null
+                    return null;
                   }}
                 />
               </AreaChart>
@@ -223,7 +227,7 @@ function StatCard({
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
 
 // Activity Feed Item
@@ -272,7 +276,7 @@ function ActivityItem({ item, index }: { item: ActivityItem; index: number }) {
         {item.asset.type}
       </Badge>
     </motion.div>
-  )
+  );
 }
 
 // Simplified Asset Card for Carousel
@@ -280,7 +284,7 @@ function MiniAssetCard({ asset }: { asset: Asset }) {
   const progressPercent = Math.min(
     (asset.currentCollected / (asset.targetPrice * (1 + asset.platformFee))) * 100,
     100
-  )
+  );
 
   return (
     <Link href={`/assets/${asset.id}`} className="block group">
@@ -347,7 +351,7 @@ function MiniAssetCard({ asset }: { asset: Asset }) {
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }
 
 // Loading Skeleton
@@ -365,12 +369,12 @@ function StatCardSkeleton() {
         <div className="mt-4 h-16 bg-muted animate-pulse rounded" />
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
 
   // Fetch dashboard data
   const {
@@ -381,13 +385,13 @@ export default function DashboardPage() {
   } = useSWR<DashboardData>(user ? '/api/dashboard' : null, fetcher, {
     revalidateOnFocus: true,
     dedupingInterval: 30000,
-  })
+  });
 
   // Fetch featured/trending assets
   const { data: featuredData, isLoading: featuredLoading } = useSWR<FeaturedAssetsData>(
     '/api/assets/featured?trending=true&limit=6',
     fetcher
-  )
+  );
 
   // Fetch global activity feed
   const { data: activityData, isLoading: activityLoading } = useSWR<{ activity: ActivityItem[] }>(
@@ -396,20 +400,20 @@ export default function DashboardPage() {
     {
       refreshInterval: 60000, // Refresh every minute
     }
-  )
+  );
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth/sign-in')
+      router.push('/auth/sign-in');
     }
-  }, [user, authLoading, router])
+  }, [user, authLoading, router]);
 
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   return (
@@ -436,7 +440,9 @@ export default function DashboardPage() {
               <h1 className="text-3xl font-bold">
                 Welcome back, {user.firstName || user.name || user.email?.split('@')[0]}!
               </h1>
-              <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your account</p>
+              <p className="text-muted-foreground">
+                Here&apos;s what&apos;s happening with your account
+              </p>
             </motion.div>
             <motion.div {...buttonTap}>
               <Button
@@ -555,9 +561,7 @@ export default function DashboardPage() {
               <Card className="border-2">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Community Contributions</CardTitle>
-                  <CardDescription>
-                    Real-time updates from across the platform
-                  </CardDescription>
+                  <CardDescription>Real-time updates from across the platform</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {activityLoading ? (
@@ -632,9 +636,7 @@ export default function DashboardPage() {
                     </Card>
                   ))
                 ) : featuredData?.assets && featuredData.assets.length > 0 ? (
-                  featuredData.assets.map((asset) => (
-                    <MiniAssetCard key={asset.id} asset={asset} />
-                  ))
+                  featuredData.assets.map((asset) => <MiniAssetCard key={asset.id} asset={asset} />)
                 ) : (
                   <Card className="col-span-full">
                     <CardContent className="p-12 text-center text-muted-foreground">
@@ -684,9 +686,7 @@ export default function DashboardPage() {
                     className="w-full justify-start"
                     onClick={() => {
                       // Copy invite link
-                      navigator.clipboard.writeText(
-                        `${window.location.origin}?ref=${user.id}`
-                      )
+                      navigator.clipboard.writeText(`${window.location.origin}?ref=${user.id}`);
                     }}
                   >
                     <Share2 className="w-4 h-4 mr-2" />
@@ -817,5 +817,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </motion.div>
-  )
+  );
 }

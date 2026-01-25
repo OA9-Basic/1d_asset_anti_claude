@@ -16,13 +16,7 @@
       "jsx": true
     }
   },
-  "plugins": [
-    "@typescript-eslint",
-    "react-refresh",
-    "jsx-a11y",
-    "import",
-    "unused-imports"
-  ],
+  "plugins": ["@typescript-eslint", "react-refresh", "jsx-a11y", "import", "unused-imports"],
   "settings": {
     "react": {
       "version": "detect"
@@ -52,21 +46,11 @@
     ],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-non-null-assertion": "warn",
-    "react-refresh/only-export-components": [
-      "warn",
-      { "allowConstantExport": true }
-    ],
+    "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }],
     "import/order": [
       "error",
       {
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index"
-        ],
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
         "newlines-between": "always",
         "alphabetize": {
           "order": "asc",
@@ -75,9 +59,6 @@
       }
     ],
     "jsx-a11y/anchor-is-valid": "warn",
-    "no-console": [
-      "warn",
-      { "allow": ["warn", "error", "info"] }
-    ]
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }]
   }
 }

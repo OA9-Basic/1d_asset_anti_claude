@@ -1,46 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 const convertSchema = z.object({
-  amount: z.string().or(z.number()).transform((val) => {
-    const num = typeof val === 'string' ? parseFloat(val) : val
-    if (isNaN(num) || num <= 0) throw new Error('Amount must be positive')
-    return num
-  }),
-})
+  amount: z
+    .string()
+    .or(z.number())
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseFloat(val) : val;
+      if (isNaN(num) || num <= 0) throw new Error('Amount must be positive');
+      return num;
+    }),
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserFromToken(req)
+    const userId = await getUserFromToken(req);
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json()
-    const { amount } = convertSchema.parse(body)
+    const body = await req.json();
+    const { amount } = convertSchema.parse(body);
 
     const result = await db.$transaction(async (tx) => {
       const wallet = await tx.wallet.findUnique({
         where: { userId },
-      })
+      });
 
       if (!wallet) {
-        throw new Error('Wallet not found')
+        throw new Error('Wallet not found');
       }
 
       // Check withdrawable balance
       if (wallet.withdrawableBalance < amount) {
-        throw new Error(`Insufficient withdrawable balance. Available: $${wallet.withdrawableBalance.toFixed(2)}`)
+        throw new Error(
+          `Insufficient withdrawable balance. Available: $${wallet.withdrawableBalance.toFixed(2)}`
+        );
       }
 
-      const withdrawableBefore = wallet.withdrawableBalance
-      const creditBefore = wallet.storeCredit
-      const withdrawableAfter = withdrawableBefore - amount
-      const creditAfter = creditBefore + amount
+      const withdrawableBefore = wallet.withdrawableBalance;
+      const creditBefore = wallet.storeCredit;
+      const withdrawableAfter = withdrawableBefore - amount;
+      const creditAfter = creditBefore + amount;
 
       // Create transaction
       await tx.transaction.create({
@@ -57,7 +62,7 @@ export async function POST(req: NextRequest) {
             creditAfter,
           },
         },
-      })
+      });
 
       // Update wallet
       await tx.wallet.update({
@@ -67,15 +72,15 @@ export async function POST(req: NextRequest) {
           storeCredit: creditAfter,
           totalConvertedToCredit: wallet.totalConvertedToCredit + amount,
         },
-      })
+      });
 
       return {
         withdrawableBefore,
         withdrawableAfter,
         creditBefore,
         creditAfter,
-      }
-    })
+      };
+    });
 
     return NextResponse.json({
       success: true,
@@ -83,24 +88,26 @@ export async function POST(req: NextRequest) {
       withdrawableBalance: result.withdrawableAfter,
       storeCredit: result.creditAfter,
       message: `Converted $${amount.toFixed(2)} to store credit`,
-    })
-
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({
-        error: 'Validation failed',
-        details: error.errors,
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: error.errors,
+        },
+        { status: 400 }
+      );
     }
 
     if (error instanceof Error) {
-      const message = error.message.toLowerCase()
+      const message = error.message.toLowerCase();
       if (message.includes('insufficient')) {
-        return NextResponse.json({ error: error.message }, { status: 400 })
+        return NextResponse.json({ error: error.message }, { status: 400 });
       }
     }
 
-    console.error('Store credit conversion error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Store credit conversion error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

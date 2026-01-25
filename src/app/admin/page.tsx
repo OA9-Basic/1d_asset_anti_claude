@@ -1,79 +1,107 @@
-'use client'
+'use client';
 
-import { Loader2, Users, DollarSign, Package, CheckCircle, XCircle, CheckCircle2, AlertCircle } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import {
+  Loader2,
+  Users,
+  DollarSign,
+  Package,
+  CheckCircle,
+  XCircle,
+  CheckCircle2,
+  AlertCircle,
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/hooks/use-auth'
-import { useToast } from '@/hooks/use-toast'
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 
 interface DashboardStats {
-  totalUsers: number
-  totalAssets: number
-  totalRevenue: number
-  pendingRequests: number
-  activeContributions: number
-  pendingWithdrawals: number
+  totalUsers: number;
+  totalAssets: number;
+  totalRevenue: number;
+  pendingRequests: number;
+  activeContributions: number;
+  pendingWithdrawals: number;
 }
 
 interface AssetRequest {
-  id: string
-  title: string
-  type: string
-  estimatedPrice: number
-  status: string
-  user: { firstName: string | null; email: string }
-  upvotes: number
-  downvotes: number
-  score: number
-  sourceUrl: string
-  thumbnail: string | null
-  description: string
+  id: string;
+  title: string;
+  type: string;
+  estimatedPrice: number;
+  status: string;
+  user: { firstName: string | null; email: string };
+  upvotes: number;
+  downvotes: number;
+  score: number;
+  sourceUrl: string;
+  thumbnail: string | null;
+  description: string;
 }
 
 interface Withdrawal {
-  id: string
-  amount: number
-  cryptoCurrency: string
-  walletAddress: string
-  status: string
-  user: { firstName: string | null; email: string }
-  createdAt: string
+  id: string;
+  amount: number;
+  cryptoCurrency: string;
+  walletAddress: string;
+  status: string;
+  user: { firstName: string | null; email: string };
+  createdAt: string;
 }
 
 interface FundedAsset {
-  id: string
-  title: string
-  targetPrice: number
-  currentCollected: number
-  status: string
-  type: string
-  thumbnail: string | null
-  contributorCount: number
-  isFullyFunded: boolean
+  id: string;
+  title: string;
+  targetPrice: number;
+  currentCollected: number;
+  status: string;
+  type: string;
+  thumbnail: string | null;
+  contributorCount: number;
+  isFullyFunded: boolean;
 }
 
-function StatCard({ icon: Icon, title, value, description, _trend }: { icon: any, title: string, value: string | number, description: string, _trend?: 'up' | 'down' | 'neutral' }) {
+function StatCard({
+  icon: Icon,
+  title,
+  value,
+  description,
+  _trend,
+}: {
+  icon: any;
+  title: string;
+  value: string | number;
+  description: string;
+  _trend?: 'up' | 'down' | 'neutral';
+}) {
   const _trendColors = {
     up: 'text-green-500',
     down: 'text-red-500',
     neutral: 'text-muted-foreground',
-  }
+  };
 
   return (
     <Card className="border-2 card-hover">
@@ -84,20 +112,22 @@ function StatCard({ icon: Icon, title, value, description, _trend }: { icon: any
             <p className="text-2xl font-bold mt-1">{value}</p>
             <p className="text-xs text-muted-foreground mt-1">{description}</p>
           </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-600/10`}>
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-600/10`}
+          >
             <Icon className="h-6 w-6 text-primary" />
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function AdminDashboardPage() {
-  const router = useRouter()
-  const { user, isLoading: authLoading } = useAuth()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalAssets: 0,
@@ -105,37 +135,37 @@ export default function AdminDashboardPage() {
     pendingRequests: 0,
     activeContributions: 0,
     pendingWithdrawals: 0,
-  })
-  const [assetRequests, setAssetRequests] = useState<AssetRequest[]>([])
-  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([])
-  const [fundedAssets, setFundedAssets] = useState<FundedAsset[]>([])
+  });
+  const [assetRequests, setAssetRequests] = useState<AssetRequest[]>([]);
+  const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
+  const [fundedAssets, setFundedAssets] = useState<FundedAsset[]>([]);
 
   // Dialog states
-  const [selectedRequest, setSelectedRequest] = useState<AssetRequest | null>(null)
-  const [selectedAsset, setSelectedAsset] = useState<FundedAsset | null>(null)
-  const [approveDialogOpen, setApproveDialogOpen] = useState(false)
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
-  const [processDialogOpen, setProcessDialogOpen] = useState(false)
-  const [rejectReason, setRejectReason] = useState('')
-  const [platformFee, setPlatformFee] = useState('15')
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [selectedRequest, setSelectedRequest] = useState<AssetRequest | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<FundedAsset | null>(null);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [processDialogOpen, setProcessDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [platformFee, setPlatformFee] = useState('15');
+  const [isProcessing, setIsProcessing] = useState(false);
   const [deliveryData, setDeliveryData] = useState({
     deliveryUrl: '',
     streamUrl: '',
-    deliveryKey: ''
-  })
+    deliveryKey: '',
+  });
 
   // Check if user is admin
   useEffect(() => {
     if (user && user.role !== 'ADMIN') {
-      router.push('/')
+      router.push('/');
       toast({
         variant: 'destructive',
         title: 'Access Denied',
         description: 'Admin access required',
-      })
+      });
     }
-  }, [user, router, toast])
+  }, [user, router, toast]);
 
   const fetchDashboardData = async () => {
     try {
@@ -143,56 +173,72 @@ export default function AdminDashboardPage() {
         fetch('/api/asset-requests'),
         fetch('/api/admin/withdrawals'),
         fetch('/api/admin/assets/funded'),
-      ])
+      ]);
 
       if (requestsRes.ok) {
-        const data = await requestsRes.json()
-        setAssetRequests(data.requests || [])
-        setStats((prev) => ({ ...prev, pendingRequests: data.requests?.filter((r: AssetRequest) => r.status === 'PENDING').length || 0 }))
+        const data = await requestsRes.json();
+        setAssetRequests(data.requests || []);
+        setStats((prev) => ({
+          ...prev,
+          pendingRequests:
+            data.requests?.filter((r: AssetRequest) => r.status === 'PENDING').length || 0,
+        }));
       }
 
       if (withdrawalsRes.ok) {
-        const data = await withdrawalsRes.json()
-        setWithdrawals(data.withdrawals || [])
-        setStats((prev) => ({ ...prev, pendingWithdrawals: data.withdrawals?.filter((w: Withdrawal) => w.status === 'PENDING').length || 0 }))
+        const data = await withdrawalsRes.json();
+        setWithdrawals(data.withdrawals || []);
+        setStats((prev) => ({
+          ...prev,
+          pendingWithdrawals:
+            data.withdrawals?.filter((w: Withdrawal) => w.status === 'PENDING').length || 0,
+        }));
       }
 
       if (assetsRes.ok) {
-        const data = await assetsRes.json()
-        setFundedAssets(data.assets || [])
-        setStats((prev) => ({ ...prev, activeContributions: data.assets?.filter((a: FundedAsset) => a.status === 'PURCHASED').length || 0 }))
+        const data = await assetsRes.json();
+        setFundedAssets(data.assets || []);
+        setStats((prev) => ({
+          ...prev,
+          activeContributions:
+            data.assets?.filter((a: FundedAsset) => a.status === 'PURCHASED').length || 0,
+        }));
       }
 
       // Get user and asset counts
       const [usersCount, assetsCount] = await Promise.all([
         fetch('/api/admin/stats/users'),
         fetch('/api/admin/stats/assets'),
-      ])
+      ]);
 
       if (usersCount.ok) {
-        const data = await usersCount.json()
-        setStats((prev) => ({ ...prev, totalUsers: data.count || 0 }))
+        const data = await usersCount.json();
+        setStats((prev) => ({ ...prev, totalUsers: data.count || 0 }));
       }
 
       if (assetsCount.ok) {
-        const data = await assetsCount.json()
-        setStats((prev) => ({ ...prev, totalAssets: data.count || 0, totalRevenue: data.revenue || 0 }))
+        const data = await assetsCount.json();
+        setStats((prev) => ({
+          ...prev,
+          totalAssets: data.count || 0,
+          totalRevenue: data.revenue || 0,
+        }));
       }
     } catch (error) {
-      console.error('Failed to fetch dashboard data:', error)
+      console.error('Failed to fetch dashboard data:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (user?.role === 'ADMIN') {
-      fetchDashboardData()
+      fetchDashboardData();
     }
-  }, [user])
+  }, [user]);
 
   const handleApproveRequest = async () => {
-    if (!selectedRequest) return
+    if (!selectedRequest) return;
 
     try {
       const res = await fetch(`/api/admin/asset-requests/${selectedRequest.id}`, {
@@ -202,59 +248,59 @@ export default function AdminDashboardPage() {
           platformFee: parseFloat(platformFee) / 100,
           featured: false,
         }),
-      })
+      });
 
       if (res.ok) {
         toast({
           title: 'Request Approved',
           description: 'Asset has been added to the platform',
-        })
-        setApproveDialogOpen(false)
-        fetchDashboardData()
+        });
+        setApproveDialogOpen(false);
+        fetchDashboardData();
       } else {
-        const data = await res.json()
+        const data = await res.json();
         toast({
           variant: 'destructive',
           title: 'Approval Failed',
           description: data.error || 'Failed to approve request',
-        })
+        });
       }
     } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to process approval',
-      })
+      });
     }
-  }
+  };
 
   const handleRejectRequest = async () => {
-    if (!selectedRequest) return
+    if (!selectedRequest) return;
 
     try {
       const res = await fetch(`/api/admin/asset-requests/${selectedRequest.id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rejectionReason: rejectReason }),
-      })
+      });
 
       if (res.ok) {
         toast({
           title: 'Request Rejected',
           description: 'Asset request has been rejected',
-        })
-        setRejectDialogOpen(false)
-        setRejectReason('')
-        fetchDashboardData()
+        });
+        setRejectDialogOpen(false);
+        setRejectReason('');
+        fetchDashboardData();
       }
     } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to reject request',
-      })
+      });
     }
-  }
+  };
 
   const handleStartVoting = async (requestId: string) => {
     try {
@@ -262,96 +308,99 @@ export default function AdminDashboardPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'VOTING' }),
-      })
+      });
 
       if (res.ok) {
         toast({
           title: 'Voting Started',
           description: 'Community can now vote on this request',
-        })
-        fetchDashboardData()
+        });
+        fetchDashboardData();
       }
     } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to start voting',
-      })
+      });
     }
-  }
+  };
 
-  const handleWithdrawalAction = async (withdrawalId: string, action: 'PROCESSING' | 'COMPLETED' | 'REJECTED') => {
+  const handleWithdrawalAction = async (
+    withdrawalId: string,
+    action: 'PROCESSING' | 'COMPLETED' | 'REJECTED'
+  ) => {
     try {
       const res = await fetch(`/api/admin/withdrawals/${withdrawalId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: action }),
-      })
+      });
 
       if (res.ok) {
         toast({
           title: 'Withdrawal Updated',
           description: `Status changed to ${action.toLowerCase()}`,
-        })
-        fetchDashboardData()
+        });
+        fetchDashboardData();
       }
     } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to update withdrawal',
-      })
+      });
     }
-  }
+  };
 
   const handleProcessAsset = async () => {
-    if (!selectedAsset) return
+    if (!selectedAsset) return;
 
-    setIsProcessing(true)
+    setIsProcessing(true);
     try {
       const res = await fetch(`/api/admin/assets/${selectedAsset.id}/process`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(deliveryData),
-      })
+      });
 
       if (res.ok) {
-        const data = await res.json()
+        const data = await res.json();
         toast({
           title: 'Asset Processed Successfully',
           description: data.message,
-        })
-        setProcessDialogOpen(false)
-        fetchDashboardData()
+        });
+        setProcessDialogOpen(false);
+        fetchDashboardData();
       } else {
-        const data = await res.json()
+        const data = await res.json();
         toast({
           variant: 'destructive',
           title: 'Processing Failed',
           description: data.error || 'Failed to process asset',
-        })
+        });
       }
     } catch (_error) {
       toast({
         variant: 'destructive',
         title: 'Error',
         description: 'Failed to process asset',
-      })
+      });
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   if (!user || user.role !== 'ADMIN') {
-    return null
+    return null;
   }
 
   return (
@@ -443,16 +492,24 @@ export default function AdminDashboardPage() {
                           <TableCell>{request.type}</TableCell>
                           <TableCell>${request.estimatedPrice.toFixed(2)}</TableCell>
                           <TableCell>
-                            <span className={request.score >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            <span
+                              className={request.score >= 0 ? 'text-green-600' : 'text-red-600'}
+                            >
                               +{request.upvotes} / -{request.downvotes}
                             </span>
                           </TableCell>
                           <TableCell>
-                            <Badge variant={
-                              request.status === 'APPROVED' ? 'default' :
-                                request.status === 'VOTING' ? 'secondary' :
-                                  request.status === 'REJECTED' ? 'destructive' : 'outline'
-                            }>
+                            <Badge
+                              variant={
+                                request.status === 'APPROVED'
+                                  ? 'default'
+                                  : request.status === 'VOTING'
+                                    ? 'secondary'
+                                    : request.status === 'REJECTED'
+                                      ? 'destructive'
+                                      : 'outline'
+                              }
+                            >
                               {request.status.toLowerCase()}
                             </Badge>
                           </TableCell>
@@ -470,8 +527,8 @@ export default function AdminDashboardPage() {
                                   <Button
                                     size="sm"
                                     onClick={() => {
-                                      setSelectedRequest(request)
-                                      setApproveDialogOpen(true)
+                                      setSelectedRequest(request);
+                                      setApproveDialogOpen(true);
                                     }}
                                   >
                                     <CheckCircle className="w-4 h-4" />
@@ -480,8 +537,8 @@ export default function AdminDashboardPage() {
                                     size="sm"
                                     variant="destructive"
                                     onClick={() => {
-                                      setSelectedRequest(request)
-                                      setRejectDialogOpen(true)
+                                      setSelectedRequest(request);
+                                      setRejectDialogOpen(true);
                                     }}
                                   >
                                     <XCircle className="w-4 h-4" />
@@ -492,8 +549,8 @@ export default function AdminDashboardPage() {
                                 <Button
                                   size="sm"
                                   onClick={() => {
-                                    setSelectedRequest(request)
-                                    setApproveDialogOpen(true)
+                                    setSelectedRequest(request);
+                                    setApproveDialogOpen(true);
                                   }}
                                 >
                                   Approve
@@ -541,15 +598,25 @@ export default function AdminDashboardPage() {
                             <p>{withdrawal.user.firstName || withdrawal.user.email}</p>
                             <p className="text-xs text-muted-foreground">{withdrawal.user.email}</p>
                           </TableCell>
-                          <TableCell className="font-medium">${withdrawal.amount.toFixed(2)}</TableCell>
+                          <TableCell className="font-medium">
+                            ${withdrawal.amount.toFixed(2)}
+                          </TableCell>
                           <TableCell>{withdrawal.cryptoCurrency}</TableCell>
-                          <TableCell className="text-sm font-mono">{withdrawal.walletAddress.slice(0, 10)}...</TableCell>
+                          <TableCell className="text-sm font-mono">
+                            {withdrawal.walletAddress.slice(0, 10)}...
+                          </TableCell>
                           <TableCell>
-                            <Badge variant={
-                              withdrawal.status === 'COMPLETED' ? 'default' :
-                                withdrawal.status === 'PROCESSING' ? 'secondary' :
-                                  withdrawal.status === 'REJECTED' ? 'destructive' : 'outline'
-                            }>
+                            <Badge
+                              variant={
+                                withdrawal.status === 'COMPLETED'
+                                  ? 'default'
+                                  : withdrawal.status === 'PROCESSING'
+                                    ? 'secondary'
+                                    : withdrawal.status === 'REJECTED'
+                                      ? 'destructive'
+                                      : 'outline'
+                              }
+                            >
                               {withdrawal.status.toLowerCase()}
                             </Badge>
                           </TableCell>
@@ -559,7 +626,9 @@ export default function AdminDashboardPage() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => handleWithdrawalAction(withdrawal.id, 'PROCESSING')}
+                                  onClick={() =>
+                                    handleWithdrawalAction(withdrawal.id, 'PROCESSING')
+                                  }
                                 >
                                   Processing
                                 </Button>
@@ -593,11 +662,12 @@ export default function AdminDashboardPage() {
               <CardHeader>
                 <CardTitle>Funded Assets - Ready to Process</CardTitle>
                 <CardDescription>
-                  Assets that have reached their funding goal. Purchase and process to give contributors access.
+                  Assets that have reached their funding goal. Purchase and process to give
+                  contributors access.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {fundedAssets.filter(a => a.status === 'PURCHASED').length === 0 ? (
+                {fundedAssets.filter((a) => a.status === 'PURCHASED').length === 0 ? (
                   <div className="text-center py-12">
                     <CheckCircle2 className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">No assets ready for processing</p>
@@ -617,7 +687,7 @@ export default function AdminDashboardPage() {
                     </TableHeader>
                     <TableBody>
                       {fundedAssets
-                        .filter(a => a.status === 'PURCHASED')
+                        .filter((a) => a.status === 'PURCHASED')
                         .map((asset) => (
                           <TableRow key={asset.id}>
                             <TableCell>
@@ -638,7 +708,13 @@ export default function AdminDashboardPage() {
                             <TableCell>{asset.type}</TableCell>
                             <TableCell>${asset.targetPrice.toFixed(2)}</TableCell>
                             <TableCell>
-                              <span className={asset.currentCollected >= asset.targetPrice ? 'text-green-600 font-medium' : ''}>
+                              <span
+                                className={
+                                  asset.currentCollected >= asset.targetPrice
+                                    ? 'text-green-600 font-medium'
+                                    : ''
+                                }
+                              >
                                 ${asset.currentCollected.toFixed(2)}
                               </span>
                             </TableCell>
@@ -653,8 +729,8 @@ export default function AdminDashboardPage() {
                                 <Button
                                   size="sm"
                                   onClick={() => {
-                                    setSelectedAsset(asset)
-                                    setProcessDialogOpen(true)
+                                    setSelectedAsset(asset);
+                                    setProcessDialogOpen(true);
                                   }}
                                 >
                                   Process Asset
@@ -728,9 +804,7 @@ export default function AdminDashboardPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject Asset Request</DialogTitle>
-            <DialogDescription>
-              Reject &quot;{selectedRequest?.title}&quot;
-            </DialogDescription>
+            <DialogDescription>Reject &quot;{selectedRequest?.title}&quot;</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -764,7 +838,9 @@ export default function AdminDashboardPage() {
           </DialogHeader>
           <div className="space-y-4 max-h-[60vh] overflow-y-auto">
             <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-900 rounded-lg p-4 space-y-2">
-              <p className="font-medium text-blue-900 dark:text-blue-100 text-sm">Before processing:</p>
+              <p className="font-medium text-blue-900 dark:text-blue-100 text-sm">
+                Before processing:
+              </p>
               <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-decimal list-inside">
                 <li>Purchase the actual course/product using the collected funds</li>
                 <li>Get the delivery URL/access credentials</li>
@@ -773,11 +849,18 @@ export default function AdminDashboardPage() {
               </ol>
             </div>
             <div className="space-y-2 text-sm">
-              <p><strong>Asset:</strong> {selectedAsset?.title}</p>
-              <p><strong>Target Price:</strong> ${selectedAsset?.targetPrice.toFixed(2)}</p>
-              <p><strong>Collected:</strong> ${selectedAsset?.currentCollected.toFixed(2)}</p>
+              <p>
+                <strong>Asset:</strong> {selectedAsset?.title}
+              </p>
+              <p>
+                <strong>Target Price:</strong> ${selectedAsset?.targetPrice.toFixed(2)}
+              </p>
+              <p>
+                <strong>Collected:</strong> ${selectedAsset?.currentCollected.toFixed(2)}
+              </p>
               <p className="text-muted-foreground">
-                Contributors will receive access to the asset. Any excess contributions will be refunded to their withdrawable balance.
+                Contributors will receive access to the asset. Any excess contributions will be
+                refunded to their withdrawable balance.
               </p>
             </div>
 
@@ -788,7 +871,9 @@ export default function AdminDashboardPage() {
                 <Input
                   placeholder="https://example.com/download.zip"
                   value={deliveryData.deliveryUrl}
-                  onChange={e => setDeliveryData(prev => ({ ...prev, deliveryUrl: e.target.value }))}
+                  onChange={(e) =>
+                    setDeliveryData((prev) => ({ ...prev, deliveryUrl: e.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -796,7 +881,9 @@ export default function AdminDashboardPage() {
                 <Input
                   placeholder="https://vimeo.com/..."
                   value={deliveryData.streamUrl}
-                  onChange={e => setDeliveryData(prev => ({ ...prev, streamUrl: e.target.value }))}
+                  onChange={(e) =>
+                    setDeliveryData((prev) => ({ ...prev, streamUrl: e.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -804,7 +891,9 @@ export default function AdminDashboardPage() {
                 <Input
                   placeholder="Secret key for access"
                   value={deliveryData.deliveryKey}
-                  onChange={e => setDeliveryData(prev => ({ ...prev, deliveryKey: e.target.value }))}
+                  onChange={(e) =>
+                    setDeliveryData((prev) => ({ ...prev, deliveryKey: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -813,7 +902,11 @@ export default function AdminDashboardPage() {
                 {isProcessing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Process Asset
               </Button>
-              <Button variant="outline" onClick={() => setProcessDialogOpen(false)} disabled={isProcessing}>
+              <Button
+                variant="outline"
+                onClick={() => setProcessDialogOpen(false)}
+                disabled={isProcessing}
+              >
                 Cancel
               </Button>
             </div>
@@ -821,5 +914,5 @@ export default function AdminDashboardPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

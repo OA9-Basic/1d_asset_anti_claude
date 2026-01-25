@@ -6,9 +6,9 @@
  */
 
 /* eslint-disable */
-import { render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react';
 
-import { AssetCard } from '../asset-card'
+import { AssetCard } from '../asset-card';
 
 // ============================================================================
 // MOCK DATA
@@ -32,7 +32,7 @@ const mockAssetCollecting = {
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-23'),
   slug: 'complete-web-development-bootcamp',
-}
+};
 
 const mockAssetAvailable = {
   id: 'test-asset-2',
@@ -52,7 +52,7 @@ const mockAssetAvailable = {
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-23'),
   slug: 'premium-ui-component-library',
-}
+};
 
 const mockAssetPurchased = {
   id: 'test-asset-3',
@@ -72,7 +72,7 @@ const mockAssetPurchased = {
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-23'),
   slug: 'ai-model-training-course',
-}
+};
 
 const mockAssetRequested = {
   id: 'test-asset-4',
@@ -92,7 +92,7 @@ const mockAssetRequested = {
   createdAt: new Date('2026-01-23'),
   updatedAt: new Date('2026-01-23'),
   slug: 'requested-asset',
-}
+};
 
 // ============================================================================
 // TEST CASES
@@ -101,99 +101,99 @@ const mockAssetRequested = {
 describe('AssetCard Component', () => {
   // Test 1: Renders with COLLECTING status
   test('renders COLLECTING asset correctly', () => {
-    render(<AssetCard asset={mockAssetCollecting} />)
+    render(<AssetCard asset={mockAssetCollecting} />);
 
     // Check title
-    expect(screen.getByText('Complete Web Development Bootcamp 2026')).toBeInTheDocument()
+    expect(screen.getByText('Complete Web Development Bootcamp 2026')).toBeInTheDocument();
 
     // Check status badge
-    expect(screen.getByText('Funding')).toBeInTheDocument()
+    expect(screen.getByText('Funding')).toBeInTheDocument();
 
     // Check progress
-    expect(screen.getByText(/\$650/)).toBeInTheDocument()
-    expect(screen.getByText(/\$1150/)).toBeInTheDocument() // 1000 * 1.15
+    expect(screen.getByText(/\$650/)).toBeInTheDocument();
+    expect(screen.getByText(/\$1150/)).toBeInTheDocument(); // 1000 * 1.15
 
     // Check button
-    expect(screen.getByText('Contribute Now')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Contribute Now')).toBeInTheDocument();
+  });
 
   // Test 2: Renders with AVAILABLE status
   test('renders AVAILABLE asset correctly', () => {
-    render(<AssetCard asset={mockAssetAvailable} />)
+    render(<AssetCard asset={mockAssetAvailable} />);
 
-    expect(screen.getByText('Premium UI Component Library')).toBeInTheDocument()
-    expect(screen.getByText('Available')).toBeInTheDocument()
-    expect(screen.getByText('Instant Access')).toBeInTheDocument()
-    expect(screen.getByText('Get for $1')).toBeInTheDocument()
-    expect(screen.getByText(/150 people have access/)).toBeInTheDocument()
-  })
+    expect(screen.getByText('Premium UI Component Library')).toBeInTheDocument();
+    expect(screen.getByText('Available')).toBeInTheDocument();
+    expect(screen.getByText('Instant Access')).toBeInTheDocument();
+    expect(screen.getByText('Get for $1')).toBeInTheDocument();
+    expect(screen.getByText(/150 people have access/)).toBeInTheDocument();
+  });
 
   // Test 3: Renders with PURCHASED status
   test('renders PURCHASED asset correctly', () => {
-    render(<AssetCard asset={mockAssetPurchased} />)
+    render(<AssetCard asset={mockAssetPurchased} />);
 
-    expect(screen.getByText('AI Model Training Course')).toBeInTheDocument()
-    expect(screen.getByText('Purchased')).toBeInTheDocument()
-    expect(screen.getByText('Fully Funded')).toBeInTheDocument()
-    expect(screen.getByText('View Asset')).toBeInTheDocument()
-  })
+    expect(screen.getByText('AI Model Training Course')).toBeInTheDocument();
+    expect(screen.getByText('Purchased')).toBeInTheDocument();
+    expect(screen.getByText('Fully Funded')).toBeInTheDocument();
+    expect(screen.getByText('View Asset')).toBeInTheDocument();
+  });
 
   // Test 4: Renders with REQUESTED status
   test('renders REQUESTED asset correctly', () => {
-    render(<AssetCard asset={mockAssetRequested} />)
+    render(<AssetCard asset={mockAssetRequested} />);
 
-    expect(screen.getByText('Requested Asset')).toBeInTheDocument()
-    expect(screen.getByText('Requested')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Requested Asset')).toBeInTheDocument();
+    expect(screen.getByText('Requested')).toBeInTheDocument();
+  });
 
   // Test 5: Shows featured badge
   test('shows featured badge when asset is featured', () => {
-    render(<AssetCard asset={mockAssetCollecting} />)
+    render(<AssetCard asset={mockAssetCollecting} />);
 
-    expect(screen.getByText('Featured')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Featured')).toBeInTheDocument();
+  });
 
   // Test 6: Does not show featured badge when not featured
   test('does not show featured badge when asset is not featured', () => {
-    render(<AssetCard asset={mockAssetAvailable} />)
+    render(<AssetCard asset={mockAssetAvailable} />);
 
-    expect(screen.queryByText('Featured')).not.toBeInTheDocument()
-  })
+    expect(screen.queryByText('Featured')).not.toBeInTheDocument();
+  });
 
   // Test 7: Shows placeholder when no thumbnail
   test('shows placeholder when no thumbnail', () => {
-    render(<AssetCard asset={mockAssetAvailable} />)
+    render(<AssetCard asset={mockAssetAvailable} />);
 
-    expect(screen.getByText('No preview available')).toBeInTheDocument()
-  })
+    expect(screen.getByText('No preview available')).toBeInTheDocument();
+  });
 
   // Test 8: Progress calculation with platform fee
   test('calculates progress correctly with platform fee', () => {
-    render(<AssetCard asset={mockAssetCollecting} />)
+    render(<AssetCard asset={mockAssetCollecting} />);
 
     // Target: 1000, Platform fee: 15%, Total: 1150
     // Collected: 650
     // Progress: 650/1150 = 56.52%
 
-    const progressBar = screen.getByRole('progressbar')
-    expect(progressBar).toBeInTheDocument()
-  })
+    const progressBar = screen.getByRole('progressbar');
+    expect(progressBar).toBeInTheDocument();
+  });
 
   // Test 9: Shows remaining amount
   test('shows remaining amount for COLLECTING assets', () => {
-    render(<AssetCard asset={mockAssetCollecting} />)
+    render(<AssetCard asset={mockAssetCollecting} />);
 
     // Remaining: 1150 - 650 = 500
-    expect(screen.getByText(/500 remaining to fund/i)).toBeInTheDocument()
-  })
+    expect(screen.getByText(/500 remaining to fund/i)).toBeInTheDocument();
+  });
 
   // Test 10: Shows correct stats
   test('displays correct stats', () => {
-    render(<AssetCard asset={mockAssetCollecting} />)
+    render(<AssetCard asset={mockAssetCollecting} />);
 
-    expect(screen.getByText('25')).toBeInTheDocument() // pledges
-  })
-})
+    expect(screen.getByText('25')).toBeInTheDocument(); // pledges
+  });
+});
 
 // ============================================================================
 // MANUAL TESTING CHECKLIST
@@ -213,7 +213,7 @@ export const manualTestChecklist = {
       'Card scales up on hover',
       'Card lifts up on hover (-4px)',
     ],
-    'Thumbnail': [
+    Thumbnail: [
       'Thumbnail is 256px tall (h-64)',
       'Thumbnail has hover zoom effect',
       'Thumbnail shows gradient overlay on hover',
@@ -234,7 +234,7 @@ export const manualTestChecklist = {
       'Progress bar has shimmer effect',
       'Progress bar shows remaining amount',
     ],
-    'Buttons': [
+    Buttons: [
       'Button has correct text',
       'Button has gradient background',
       'Button has hover effect',
@@ -297,22 +297,14 @@ export const manualTestChecklist = {
   },
 
   responsiveness: {
-    'Mobile': [
+    Mobile: [
       'Card fits in 1 column grid',
       'Content is readable',
       'Buttons are tappable',
       'Text is not truncated',
     ],
-    'Tablet': [
-      'Card fits in 2 column grid',
-      'Layout is balanced',
-      'Images scale correctly',
-    ],
-    'Desktop': [
-      'Card fits in 3-4 column grid',
-      'Hover effects work',
-      'All content visible',
-    ],
+    Tablet: ['Card fits in 2 column grid', 'Layout is balanced', 'Images scale correctly'],
+    Desktop: ['Card fits in 3-4 column grid', 'Hover effects work', 'All content visible'],
   },
 
   accessibility: {
@@ -350,7 +342,7 @@ export const manualTestChecklist = {
       'API calls are fast',
     ],
   },
-}
+};
 
 // ============================================================================
 // API TESTING
@@ -451,7 +443,7 @@ export const apiTestScenarios = {
       ],
     },
   },
-}
+};
 
 // ============================================================================
 // EXAMPLE USAGE
@@ -477,7 +469,7 @@ export function ExampleUsage() {
         </div>
       )
     }
-  `
+  `;
 
   // Example 2: With filtering
   const filterExample = `
@@ -498,7 +490,7 @@ export function ExampleUsage() {
         </div>
       )
     }
-  `
+  `;
 
   // Example 3: With pagination
   const paginationExample = `
@@ -523,9 +515,9 @@ export function ExampleUsage() {
         </>
       )
     }
-  `
+  `;
 
-  return { basicExample, filterExample, paginationExample }
+  return { basicExample, filterExample, paginationExample };
 }
 
 // ============================================================================
@@ -581,7 +573,7 @@ export const troubleshootingGuide = {
       ],
     },
   },
-}
+};
 
 export default {
   mockAssetCollecting,
@@ -592,4 +584,4 @@ export default {
   apiTestScenarios,
   ExampleUsage,
   troubleshootingGuide,
-}
+};

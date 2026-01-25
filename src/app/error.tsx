@@ -1,23 +1,30 @@
-'use client'
+'use client';
 
-import { AlertCircle, RefreshCw, Home } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect } from 'react'
+import { AlertCircle, RefreshCw, Home } from 'lucide-react';
+import Link from 'next/link';
+import { useEffect } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Application error:', error)
-  }, [error])
+    console.error('Application error:', error);
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
@@ -33,7 +40,8 @@ export default function Error({
           </div>
           <CardTitle className="text-2xl font-bold">Something went wrong</CardTitle>
           <CardDescription className="text-base">
-            We encountered an unexpected error. Don&apos;t worry, our team has been notified and we&apos;re working to fix it.
+            We encountered an unexpected error. Don&apos;t worry, our team has been notified and
+            we&apos;re working to fix it.
           </CardDescription>
         </CardHeader>
 
@@ -80,5 +88,5 @@ export default function Error({
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

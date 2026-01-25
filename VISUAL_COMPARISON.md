@@ -9,6 +9,7 @@ This document provides a detailed visual and functional comparison between the o
 ## Card Structure Comparison
 
 ### Old Component Structure
+
 ```
 ┌─────────────────────────────────┐
 │  Card (border-2)                │
@@ -33,6 +34,7 @@ This document provides a detailed visual and functional comparison between the o
 ```
 
 ### New Component Structure
+
 ```
 ┌─────────────────────────────────────────┐
 │  Card (border-0, shadow-lg)             │
@@ -60,23 +62,23 @@ This document provides a detailed visual and functional comparison between the o
 
 ## Feature Comparison Table
 
-| Feature | Old Component | New Component | Improvement |
-|---------|--------------|---------------|-------------|
-| **Border Radius** | `rounded-xl` (12px) | `rounded-2xl` (16px) | ⭐ More modern |
-| **Thumbnail Height** | `h-52` (208px) | `h-64` (256px) | ⭐ 23% larger |
-| **Hover Scale** | `scale-105` | `scale-110` | ⭐ More dynamic |
-| **Hover Y-Lift** | None | `-4px` lift | ✨ New feature |
-| **Shadow** | `shadow-md` | `shadow-lg → shadow-2xl` | ⭐ More depth |
-| **Background** | Solid | Gradient overlay | ✨ New feature |
-| **Progress Bar** | Basic solid | Animated gradient | ⭐⭐ Major upgrade |
-| **Status Badges** | Basic colors | Gradients + icons | ⭐ Enhanced |
-| **Buttons** | Basic gradient | Enhanced gradient | ⭐ Improved |
-| **Loading States** | Text only | Spinner animation | ✨ New feature |
-| **Animations** | CSS transitions | Framer Motion | ⭐⭐ Major upgrade |
-| **Entrance** | None | Staggered fade-in | ✨ New feature |
-| **Toast Notifications** | None | Success/Error toasts | ✨ New feature |
-| **Error Handling** | Basic UI | Comprehensive | ⭐ Improved |
-| **Accessibility** | Good | Excellent (ARIA) | ⭐ Enhanced |
+| Feature                 | Old Component       | New Component            | Improvement        |
+| ----------------------- | ------------------- | ------------------------ | ------------------ |
+| **Border Radius**       | `rounded-xl` (12px) | `rounded-2xl` (16px)     | ⭐ More modern     |
+| **Thumbnail Height**    | `h-52` (208px)      | `h-64` (256px)           | ⭐ 23% larger      |
+| **Hover Scale**         | `scale-105`         | `scale-110`              | ⭐ More dynamic    |
+| **Hover Y-Lift**        | None                | `-4px` lift              | ✨ New feature     |
+| **Shadow**              | `shadow-md`         | `shadow-lg → shadow-2xl` | ⭐ More depth      |
+| **Background**          | Solid               | Gradient overlay         | ✨ New feature     |
+| **Progress Bar**        | Basic solid         | Animated gradient        | ⭐⭐ Major upgrade |
+| **Status Badges**       | Basic colors        | Gradients + icons        | ⭐ Enhanced        |
+| **Buttons**             | Basic gradient      | Enhanced gradient        | ⭐ Improved        |
+| **Loading States**      | Text only           | Spinner animation        | ✨ New feature     |
+| **Animations**          | CSS transitions     | Framer Motion            | ⭐⭐ Major upgrade |
+| **Entrance**            | None                | Staggered fade-in        | ✨ New feature     |
+| **Toast Notifications** | None                | Success/Error toasts     | ✨ New feature     |
+| **Error Handling**      | Basic UI            | Comprehensive            | ⭐ Improved        |
+| **Accessibility**       | Good                | Excellent (ARIA)         | ⭐ Enhanced        |
 
 ---
 
@@ -85,11 +87,13 @@ This document provides a detailed visual and functional comparison between the o
 ### 1. Card Container
 
 **Old:**
+
 ```tsx
 <Card className="overflow-hidden border-2 card-hover h-full flex flex-col">
 ```
 
 **New:**
+
 ```tsx
 <Card className="overflow-hidden border-0 shadow-md hover:shadow-2xl
                  transition-all duration-300 rounded-2xl
@@ -97,6 +101,7 @@ This document provides a detailed visual and functional comparison between the o
 ```
 
 **Improvements:**
+
 - Removed border for cleaner look
 - Enhanced shadow on hover
 - Added gradient background
@@ -106,12 +111,16 @@ This document provides a detailed visual and functional comparison between the o
 ### 2. Thumbnail Section
 
 **Old:**
+
 ```tsx
-<img className="w-full h-52 object-cover
-                transition-transform duration-500 group-hover:scale-105" />
+<img
+  className="w-full h-52 object-cover
+                transition-transform duration-500 group-hover:scale-105"
+/>
 ```
 
 **New:**
+
 ```tsx
 <motion.img
   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
@@ -121,6 +130,7 @@ This document provides a detailed visual and functional comparison between the o
 ```
 
 **Improvements:**
+
 - 23% larger (256px vs 208px)
 - Stronger hover effect (110 vs 105)
 - Gradient overlay on hover
@@ -130,11 +140,13 @@ This document provides a detailed visual and functional comparison between the o
 ### 3. Progress Bar
 
 **Old:**
+
 ```tsx
 <Progress value={progressPercent} className="h-2.5" />
 ```
 
 **New:**
+
 ```tsx
 <div className="relative h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
   <motion.div
@@ -155,6 +167,7 @@ This document provides a detailed visual and functional comparison between the o
 ```
 
 **Improvements:**
+
 - Animated gradient fill
 - Shimmer effect animation
 - Smooth entrance animation
@@ -164,6 +177,7 @@ This document provides a detailed visual and functional comparison between the o
 ### 4. Status Badges
 
 **Old:**
+
 ```tsx
 <Badge className={`${statusInfo.className} backdrop-blur-sm border-0`}>
   <StatusIcon className="w-3 h-3 mr-1" />
@@ -172,16 +186,20 @@ This document provides a detailed visual and functional comparison between the o
 ```
 
 **New:**
+
 ```tsx
-<Badge className={`${statusInfo.className}
+<Badge
+  className={`${statusInfo.className}
                   backdrop-blur-md shadow-lg border-2
-                  px-3 py-1.5 text-sm font-semibold rounded-full`}>
+                  px-3 py-1.5 text-sm font-semibold rounded-full`}
+>
   <StatusIcon className="w-3.5 h-3.5 mr-1.5" />
   {statusInfo.label}
 </Badge>
 ```
 
 **Improvements:**
+
 - Stronger backdrop blur (md vs sm)
 - Added shadow-lg
 - Border-2 for emphasis
@@ -192,37 +210,56 @@ This document provides a detailed visual and functional comparison between the o
 ### 5. Action Buttons
 
 **Old:**
+
 ```tsx
-<Button className="w-full h-10 bg-gradient-to-r from-violet-500 to-purple-600
+<Button
+  className="w-full h-10 bg-gradient-to-r from-violet-500 to-purple-600
                   hover:from-violet-600 hover:to-purple-700
                   shadow-md button-glow"
-          disabled={isLoading}>
-  {isLoading ? 'Processing...' : <><Wallet className="w-4 h-4 mr-2" />Contribute</>}
+  disabled={isLoading}
+>
+  {isLoading ? (
+    'Processing...'
+  ) : (
+    <>
+      <Wallet className="w-4 h-4 mr-2" />
+      Contribute
+    </>
+  )}
 </Button>
 ```
 
 **New:**
+
 ```tsx
 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-  <Button className="w-full h-12 bg-gradient-to-r from-violet-500 to-purple-600
+  <Button
+    className="w-full h-12 bg-gradient-to-r from-violet-500 to-purple-600
                     hover:opacity-90 shadow-lg hover:shadow-xl
                     transition-all duration-300 text-white font-semibold rounded-xl"
-          disabled={isLoading}>
+    disabled={isLoading}
+  >
     {isLoading ? (
       <>
-        <motion.div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity }} />
+        <motion.div
+          className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity }}
+        />
         Processing...
       </>
     ) : (
-      <><Wallet className="w-5 h-5 mr-2" />Contribute Now</>
+      <>
+        <Wallet className="w-5 h-5 mr-2" />
+        Contribute Now
+      </>
     )}
   </Button>
 </motion.div>
 ```
 
 **Improvements:**
+
 - Larger button (h-12 vs h-10)
 - Motion wrapper (hover/tap effects)
 - Animated spinner during loading
@@ -283,6 +320,7 @@ whileTap={{ scale: 0.98 }}
 ```
 
 **Improvements:**
+
 - GPU-accelerated animations
 - Staggered entrance effects
 - Smoother easing curves
@@ -300,7 +338,7 @@ const statusConfig = {
   COLLECTING: 'from-violet-500 to-purple-600',
   AVAILABLE: 'from-green-500 to-emerald-600',
   // Basic single-color gradients
-}
+};
 ```
 
 ### New Component Colors
@@ -324,10 +362,11 @@ const statusConfig = {
     gradient: 'from-green-500 to-emerald-600',
   },
   // Enhanced multi-stop gradients
-}
+};
 ```
 
 **Improvements:**
+
 - Multi-stop gradients
 - Status-specific background colors
 - Better dark mode support
@@ -339,20 +378,19 @@ const statusConfig = {
 ## Spacing & Layout
 
 ### Old Component
+
 ```tsx
-<CardContent className="p-5 space-y-4">
-  {/* Content */}
-</CardContent>
+<CardContent className="p-5 space-y-4">{/* Content */}</CardContent>
 ```
 
 ### New Component
+
 ```tsx
-<CardContent className="p-6 space-y-5">
-  {/* Content with more breathing room */}
-</CardContent>
+<CardContent className="p-6 space-y-5">{/* Content with more breathing room */}</CardContent>
 ```
 
 **Improvements:**
+
 - Increased padding (p-6 vs p-5)
 - More vertical spacing (space-y-5 vs space-y-4)
 - Better visual hierarchy
@@ -363,6 +401,7 @@ const statusConfig = {
 ## Responsive Design
 
 ### Both components support:
+
 - Mobile: 1 column
 - Tablet (sm): 2 columns
 - Desktop (lg): 3 columns
@@ -375,11 +414,13 @@ The new component works seamlessly with the same grid structure.
 ## Performance Impact
 
 ### Old Component
+
 - Pure CSS transitions
 - No JavaScript animations
 - Lightweight but limited
 
 ### New Component
+
 - Framer Motion animations
 - GPU-accelerated
 - Optimized with `will-change`
@@ -387,6 +428,7 @@ The new component works seamlessly with the same grid structure.
 - Better user experience
 
 **Benchmark:**
+
 - Initial render: ~5ms overhead
 - Animations: 60fps maintained
 - Memory: Negligible increase
@@ -396,12 +438,14 @@ The new component works seamlessly with the same grid structure.
 ## Code Quality
 
 ### Old Component
+
 - 292 lines
 - Basic error handling
 - Limited TypeScript types
 - No loading states
 
 ### New Component
+
 - 520 lines (more features)
 - Comprehensive error handling
 - Full TypeScript coverage
@@ -409,6 +453,7 @@ The new component works seamlessly with the same grid structure.
 - Better code organization
 
 **Improvements:**
+
 - +228 lines of enhancements
 - Better maintainability
 - More robust error handling
@@ -419,18 +464,21 @@ The new component works seamlessly with the same grid structure.
 ## User Experience Improvements
 
 ### Visual Feedback
+
 1. **Hover Effects**: Clear feedback on interaction
 2. **Loading States**: Animated spinners during API calls
 3. **Success/Error**: Toast notifications for all actions
 4. **Progress**: Animated progress bars show funding status
 
 ### Accessibility
+
 1. **Keyboard Navigation**: Full keyboard support
 2. **Screen Reader**: Proper ARIA labels
 3. **Focus Indicators**: Clear focus states
 4. **Semantic HTML**: Proper structure
 
 ### Performance
+
 1. **Smooth Animations**: 60fps maintained
 2. **Fast Loading**: Optimized renders
 3. **Efficient Updates**: Minimal re-renders
@@ -441,18 +489,21 @@ The new component works seamlessly with the same grid structure.
 ## Migration Impact
 
 ### What Changes
+
 ✅ Import path (1 line per file)
 ✅ Visual appearance (significantly improved)
 ✅ Animations (much smoother)
 ✅ User feedback (better UX)
 
 ### What Stays the Same
+
 ✅ Data structure (100% compatible)
 ✅ API integration (same endpoints)
 ✅ Props interface (identical)
 ✅ Functionality (enhanced, not changed)
 
 ### Migration Effort
+
 ⏱️ Time: 5-10 minutes per page
 🔧 Complexity: Low (change import only)
 📚 Learning: Minimal (same usage)

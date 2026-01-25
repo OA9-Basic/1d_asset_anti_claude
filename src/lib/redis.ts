@@ -3,4 +3,4 @@ export const redis = {
   set: async () => 'OK',
   del: async () => 1,
   flushdb: async () => 'OK',
-}
+};

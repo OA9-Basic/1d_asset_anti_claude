@@ -1,21 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { db } from '@/lib/db'
+import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url)
-    const limit = parseInt(searchParams.get('limit') || '6')
-    const trending = searchParams.get('trending') === 'true'
+    const { searchParams } = new URL(req.url);
+    const limit = parseInt(searchParams.get('limit') || '6');
+    const trending = searchParams.get('trending') === 'true';
 
-    let orderBy: any = { createdAt: 'desc' }
+    let orderBy: any = { createdAt: 'desc' };
 
     // If trending, order by purchases and collected amount
     if (trending) {
-      orderBy = [
-        { totalPurchases: 'desc' },
-        { currentCollected: 'desc' },
-      ]
+      orderBy = [{ totalPurchases: 'desc' }, { currentCollected: 'desc' }];
     }
 
     const assets = await db.asset.findMany({
@@ -42,14 +39,16 @@ export async function GET(req: NextRequest) {
         featured: true,
         createdAt: true,
       },
-    })
+    });
 
-    return NextResponse.json({ assets })
-
+    return NextResponse.json({ assets });
   } catch (error) {
-    console.error('Featured assets fetch error:', error)
-    return NextResponse.json({
-      error: 'Internal server error',
-    }, { status: 500 })
+    console.error('Featured assets fetch error:', error);
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+      },
+      { status: 500 }
+    );
   }
 }

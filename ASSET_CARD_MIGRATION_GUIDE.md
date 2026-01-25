@@ -13,12 +13,14 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 ## Key Features
 
 ### 1. Modern Bento-Style Design
+
 - Clean, rounded-xl corners (2xl) for a modern aesthetic
 - Gradient backgrounds with subtle overlays
 - Enhanced spacing and visual hierarchy
 - Professional shadow effects with hover elevation
 
 ### 2. Enhanced Thumbnail Experience
+
 - Large 64-height thumbnail (256px)
 - Smooth hover zoom effect (scale-110)
 - Gradient overlay on hover
@@ -26,6 +28,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 - Image error handling with graceful degradation
 
 ### 3. Thick Gradient Progress Bar
+
 - Animated gradient progress bar for COLLECTING status
 - Shimmer effect animation
 - Smooth width animation on mount
@@ -33,6 +36,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 - "X% Funded" with gradient text
 
 ### 4. Status Badges with Icons
+
 - Status-specific color schemes and gradients
 - Backdrop blur effect for modern glass morphism
 - Icons for each status type:
@@ -45,6 +49,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
   - REJECTED: Clock, red-rose gradient
 
 ### 5. Pricing Information
+
 - Clear target price display
 - Current collected amount with gradient text
 - Remaining amount to fund
@@ -52,6 +57,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 - Grid layout for better information hierarchy
 
 ### 6. Hover Effects
+
 - Scale 1.02 on hover (subtle lift)
 - Y-axis lift (-4px) for elevation
 - Enhanced shadow (shadow-2xl)
@@ -59,6 +65,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 - Text gradient effect on title hover
 
 ### 7. Framer Motion Animations
+
 - **Container Animation**: Fade in + slide up
 - **Card Animation**: Scale + fade in
 - **Progress Bar**: Animated width with spring easing
@@ -69,6 +76,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 ### 8. Status-Specific Styling
 
 #### COLLECTING Status
+
 - Shows progress bar with gradient
 - "Contribute Now" button with violet-purple gradient
 - Raised amount + Goal display
@@ -77,6 +85,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 - Violet-purple color scheme
 
 #### AVAILABLE Status
+
 - Shows "Instant Access" message
 - "Get for $1" button with green-emerald gradient
 - People count with access
@@ -84,12 +93,14 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 - Price tag overlay ($1)
 
 #### PURCHASED Status
+
 - Shows "Fully Funded" message
 - "View Asset" button
 - People count display
 - Emerald-teal color scheme
 
 #### Other Statuses
+
 - Disabled state with appropriate styling
 - Status badge displayed
 - No action button (disabled)
@@ -97,6 +108,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 ### 9. Full Backend Connectivity
 
 #### Contribute API
+
 - **Endpoint**: `POST /api/contribute`
 - **Payload**: `{ assetId: string, amount: number }`
 - **Features**:
@@ -108,6 +120,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
   - Excess amount notification
 
 #### Purchase API
+
 - **Endpoint**: `POST /api/assets/[id]/purchase`
 - **Payload**: `{ amount: number }`
 - **Features**:
@@ -118,6 +131,7 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
   - Redirect with access=true on success
 
 ### 10. Progress Calculation
+
 - Includes platform fee (15% by default)
 - Calculates target with fee: `targetPrice * (1 + platformFee)`
 - Shows accurate progress percentage
@@ -130,9 +144,9 @@ A completely redesigned Asset Card component with modern bento-style design, Fra
 interface AssetCardProps {
   asset: Asset & {
     _count?: {
-      pledges: number
-    }
-  }
+      pledges: number;
+    };
+  };
 }
 ```
 
@@ -162,6 +176,7 @@ function MyPage() {
 ### Migration from Old Component
 
 **Before**:
+
 ```typescript
 import { AssetCard } from '@/components/features/asset-card'
 
@@ -169,6 +184,7 @@ import { AssetCard } from '@/components/features/asset-card'
 ```
 
 **After**:
+
 ```typescript
 import { AssetCard } from '@/components/dashboard/asset-card'
 // or
@@ -182,12 +198,14 @@ import { AssetCard } from '@/components/dashboard'
 The component uses the following dependencies (already installed in your project):
 
 ### UI Components
+
 - `@/components/ui/card` - Card container
 - `@/components/ui/badge` - Status badges
 - `@/components/ui/button` - Action buttons
 - `@/components/ui/progress` - Progress bar (custom implementation with gradient)
 
 ### Animation
+
 - `framer-motion` - All animations and motion effects
   - Container animations
   - Card hover effects
@@ -196,33 +214,43 @@ The component uses the following dependencies (already installed in your project
   - Staggered delays
 
 ### Icons
+
 - `lucide-react` - All icons used
   - Wallet, CheckCircle2, Clock
   - Users, ShoppingCart, Star
   - DollarSign, Sparkles, TrendingUp
 
 ### Utilities
+
 - `@/hooks/use-toast` - Toast notifications
 - `next/navigation` - Router for navigation
 - `next/link` - Link wrapper for card
 
 ### Database
+
 - `@prisma/client` - Asset type definition
 
 ## Component Structure
 
 ```tsx
-<motion.div>  // Container with fade-in animation
-  <Link>      // Clickable link to asset detail
-    <motion.div>  // Card with hover effects
-      <Card>      // Main card container
+<motion.div>
+  {' '}
+  // Container with fade-in animation
+  <Link>
+    {' '}
+    // Clickable link to asset detail
+    <motion.div>
+      {' '}
+      // Card with hover effects
+      <Card>
+        {' '}
+        // Main card container
         {/* Thumbnail Section */}
         <div className="relative">
-          <img />  {/* With hover zoom */}
-          <Badge />  {/* Status badge */}
-          <Badge />  {/* Featured badge */}
+          <img /> {/* With hover zoom */}
+          <Badge /> {/* Status badge */}
+          <Badge /> {/* Featured badge */}
         </div>
-
         <CardContent>
           {/* Title & Type */}
           <h3>Title</h3>
@@ -248,12 +276,14 @@ The component uses the following dependencies (already installed in your project
 ## Color Schemes
 
 ### Primary Gradients
+
 - **Violet-Purple**: `from-violet-500 to-purple-600` (COLLECTING)
 - **Green-Emerald**: `from-green-500 to-emerald-600` (AVAILABLE)
 - **Emerald-Teal**: `from-emerald-500 to-teal-600` (PURCHASED)
 - **Blue-Cyan**: `from-blue-500 to-cyan-500` (APPROVED)
 
 ### Status Colors
+
 - **Requested**: Slate (neutral)
 - **Approved**: Blue (positive)
 - **Collecting**: Violet-Purple (active)
@@ -265,6 +295,7 @@ The component uses the following dependencies (already installed in your project
 ## Responsive Design
 
 The card is fully responsive and works with:
+
 - Mobile: 1 column grid
 - Tablet: 2 columns (sm:grid-cols-2)
 - Desktop: 3 columns (lg:grid-cols-3)
@@ -291,6 +322,7 @@ The card is fully responsive and works with:
 ## Customization
 
 ### Modify Animation Speed
+
 ```typescript
 // In cardVariants
 transition: {
@@ -300,6 +332,7 @@ transition: {
 ```
 
 ### Change Hover Scale
+
 ```typescript
 // In whileHover
 whileHover={{
@@ -309,16 +342,18 @@ whileHover={{
 ```
 
 ### Adjust Thumbnail Height
+
 ```typescript
 // Currently h-64 (256px)
-className="w-full h-64 object-cover"
+className = 'w-full h-64 object-cover';
 // Change to h-56 (224px) or h-72 (288px)
 ```
 
 ### Modify Progress Bar Gradient
+
 ```typescript
 // Currently: from-violet-500 via-purple-500 to-fuchsia-500
-className="bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500"
+className = 'bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500';
 ```
 
 ## Browser Compatibility
@@ -331,6 +366,7 @@ className="bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500"
 ## Future Enhancements
 
 Potential improvements for future versions:
+
 1. Wishlist/favorite functionality
 2. Quick preview modal on hover
 3. Social share buttons
@@ -343,6 +379,7 @@ Potential improvements for future versions:
 ## Testing
 
 Recommended test cases:
+
 1. Render with all asset statuses
 2. Contribute button functionality
 3. Purchase button functionality
@@ -357,6 +394,7 @@ Recommended test cases:
 ## Support
 
 For issues or questions:
+
 1. Check the API endpoints are working
 2. Verify asset data structure
 3. Check browser console for errors

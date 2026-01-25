@@ -1,6 +1,6 @@
 export async function distributeRevenue(_assetId: string, _amount: number | string) {
   // Gap loan feature is not yet implemented - requires gapLoan table in Prisma schema
-  throw new Error('Revenue distribution with gap loan repayment is not yet available')
+  throw new Error('Revenue distribution with gap loan repayment is not yet available');
 
   /*
   const revenueAmount = typeof amount === 'string' ? parseFloat(amount) : amount

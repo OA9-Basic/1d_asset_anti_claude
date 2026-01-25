@@ -1,1 +1,1 @@
-export { AssetCard } from './asset-card'
+export { AssetCard } from './asset-card';

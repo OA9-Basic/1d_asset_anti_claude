@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowUpDown,
@@ -11,58 +11,58 @@ import {
   Search,
   TrendingUp,
   X,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import useSWR from 'swr'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 
-import { AssetCard } from '@/components/features/asset-card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { AssetCard } from '@/components/features/asset-card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from '@/components/ui/select';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Asset {
-  id: string
-  title: string
-  description: string
-  type: string
-  status: string
-  thumbnail: string | null
-  targetPrice: number
-  platformFee: number
-  currentCollected: number
-  totalPurchases: number
-  totalRevenue: number
-  featured: boolean
-  createdAt: string
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  thumbnail: string | null;
+  targetPrice: number;
+  platformFee: number;
+  currentCollected: number;
+  totalPurchases: number;
+  totalRevenue: number;
+  featured: boolean;
+  createdAt: string;
 }
 
 interface AssetsResponse {
-  assets: Asset[]
-  nextCursor?: string
-  totalCount: number
-  hasMore: boolean
+  assets: Asset[];
+  nextCursor?: string;
+  totalCount: number;
+  hasMore: boolean;
 }
 
-type SortOption = 'newest' | 'mostFunded' | 'endingSoon' | 'trending'
+type SortOption = 'newest' | 'mostFunded' | 'endingSoon' | 'trending';
 
 const sortOptions: { value: SortOption; label: string; icon: string }[] = [
   { value: 'newest', label: 'Newest', icon: '🕐' },
   { value: 'mostFunded', label: 'Most Funded', icon: '💰' },
   { value: 'endingSoon', label: 'Ending Soon', icon: '⏰' },
   { value: 'trending', label: 'Trending', icon: '🔥' },
-]
+];
 
 const assetTypes = [
   { value: 'COURSE', label: 'Course', icon: '📚' },
@@ -74,7 +74,7 @@ const assetTypes = [
   { value: 'MODEL_3D', label: '3D Model', icon: '🎨' },
   { value: 'EBOOK', label: 'Ebook', icon: '📖' },
   { value: 'OTHER', label: 'Other', icon: '📦' },
-]
+];
 
 const priceRanges = [
   { value: '0-50', label: 'Under $50', min: 0, max: 50 },
@@ -82,7 +82,7 @@ const priceRanges = [
   { value: '100-200', label: '$100 - $200', min: 100, max: 200 },
   { value: '200-500', label: '$200 - $500', min: 200, max: 500 },
   { value: '500+', label: '$500+', min: 500, max: null },
-]
+];
 
 // Loading Skeleton Component
 function AssetCardSkeleton() {
@@ -98,7 +98,7 @@ function AssetCardSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Filter Chip Component
@@ -107,9 +107,9 @@ function FilterChip({
   isActive,
   onRemove,
 }: {
-  label: string
-  isActive: boolean
-  onRemove: () => void
+  label: string;
+  isActive: boolean;
+  onRemove: () => void;
 }) {
   return (
     <Badge
@@ -124,120 +124,112 @@ function FilterChip({
       {label}
       {isActive && <X className="w-3 h-3 ml-1" />}
     </Badge>
-  )
+  );
 }
 
 export default function FundingAssetsPage() {
-  const _router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState<SortOption>('newest')
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
-  const [selectedPriceRange, setSelectedPriceRange] = useState<string>('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [cursor, setCursor] = useState<string | undefined>()
-  const [allAssets, setAllAssets] = useState<Asset[]>([])
-  const [showFilters, setShowFilters] = useState(false)
+  const _router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [cursor, setCursor] = useState<string | undefined>();
+  const [allAssets, setAllAssets] = useState<Asset[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery)
-      setCursor(undefined) // Reset pagination when search changes
-      setAllAssets([]) // Clear previous results
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [searchQuery])
+      setDebouncedSearch(searchQuery);
+      setCursor(undefined); // Reset pagination when search changes
+      setAllAssets([]); // Clear previous results
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Reset pagination when filters change
   useEffect(() => {
-    setCursor(undefined)
-    setAllAssets([])
-  }, [selectedTypes, selectedPriceRange, sortBy])
+    setCursor(undefined);
+    setAllAssets([]);
+  }, [selectedTypes, selectedPriceRange, sortBy]);
 
   // Build query params
   const queryParams = new URLSearchParams({
     status: 'COLLECTING',
     sort: sortBy,
     limit: '12',
-  })
+  });
 
   if (debouncedSearch) {
-    queryParams.append('search', debouncedSearch)
+    queryParams.append('search', debouncedSearch);
   }
 
   if (selectedTypes.length > 0) {
-    queryParams.append('type', selectedTypes.join(','))
+    queryParams.append('type', selectedTypes.join(','));
   }
 
   if (selectedPriceRange) {
-    const range = priceRanges.find((r) => r.value === selectedPriceRange)
+    const range = priceRanges.find((r) => r.value === selectedPriceRange);
     if (range) {
-      if (range.min !== null) queryParams.append('minPrice', range.min.toString())
-      if (range.max !== null) queryParams.append('maxPrice', range.max.toString())
+      if (range.min !== null) queryParams.append('minPrice', range.min.toString());
+      if (range.max !== null) queryParams.append('maxPrice', range.max.toString());
     }
   }
 
   if (cursor) {
-    queryParams.append('cursor', cursor)
+    queryParams.append('cursor', cursor);
   }
 
-  const queryString = queryParams.toString()
-  const url = `/api/assets?${queryString}`
+  const queryString = queryParams.toString();
+  const url = `/api/assets?${queryString}`;
 
   // Fetch assets
-  const { data, error, isLoading, mutate } = useSWR<AssetsResponse>(
-    url,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      dedupingInterval: 30000,
-      onSuccess: (newData) => {
-        if (cursor) {
-          setAllAssets((prev) => [...prev, ...newData.assets])
-        } else {
-          setAllAssets(newData.assets)
-        }
-      },
-    }
-  )
+  const { data, error, isLoading, mutate } = useSWR<AssetsResponse>(url, fetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 30000,
+    onSuccess: (newData) => {
+      if (cursor) {
+        setAllAssets((prev) => [...prev, ...newData.assets]);
+      } else {
+        setAllAssets(newData.assets);
+      }
+    },
+  });
 
-  const displayedAssets = cursor ? allAssets : (data?.assets || [])
+  const displayedAssets = cursor ? allAssets : data?.assets || [];
 
   // Toggle asset type filter
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
-      prev.includes(type)
-        ? prev.filter((t) => t !== type)
-        : [...prev, type]
-    )
-  }
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
 
   // Clear all filters
   const clearFilters = () => {
-    setSelectedTypes([])
-    setSelectedPriceRange('')
-    setSearchQuery('')
-  }
+    setSelectedTypes([]);
+    setSelectedPriceRange('');
+    setSearchQuery('');
+  };
 
   // Load more handler
   const handleLoadMore = () => {
     if (data?.nextCursor && !isLoading) {
-      setCursor(data.nextCursor)
+      setCursor(data.nextCursor);
     }
-  }
+  };
 
   // Reset to first page when sort changes
   const handleSortChange = (value: SortOption) => {
-    setSortBy(value)
-    setCursor(undefined)
-    setAllAssets([])
-  }
+    setSortBy(value);
+    setCursor(undefined);
+    setAllAssets([]);
+  };
 
   // Count active filters
   const activeFilterCount =
-    (searchQuery ? 1 : 0) +
-    selectedTypes.length +
-    (selectedPriceRange ? 1 : 0)
+    (searchQuery ? 1 : 0) + selectedTypes.length + (selectedPriceRange ? 1 : 0);
 
   return (
     <div className="space-y-6">
@@ -247,7 +239,10 @@ export default function FundingAssetsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Link href="/marketplace" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
+        <Link
+          href="/marketplace"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
+        >
           <ChevronLeft className="w-4 h-4 mr-1" />
           Back to Marketplace
         </Link>
@@ -322,12 +317,7 @@ export default function FundingAssetsPage() {
               </Button>
 
               {/* Refresh */}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => mutate()}
-                disabled={isLoading}
-              >
+              <Button variant="outline" size="icon" onClick={() => mutate()} disabled={isLoading}>
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
             </div>
@@ -394,9 +384,7 @@ export default function FundingAssetsPage() {
                       label={range.label}
                       isActive={selectedPriceRange === range.value}
                       onRemove={() =>
-                        setSelectedPriceRange(
-                          selectedPriceRange === range.value ? '' : range.value
-                        )
+                        setSelectedPriceRange(selectedPriceRange === range.value ? '' : range.value)
                       }
                     />
                   ))}
@@ -410,11 +398,7 @@ export default function FundingAssetsPage() {
                     <span className="text-sm text-muted-foreground">
                       {activeFilterCount} filter{activeFilterCount > 1 ? 's' : ''} applied
                     </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={clearFilters}
-                    >
+                    <Button variant="outline" size="sm" onClick={clearFilters}>
                       Clear all filters
                     </Button>
                   </div>
@@ -440,10 +424,7 @@ export default function FundingAssetsPage() {
 
       {/* Error State */}
       {error && !isLoading && displayedAssets.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-destructive">
             <CardContent className="p-12 text-center">
               <AlertCircle className="w-12 h-12 mx-auto mb-4 text-destructive" />
@@ -462,10 +443,7 @@ export default function FundingAssetsPage() {
 
       {/* Empty State */}
       {!isLoading && !error && displayedAssets.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-2">
             <CardContent className="p-12 text-center">
               <TrendingUp className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
@@ -549,5 +527,5 @@ export default function FundingAssetsPage() {
         </motion.div>
       )}
     </div>
-  )
+  );
 }

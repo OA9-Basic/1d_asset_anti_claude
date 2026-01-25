@@ -1,22 +1,65 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { hashPassword, signToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { hashPassword, signToken } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
+/**
+ * Sign up endpoint with rate limiting
+ * SECURITY: 5 attempts per 15 minutes per IP address
+ */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { email, password, name } = body
+    // SECURITY: Rate limiting based on IP address
+    const ip = req.headers.get('x-forwarded-for') || 'unknown';
+    const rateLimit = checkRateLimit(`signup:${ip}`, RateLimitPresets.auth);
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many sign-up attempts. Please try again later.',
+          retryAfter: Math.ceil((rateLimit.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimit.limit.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': new Date(rateLimit.resetTime).toISOString(),
+            'Retry-After': Math.ceil((rateLimit.resetTime - Date.now()) / 1000).toString(),
+          },
+        }
+      );
+    }
+
+    const body = await req.json();
+    const { email, password, name } = body;
+
+    // SECURITY: Basic input validation
+    if (!email || !password || !name) {
+      return NextResponse.json(
+        { error: 'Email, password, and name are required' },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Password strength check
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      );
+    }
 
     const existing = await db.user.findUnique({
       where: { email },
-    })
+    });
 
     if (existing) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+      return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
     }
 
-    const passwordHash = await hashPassword(password)
+    const passwordHash = await hashPassword(password);
 
     const user = await db.user.create({
       data: {
@@ -27,29 +70,39 @@ export async function POST(req: NextRequest) {
           create: {},
         },
       },
-    })
+    });
 
-    const token = signToken(user.id)
+    const token = signToken(user.id);
 
-    const response = NextResponse.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.firstName,
+    const response = NextResponse.json(
+      {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.firstName,
+        },
       },
-    })
+      {
+        headers: {
+          'X-RateLimit-Limit': rateLimit.limit.toString(),
+          'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+          'X-RateLimit-Reset': new Date(rateLimit.resetTime).toISOString(),
+        },
+      }
+    );
 
+    // Set cookie with 7 day expiration to match token
     response.cookies.set('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
-    })
+    });
 
-    return response
+    return response;
   } catch (error) {
-    console.error('Sign up error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Sign up error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

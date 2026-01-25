@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowUpDown,
@@ -10,58 +10,52 @@ import {
   Package,
   RefreshCw,
   Search,
-} from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import useSWR from 'swr'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import useSWR from 'swr';
 
-import { AssetCard } from '@/components/features/asset-card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { AssetCard } from '@/components/features/asset-card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import {
-  buttonTap,
-  fadeInUp,
-  hoverScale,
-  staggerContainer,
-  staggerItem,
-} from '@/lib/animations'
+} from '@/components/ui/select';
+import { buttonTap, fadeInUp, hoverScale, staggerContainer, staggerItem } from '@/lib/animations';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Asset {
-  id: string
-  title: string
-  description: string
-  type: string
-  status: string
-  thumbnail: string | null
-  targetPrice: number
-  platformFee: number
-  currentCollected: number
-  totalPurchases: number
-  totalRevenue: number
-  featured: boolean
-  createdAt: string
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  thumbnail: string | null;
+  targetPrice: number;
+  platformFee: number;
+  currentCollected: number;
+  totalPurchases: number;
+  totalRevenue: number;
+  featured: boolean;
+  createdAt: string;
 }
 
 interface AssetsResponse {
-  assets: Asset[]
-  nextCursor?: string
-  totalCount: number
-  hasMore: boolean
+  assets: Asset[];
+  nextCursor?: string;
+  totalCount: number;
+  hasMore: boolean;
 }
 
-type SortOption = 'newest' | 'mostPurchased' | 'trending' | 'priceAsc' | 'priceDesc'
+type SortOption = 'newest' | 'mostPurchased' | 'trending' | 'priceAsc' | 'priceDesc';
 
 const sortOptions: { value: SortOption; label: string; icon: string }[] = [
   { value: 'newest', label: 'Newest', icon: '🕐' },
@@ -69,7 +63,7 @@ const sortOptions: { value: SortOption; label: string; icon: string }[] = [
   { value: 'trending', label: 'Trending', icon: '📈' },
   { value: 'priceAsc', label: 'Price: Low to High', icon: '💰' },
   { value: 'priceDesc', label: 'Price: High to Low', icon: '💎' },
-]
+];
 
 // Loading Skeleton Component
 function AssetCardSkeleton() {
@@ -85,67 +79,63 @@ function AssetCardSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function AvailableAssetsPage() {
-  const _router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState<SortOption>('newest')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [cursor, setCursor] = useState<string | undefined>()
-  const [allAssets, setAllAssets] = useState<Asset[]>([])
+  const _router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [cursor, setCursor] = useState<string | undefined>();
+  const [allAssets, setAllAssets] = useState<Asset[]>([]);
 
   // Build query params
   const queryParams = new URLSearchParams({
     status: 'AVAILABLE,PURCHASED',
     sort: sortBy,
     limit: '12',
-  })
+  });
 
   if (debouncedSearch) {
-    queryParams.append('search', debouncedSearch)
+    queryParams.append('search', debouncedSearch);
   }
 
   if (cursor) {
-    queryParams.append('cursor', cursor)
+    queryParams.append('cursor', cursor);
   }
 
-  const queryString = queryParams.toString()
-  const url = `/api/assets?${queryString}`
+  const queryString = queryParams.toString();
+  const url = `/api/assets?${queryString}`;
 
   // Fetch assets
-  const { data, error, isLoading, mutate } = useSWR<AssetsResponse>(
-    url,
-    fetcher,
-    {
-      revalidateOnFocus: true,
-      dedupingInterval: 30000,
-      onSuccess: (newData) => {
-        if (cursor) {
-          setAllAssets((prev) => [...prev, ...newData.assets])
-        } else {
-          setAllAssets(newData.assets)
-        }
-      },
-    }
-  )
+  const { data, error, isLoading, mutate } = useSWR<AssetsResponse>(url, fetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 30000,
+    onSuccess: (newData) => {
+      if (cursor) {
+        setAllAssets((prev) => [...prev, ...newData.assets]);
+      } else {
+        setAllAssets(newData.assets);
+      }
+    },
+  });
 
-  const displayedAssets = cursor ? allAssets : (data?.assets || [])
+  const displayedAssets = cursor ? allAssets : data?.assets || [];
 
   // Load more handler
   const handleLoadMore = () => {
     if (data?.nextCursor && !isLoading) {
-      setCursor(data.nextCursor)
+      setCursor(data.nextCursor);
     }
-  }
+  };
 
   // Reset to first page when sort changes
   const handleSortChange = (value: SortOption) => {
-    setSortBy(value)
-    setCursor(undefined)
-    setAllAssets([])
-  }
+    setSortBy(value);
+    setCursor(undefined);
+    setAllAssets([]);
+  };
 
   return (
     <motion.div
@@ -155,13 +145,12 @@ export default function AvailableAssetsPage() {
       className="space-y-6"
     >
       {/* Header */}
-      <motion.div
-        variants={fadeInUp}
-        initial="initial"
-        animate="animate"
-      >
+      <motion.div variants={fadeInUp} initial="initial" animate="animate">
         <motion.div {...hoverScale} className="inline-block">
-          <Link href="/marketplace" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
+          <Link
+            href="/marketplace"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors"
+          >
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Marketplace
           </Link>
@@ -232,12 +221,7 @@ export default function AvailableAssetsPage() {
               </Select>
 
               {/* Refresh */}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => mutate()}
-                disabled={isLoading}
-              >
+              <Button variant="outline" size="icon" onClick={() => mutate()} disabled={isLoading}>
                 <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
               </Button>
             </div>
@@ -260,10 +244,7 @@ export default function AvailableAssetsPage() {
 
       {/* Error State */}
       {error && !isLoading && displayedAssets.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-destructive">
             <CardContent className="p-12 text-center">
               <AlertCircle className="w-12 h-12 mx-auto mb-4 text-destructive" />
@@ -282,10 +263,7 @@ export default function AvailableAssetsPage() {
 
       {/* Empty State */}
       {!isLoading && !error && displayedAssets.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <Card className="border-2">
             <CardContent className="p-12 text-center">
               <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
@@ -300,8 +278,8 @@ export default function AvailableAssetsPage() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setSearchQuery('')
-                      setDebouncedSearch('')
+                      setSearchQuery('');
+                      setDebouncedSearch('');
                     }}
                   >
                     Clear Search
@@ -378,5 +356,5 @@ export default function AvailableAssetsPage() {
         </motion.div>
       )}
     </motion.div>
-  )
+  );
 }

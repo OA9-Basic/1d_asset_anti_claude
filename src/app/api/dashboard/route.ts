@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { getUserFromToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { getUserFromToken } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserFromToken(req)
+    const userId = await getUserFromToken(req);
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await db.user.findUnique({
@@ -51,10 +51,10 @@ export async function GET(req: NextRequest) {
           orderBy: { createdAt: 'desc' },
         },
       },
-    })
+    });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Get active votes (asset requests user has voted on that are in VOTING status)
@@ -74,19 +74,15 @@ export async function GET(req: NextRequest) {
         },
       },
       orderBy: { createdAt: 'desc' },
-    })
+    });
 
-    const activeVotes = userVotes.filter(
-      (v) => v.assetRequest.status === 'VOTING'
-    ).length
+    const activeVotes = userVotes.filter((v) => v.assetRequest.status === 'VOTING').length;
 
     // Count total assets user has access to (contributions to funded/purchased assets + purchases)
     const assetsOwned =
       user.contributions.filter(
-        (c) =>
-          c.asset.status === 'PURCHASED' ||
-          c.asset.status === 'AVAILABLE'
-      ).length + user.assetPurchases.length
+        (c) => c.asset.status === 'PURCHASED' || c.asset.status === 'AVAILABLE'
+      ).length + user.assetPurchases.length;
 
     // Get recent activity (transactions and contributions)
     const transactions = await db.transaction.findMany({
@@ -95,7 +91,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
       take: 10,
-    })
+    });
 
     const recentActivity = transactions.map((tx) => ({
       id: tx.id,
@@ -103,7 +99,7 @@ export async function GET(req: NextRequest) {
       amount: tx.amount,
       description: tx.description,
       createdAt: tx.createdAt.toISOString(),
-    }))
+    }));
 
     return NextResponse.json({
       stats: {
@@ -118,12 +114,14 @@ export async function GET(req: NextRequest) {
       purchases: user.assetPurchases,
       recentActivity,
       votes: userVotes,
-    })
-
+    });
   } catch (error) {
-    console.error('Dashboard data fetch error:', error)
-    return NextResponse.json({
-      error: 'Internal server error',
-    }, { status: 500 })
+    console.error('Dashboard data fetch error:', error);
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+      },
+      { status: 500 }
+    );
   }
 }

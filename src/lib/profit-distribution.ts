@@ -1,15 +1,24 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client';
 
-import { db } from './db'
+import { db } from './db';
+import {
+  roundToCents,
+  proportionOf,
+  moneyLessThan,
+  moneyEquals,
+  moneyGreaterThan,
+  subtractMoney,
+  addMoney,
+} from './financial';
 
 export interface DistributionResult {
-  success: boolean
-  assetId: string
-  totalRevenue: number
-  platformProfit: number
-  contributorProfit: number
-  distributedShares: number
-  message: string
+  success: boolean;
+  assetId: string;
+  totalRevenue: number;
+  platformProfit: number;
+  contributorProfit: number;
+  distributedShares: number;
+  message: string;
 }
 
 /**
@@ -24,7 +33,10 @@ export interface DistributionResult {
  */
 
 // Helper type for Transaction Client
-type TransactionClient = Omit<Prisma.TransactionClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>;
+type TransactionClient = Omit<
+  Prisma.TransactionClient,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+>;
 
 export async function distributeProfit(
   assetId: string,
@@ -35,10 +47,10 @@ export async function distributeProfit(
     // Get asset
     const asset = await prisma.asset.findUnique({
       where: { id: assetId },
-    })
+    });
 
     if (!asset) {
-      throw new Error('Asset not found')
+      throw new Error('Asset not found');
     }
 
     // Only distribute profit for AVAILABLE assets
@@ -51,14 +63,14 @@ export async function distributeProfit(
         contributorProfit: 0,
         distributedShares: 0,
         message: 'Asset not available for profit distribution',
-      }
+      };
     }
 
-    const platformFee = asset.platformFee || 0.15
+    const platformFee = asset.platformFee || 0.15;
 
-    // Calculate profit split
-    const platformProfit = purchaseAmount * platformFee
-    const contributorProfit = purchaseAmount - platformProfit
+    // SECURITY FIX: Use safe financial calculations
+    const platformProfit = roundToCents(purchaseAmount * platformFee);
+    const contributorProfit = subtractMoney(purchaseAmount, platformProfit);
 
     // Get all investor contributions (those with excess amounts)
     // Only include those who haven't been fully refunded yet
@@ -68,10 +80,12 @@ export async function distributeProfit(
         isInvestment: true,
         status: 'ACTIVE',
       },
-    })
+    });
 
-    // Filter to only those who still need refunds
-    const activeInvestors = contributions.filter(c => c.totalProfitReceived < c.excessAmount)
+    // SECURITY FIX: Use safe comparison instead of floating point
+    const activeInvestors = contributions.filter((c) =>
+      moneyLessThan(c.totalProfitReceived, c.excessAmount)
+    );
 
     if (activeInvestors.length === 0) {
       // No investors need refunds - all profit goes to platform
@@ -83,42 +97,49 @@ export async function distributeProfit(
         contributorProfit: 0,
         distributedShares: 0,
         message: 'All investors fully refunded - profit goes to platform',
-      }
+      };
     }
 
+    // SECURITY FIX: Use safe financial calculations
     // Recalculate profit share ratios based on remaining amounts owed
     const totalRemainingOwed = activeInvestors.reduce(
-      (sum, c) => sum + (c.excessAmount - c.totalProfitReceived),
+      (sum, c) => addMoney(sum, subtractMoney(c.excessAmount, c.totalProfitReceived)),
       0
-    )
+    );
 
     // Distribute profit proportionally based on remaining amounts owed
-    let distributedShares = 0
+    let distributedShares = 0;
 
     for (const contribution of activeInvestors) {
-      const remainingOwed = contribution.excessAmount - contribution.totalProfitReceived
+      const remainingOwed = subtractMoney(
+        contribution.excessAmount,
+        contribution.totalProfitReceived
+      );
 
-      if (remainingOwed <= 0) continue
+      if (moneyLessThan(remainingOwed, 0) || moneyEquals(remainingOwed, 0)) continue;
 
-      // Calculate share based on remaining owed amount
-      const shareRatio = remainingOwed / totalRemainingOwed
-      let shareAmount = contributorProfit * shareRatio
+      // SECURITY FIX: Use safe proportion calculation
+      const shareRatio = remainingOwed / totalRemainingOwed;
+      let shareAmount = proportionOf(contributorProfit, remainingOwed, totalRemainingOwed);
 
       // Cap at remaining owed amount
-      shareAmount = Math.min(shareAmount, remainingOwed)
+      if (moneyGreaterThan(shareAmount, remainingOwed)) {
+        shareAmount = remainingOwed;
+      }
 
-      if (shareAmount <= 0) continue
+      if (moneyLessThan(shareAmount, 0) || moneyEquals(shareAmount, 0)) continue;
 
       // Get contributor's wallet
       const wallet = await prisma.wallet.findUnique({
         where: { userId: contribution.userId },
-      })
+      });
 
-      if (!wallet) continue
+      if (!wallet) continue;
 
+      // SECURITY FIX: Use safe financial calculations
       // Add to withdrawable balance
-      const balanceBefore = wallet.withdrawableBalance
-      const balanceAfter = balanceBefore + shareAmount
+      const balanceBefore = wallet.withdrawableBalance;
+      const balanceAfter = addMoney(balanceBefore, shareAmount);
 
       await prisma.transaction.create({
         data: {
@@ -132,19 +153,19 @@ export async function distributeProfit(
           referenceType: 'PROFIT_SHARE',
           description: `Profit share from: ${asset.title}`,
         },
-      })
+      });
 
       await prisma.wallet.update({
         where: { id: wallet.id },
         data: {
           withdrawableBalance: balanceAfter,
-          totalProfitReceived: wallet.totalProfitReceived + shareAmount,
+          totalProfitReceived: addMoney(wallet.totalProfitReceived, shareAmount),
         },
-      })
+      });
 
       // Update contribution profit tracking
-      const newTotalProfitReceived = contribution.totalProfitReceived + shareAmount
-      const isFullyRefunded = newTotalProfitReceived >= contribution.excessAmount
+      const newTotalProfitReceived = addMoney(contribution.totalProfitReceived, shareAmount);
+      const isFullyRefunded = !moneyLessThan(newTotalProfitReceived, contribution.excessAmount);
 
       await prisma.contribution.update({
         where: { id: contribution.id },
@@ -152,7 +173,7 @@ export async function distributeProfit(
           totalProfitReceived: newTotalProfitReceived,
           status: isFullyRefunded ? 'CONVERTED_TO_INVESTMENT' : 'ACTIVE',
         },
-      })
+      });
 
       // Record profit share
       await prisma.profitShare.create({
@@ -164,19 +185,20 @@ export async function distributeProfit(
           shareRatio: shareRatio,
           dailyRevenue: purchaseAmount,
         },
-      })
+      });
 
-      distributedShares++
+      distributedShares++;
     }
 
+    // SECURITY FIX: Use safe financial calculations
     // Update asset totals
     await prisma.asset.update({
       where: { id: assetId },
       data: {
-        totalRevenue: asset.totalRevenue + purchaseAmount,
-        totalProfitDistributed: asset.totalProfitDistributed + contributorProfit,
+        totalRevenue: addMoney(asset.totalRevenue, purchaseAmount),
+        totalProfitDistributed: addMoney(asset.totalProfitDistributed, contributorProfit),
       },
-    })
+    });
 
     // Record distribution
     await prisma.profitDistribution.create({
@@ -187,7 +209,7 @@ export async function distributeProfit(
         contributorProfit,
         distributedShares,
       },
-    })
+    });
 
     return {
       success: true,
@@ -197,16 +219,16 @@ export async function distributeProfit(
       contributorProfit,
       distributedShares,
       message: `Distributed $${contributorProfit.toFixed(2)} to ${distributedShares} investors`,
-    }
-  }
+    };
+  };
 
   // Use provided transaction or create a new one
   if (tx) {
-    return await runDistribution(tx)
+    return await runDistribution(tx);
   } else {
     return await db.$transaction(async (newTx) => {
-      return await runDistribution(newTx)
-    })
+      return await runDistribution(newTx);
+    });
   }
 }
 
@@ -225,36 +247,34 @@ export async function runDailyProfitDistribution() {
         select: { assetPurchases: true },
       },
     },
-  })
+  });
 
-  const results = []
+  const results = [];
 
   for (const asset of assets) {
     // Get purchases since last distribution
     const lastDistribution = await db.profitDistribution.findFirst({
       where: { assetId: asset.id },
       orderBy: { distributionDate: 'desc' },
-    })
+    });
 
     const recentPurchases = await db.assetPurchase.findMany({
       where: {
         assetId: asset.id,
-        createdAt: lastDistribution
-          ? { gte: lastDistribution.distributionDate }
-          : undefined,
+        createdAt: lastDistribution ? { gte: lastDistribution.distributionDate } : undefined,
       },
-    })
+    });
 
     if (recentPurchases.length > 0) {
-      const result = await distributeProfit(asset.id, recentPurchases.length)
-      results.push({ assetId: asset.id, assetTitle: asset.title, ...result as any })
+      const result = await distributeProfit(asset.id, recentPurchases.length);
+      results.push({ assetId: asset.id, assetTitle: asset.title, ...(result as any) });
     }
   }
 
   return {
     totalProcessed: results.length,
     distributions: results,
-  }
+  };
 }
 
 /**
@@ -264,11 +284,11 @@ export async function getAssetDistributionHistory(assetId: string) {
   const distributions = await db.profitDistribution.findMany({
     where: { assetId },
     orderBy: { distributionDate: 'desc' },
-  })
+  });
 
-  const totalRevenue = distributions.reduce((sum, d) => sum + d.totalRevenue, 0)
-  const totalPlatformProfit = distributions.reduce((sum, d) => sum + d.platformProfit, 0)
-  const totalContributorProfit = distributions.reduce((sum, d) => sum + d.contributorProfit, 0)
+  const totalRevenue = distributions.reduce((sum, d) => sum + d.totalRevenue, 0);
+  const totalPlatformProfit = distributions.reduce((sum, d) => sum + d.platformProfit, 0);
+  const totalContributorProfit = distributions.reduce((sum, d) => sum + d.contributorProfit, 0);
 
   return {
     totalRevenue,
@@ -281,7 +301,7 @@ export async function getAssetDistributionHistory(assetId: string) {
       contributorProfit: d.contributorProfit,
       shares: d.distributedShares,
     })),
-  }
+  };
 }
 
 /**
@@ -300,10 +320,10 @@ export async function getUserProfitShares(userId: string) {
       },
     },
     orderBy: { distributedAt: 'desc' },
-  })
+  });
 
   // Group by asset
-  const byAsset = new Map<string, any>()
+  const byAsset = new Map<string, any>();
 
   for (const share of shares) {
     if (!byAsset.has(share.assetId)) {
@@ -312,23 +332,23 @@ export async function getUserProfitShares(userId: string) {
         totalReceived: 0,
         shareCount: 0,
         shares: [],
-      })
+      });
     }
 
-    const data = byAsset.get(share.assetId)!
-    data.totalReceived += share.amount
-    data.shareCount++
+    const data = byAsset.get(share.assetId)!;
+    data.totalReceived += share.amount;
+    data.shareCount++;
     data.shares.push({
       amount: share.amount,
       ratio: share.shareRatio,
       date: share.distributedAt,
-    })
+    });
   }
 
-  const totalReceived = shares.reduce((sum, s) => sum + s.amount, 0)
+  const totalReceived = shares.reduce((sum, s) => sum + s.amount, 0);
 
   return {
     totalReceived,
     assets: Array.from(byAsset.values()),
-  }
+  };
 }

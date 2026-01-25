@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   CheckCircle2,
@@ -11,30 +11,30 @@ import {
   TrendingUp,
   Users,
   Zap,
-} from 'lucide-react'
-import Link from 'next/link'
-import useSWR from 'swr'
+} from 'lucide-react';
+import Link from 'next/link';
+import useSWR from 'swr';
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface Asset {
-  id: string
-  title: string
-  description: string
-  type: string
-  status: string
-  thumbnail: string | null
-  targetPrice: number
-  currentCollected: number
-  totalPurchases: number
-  featured: boolean
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+  thumbnail: string | null;
+  targetPrice: number;
+  currentCollected: number;
+  totalPurchases: number;
+  featured: boolean;
 }
 
 interface FeaturedAssetsData {
-  assets: Asset[]
+  assets: Asset[];
 }
 
 // Stat Card Component
@@ -45,11 +45,11 @@ function StatCard({
   description,
   delay,
 }: {
-  icon: any
-  title: string
-  value: string | number
-  description: string
-  delay?: number
+  icon: any;
+  title: string;
+  value: string | number;
+  description: string;
+  delay?: number;
 }) {
   return (
     <motion.div
@@ -72,7 +72,7 @@ function StatCard({
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
 
 // Featured Asset Card
@@ -128,7 +128,7 @@ function FeaturedAssetCard({ asset }: { asset: Asset }) {
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }
 
 export default function MarketplacePage() {
@@ -136,7 +136,7 @@ export default function MarketplacePage() {
   const { data: featuredData, isLoading: featuredLoading } = useSWR<FeaturedAssetsData>(
     '/api/assets/featured?limit=6',
     fetcher
-  )
+  );
 
   return (
     <div className="space-y-8">
@@ -203,9 +203,7 @@ export default function MarketplacePage() {
         <Card className="border-2 bg-gradient-to-br from-violet-500/10 to-purple-600/10">
           <CardHeader>
             <CardTitle className="text-2xl">Browse Marketplace</CardTitle>
-            <CardDescription>
-              Choose a category to explore available assets
-            </CardDescription>
+            <CardDescription>Choose a category to explore available assets</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Available Assets */}
@@ -260,9 +258,7 @@ export default function MarketplacePage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold">Featured Assets</h2>
-            <p className="text-sm text-muted-foreground">
-              Hand-picked assets from our community
-            </p>
+            <p className="text-sm text-muted-foreground">Hand-picked assets from our community</p>
           </div>
         </div>
 
@@ -278,9 +274,7 @@ export default function MarketplacePage() {
               </Card>
             ))
           ) : featuredData?.assets && featuredData.assets.length > 0 ? (
-            featuredData.assets.map((asset) => (
-              <FeaturedAssetCard key={asset.id} asset={asset} />
-            ))
+            featuredData.assets.map((asset) => <FeaturedAssetCard key={asset.id} asset={asset} />)
           ) : (
             <Card className="col-span-full">
               <CardContent className="p-12 text-center text-muted-foreground">
@@ -301,9 +295,7 @@ export default function MarketplacePage() {
         <Card className="border-2">
           <CardHeader>
             <CardTitle className="text-2xl">How It Works</CardTitle>
-            <CardDescription>
-              Simple steps to get started with our marketplace
-            </CardDescription>
+            <CardDescription>Simple steps to get started with our marketplace</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -339,5 +331,5 @@ export default function MarketplacePage() {
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }

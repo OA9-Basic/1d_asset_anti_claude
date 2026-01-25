@@ -1,29 +1,25 @@
-'use client'
+'use client';
 
-import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
-import { AppHeader } from '@/components/layout/app-header'
-import { AppSidebar } from '@/components/layout/app-sidebar'
-import { MobileNav } from '@/components/layout/mobile-nav'
-import { useAuth } from '@/hooks/use-auth'
-import { cn } from '@/lib/utils'
+import { AppHeader } from '@/components/layout/app-header';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { MobileNav } from '@/components/layout/mobile-nav';
+import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const { user, isLoading } = useAuth()
-  const router = useRouter()
-  const _pathname = usePathname()
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  const _pathname = usePathname();
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push('/auth/sign-in')
+      router.push('/auth/sign-in');
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, router]);
 
   // Show loading state
   if (isLoading) {
@@ -37,12 +33,12 @@ export default function AppLayout({
           <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Don't render if not authenticated (will redirect)
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -56,18 +52,18 @@ export default function AppLayout({
         <AppHeader />
 
         {/* Page Content */}
-        <main className={cn(
-          "min-h-[calc(100vh-4rem)]",
-          "pb-20 md:pb-0" // Add padding for mobile nav
-        )}>
-          <div className="container-custom py-6 px-4 md:px-6">
-            {children}
-          </div>
+        <main
+          className={cn(
+            'min-h-[calc(100vh-4rem)]',
+            'pb-20 md:pb-0' // Add padding for mobile nav
+          )}
+        >
+          <div className="container-custom py-6 px-4 md:px-6">{children}</div>
         </main>
       </div>
 
       {/* Mobile Navigation */}
       <MobileNav />
     </div>
-  )
+  );
 }
