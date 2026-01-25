@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, ChevronRight, Users } from 'lucide-react';
 import Link from 'next/link';
+import { useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,7 +12,7 @@ import type { CampaignCard } from '@/types/page';
 /**
  * Hero Section Component
  * Left: Text content
- * Right: Floating campaign card with bobbing animation
+ * Right: Floating campaign card with bobbing animation and background shapes
  */
 
 interface HeroSectionProps {
@@ -32,6 +33,47 @@ const staggerContainer = {
   },
 };
 
+// Magnetic Button Component
+function MagneticButton({ children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const button = ref.current;
+    if (!button) return;
+
+    const { clientX, clientY } = e;
+    const { left, top, width, height } = button.getBoundingClientRect();
+    const x = (clientX - left - width / 2) * 0.2;
+    const y = (clientY - top - height / 2) * 0.2;
+    setPosition({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  // Extract safe props to spread
+  const { disabled, type, form, onClick } = props;
+
+  return (
+    <motion.button
+      ref={ref}
+      className={className}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+      disabled={disabled}
+      type={type}
+      form={form}
+      onClick={onClick}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
 export function HeroSection({ featuredCampaign }: HeroSectionProps) {
   const progress = featuredCampaign
     ? (featuredCampaign.raisedAmount / featuredCampaign.goalAmount) * 100
@@ -42,6 +84,72 @@ export function HeroSection({ featuredCampaign }: HeroSectionProps) {
       {/* Background gradient blobs */}
       <div className="absolute top-20 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-violet-500/10 to-indigo-500/10 blur-3xl animate-pulse" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-indigo-500/10 to-violet-500/10 blur-3xl animate-pulse delay-1000" />
+
+      {/* Floating geometric shapes background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Square shapes */}
+        <motion.div
+          animate={{
+            y: [0, -30, 0],
+            rotate: [0, 180, 360],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[20%] right-[15%] w-16 h-16 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-2xl rotate-45"
+        />
+        <motion.div
+          animate={{
+            y: [0, 40, 0],
+            rotate: [360, 180, 0],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[30%] right-[25%] w-12 h-12 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-2xl rotate-12"
+        />
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, -180, -360],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[60%] right-[10%] w-20 h-20 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-2xl -rotate-12"
+        />
+
+        {/* Circle shapes */}
+        <motion.div
+          animate={{
+            y: [0, 50, 0],
+            x: [0, 20, 0],
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[40%] right-[8%] w-8 h-8 bg-gradient-to-br from-indigo-500/10 to-violet-500/10 rounded-full"
+        />
+        <motion.div
+          animate={{
+            y: [0, -40, 0],
+            x: [0, -15, 0],
+          }}
+          transition={{ duration: 19, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[20%] right-[20%] w-10 h-10 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 rounded-full"
+        />
+
+        {/* Small dots */}
+        {[1, 2, 3, 4].map((i) => (
+          <motion.div
+            key={i}
+            animate={{
+              y: [0, (i + 1) * 15, 0],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 15 + i * 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: i * 0.5,
+            }}
+            className="absolute top-[30%] right-[5%] w-2 h-2 bg-violet-500/30 rounded-full"
+            style={{ right: `${5 + i * 3}%` }}
+          />
+        ))}
+      </div>
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -76,18 +184,17 @@ export function HeroSection({ featuredCampaign }: HeroSectionProps) {
               fraction of the cost. Contribute any amount — unlock permanent access together.
             </motion.p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons with Magnetic Effect */}
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 mb-8">
-              <Link href="/auth/sign-up">
-                <Button
-                  size="lg"
-                  className="h-12 px-8 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 text-base font-medium"
+              <Link href="/auth/sign-up" className="w-full sm:w-auto">
+                <MagneticButton
+                  className="h-12 px-8 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/25 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
                   Get Started Free
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+                  <ArrowRight className="w-5 h-5" />
+                </MagneticButton>
               </Link>
-              <Link href="/assets">
+              <Link href="/assets" className="w-full sm:w-auto">
                 <Button variant="outline" size="lg" className="h-12 px-8 text-base font-medium border-2">
                   Browse Assets
                   <ChevronRight className="w-4 h-4 ml-2" />
