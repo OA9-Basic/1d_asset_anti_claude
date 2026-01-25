@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Menu, X, ShieldCheck, Zap, Users, PieChart, BookOpen, TrendingUp, BarChart3, Lock, Sparkles, ChevronRight, Clock } from 'lucide-react';
+import { ArrowRight, Menu, X, ShieldCheck, Zap, Users, PieChart, BookOpen, TrendingUp, Lock, Sparkles, ChevronRight, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import CountUp from 'react-countup';
@@ -31,13 +31,21 @@ const scaleOnHover = {
 };
 
 // Magnetic Button Component
-function MagneticButton({ children, className, ...props }: any) {
+interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  className?: string;
+}
+
+function MagneticButton({ children, className, ...props }: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { clientX, clientY } = e;
-    const { left, top, width, height } = ref.current!.getBoundingClientRect();
+    const button = ref.current;
+    if (!button) return;
+
+    const { left, top, width, height } = button.getBoundingClientRect();
     const x = (clientX - left - width / 2) * 0.2;
     const y = (clientY - top - height / 2) * 0.2;
     setPosition({ x, y });
@@ -55,7 +63,7 @@ function MagneticButton({ children, className, ...props }: any) {
       onMouseLeave={handleMouseLeave}
       animate={{ x: position.x, y: position.y }}
       transition={{ type: 'spring', stiffness: 150, damping: 15 }}
-      {...props}
+      {...(props as unknown as Parameters<typeof motion.button>[0])}
     >
       {children}
     </motion.button>

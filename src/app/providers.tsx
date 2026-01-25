@@ -2,8 +2,8 @@
 
 import { ErrorBoundary } from '@/components/error/error-boundary';
 import { LoadingProvider } from '@/components/providers/loading-provider';
-import { Toaster } from '@/components/ui/toast';
 import { Spinner } from '@/components/ui/spinner';
+import { Toaster } from '@/components/ui/toast';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

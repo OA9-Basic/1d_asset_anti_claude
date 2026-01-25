@@ -244,7 +244,7 @@ export const toastHelpers = {
       error: string | ((err: Error) => string);
     }
   ): Promise<T> => {
-    const id = toast({ title: loading }).id;
+    toast({ title: loading });
 
     try {
       const data = await promise;

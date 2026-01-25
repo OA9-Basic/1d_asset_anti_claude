@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
+
 import { toastHelpers } from '@/hooks/use-toast';
 
 interface UseActionOptions<T> {
@@ -14,12 +15,12 @@ interface UseActionOptions<T> {
 interface UseActionReturn<T> {
   isLoading: boolean;
   error: Error | null;
-  execute: (...args: any[]) => Promise<T | null>;
+  execute: (...args: unknown[]) => Promise<T | null>;
   reset: () => void;
 }
 
-export function useAction<T = any>(
-  actionFn: (...args: any[]) => Promise<T>,
+export function useAction<T = unknown>(
+  actionFn: (...args: unknown[]) => Promise<T>,
   options: UseActionOptions<T> = {}
 ): UseActionReturn<T> {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +29,7 @@ export function useAction<T = any>(
   const toastIdRef = useRef<string>();
 
   const execute = useCallback(
-    async (...args: any[]): Promise<T | null> => {
+    async (...args: unknown[]): Promise<T | null> => {
       setIsLoading(true);
       setError(null);
 
@@ -79,13 +80,16 @@ export function useOptimisticAction<T, P>(
   options: UseActionOptions<T> = {}
 ) {
   const [data, setData] = useState<T | null>(null);
-  const { isLoading, error, execute, reset } = useAction<T>(mutationFn, {
-    ...options,
-    onSuccess: (result) => {
-      setData(result);
-      options.onSuccess?.(result);
-    },
-  });
+  const { isLoading, error, execute, reset } = useAction<T>(
+    (params: unknown) => mutationFn(params as P),
+    {
+      ...options,
+      onSuccess: (result) => {
+        setData(result);
+        options.onSuccess?.(result);
+      },
+    }
+  );
 
   const executeOptimistic = useCallback(
     async (params: P) => {
