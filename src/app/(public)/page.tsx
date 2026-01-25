@@ -1,12 +1,12 @@
 import { type Metadata } from 'next';
 
-import { LiveStats } from '@/components/page/live-stats';
 import { BentoGridFeatures } from '@/components/page/bento-features';
-import { HowItWorks } from '@/components/page/how-it-works';
 import { CTASection } from '@/components/page/cta-section';
 import { Footer } from '@/components/page/footer';
 import { Header } from '@/components/page/header';
 import { HeroSection } from '@/components/page/hero-section';
+import { HowItWorks } from '@/components/page/how-it-works';
+import { LiveStats } from '@/components/page/live-stats';
 
 export const metadata: Metadata = {
   title: 'Digital Assets - Community-Powered Asset Marketplace',

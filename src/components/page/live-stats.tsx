@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Activity, PieChart, TrendingUp, Users } from 'lucide-react';
 import CountUp from 'react-countup';
-import { Users, TrendingUp, PieChart, Activity } from 'lucide-react';
 
 import type { StatsData } from '@/types/page';
 
