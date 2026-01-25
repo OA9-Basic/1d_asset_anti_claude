@@ -187,3 +187,80 @@ function useToast() {
 }
 
 export { useToast, toast };
+
+// Toast helper functions for common use cases
+export const toastHelpers = {
+  success: (title: string, description?: string) => {
+    return toast({
+      title,
+      description,
+      variant: 'default',
+      className: 'border-green-500 bg-green-50 dark:bg-green-950',
+    });
+  },
+
+  error: (title: string, description?: string) => {
+    return toast({
+      title,
+      description,
+      variant: 'destructive',
+    });
+  },
+
+  loading: (title: string, description?: string) => {
+    return toast({
+      title,
+      description,
+      className: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
+    });
+  },
+
+  info: (title: string, description?: string) => {
+    return toast({
+      title,
+      description,
+      variant: 'default',
+      className: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
+    });
+  },
+
+  warning: (title: string, description?: string) => {
+    return toast({
+      title,
+      description,
+      className: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950',
+    });
+  },
+
+  promise: async <T,>(
+    promise: Promise<T>,
+    {
+      loading,
+      success,
+      error,
+    }: {
+      loading: string;
+      success: string | ((data: T) => string);
+      error: string | ((err: Error) => string);
+    }
+  ): Promise<T> => {
+    const id = toast({ title: loading }).id;
+
+    try {
+      const data = await promise;
+      const message = typeof success === 'function' ? success(data) : success;
+      toast({
+        title: message,
+        className: 'border-green-500 bg-green-50 dark:bg-green-950',
+      });
+      return data;
+    } catch (err) {
+      const message = typeof error === 'function' ? error(err as Error) : error;
+      toast({
+        title: message,
+        variant: 'destructive',
+      });
+      throw err;
+    }
+  },
+};

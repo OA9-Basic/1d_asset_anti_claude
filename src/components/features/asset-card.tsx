@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Spinner } from '@/components/ui/spinner';
 
 type AssetCardAsset = Omit<Asset, 'contributions' | 'assetPurchases' | 'profitShares' | 'request'> | {
   id: string;
@@ -132,7 +133,12 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
 
         if (res.ok) {
           router.push(`/assets/${asset.id}?access=true`);
+        } else {
+          const data = await res.json();
+          console.error('Purchase failed:', data.error);
         }
+      } catch (error) {
+        console.error('Purchase error:', error);
       } finally {
         setIsLoading(false);
       }
@@ -148,8 +154,17 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
             onClick={handleAction}
             disabled={isLoading}
           >
-            <Wallet className="w-4 h-4 mr-2" />
-            Contribute Now
+            {isLoading ? (
+              <>
+                <Spinner size="sm" className="mr-2" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Wallet className="w-4 h-4 mr-2" />
+                Contribute Now
+              </>
+            )}
           </Button>
         );
       case 'AVAILABLE':
@@ -161,7 +176,10 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
             disabled={isLoading}
           >
             {isLoading ? (
-              <>Processing...</>
+              <>
+                <Spinner size="sm" className="mr-2" />
+                Processing...
+              </>
             ) : (
               <>
                 <ShoppingCart className="w-4 h-4 mr-2" />

@@ -126,3 +126,14 @@ export {
   ToastClose,
   ToastAction,
 };
+
+export function Toaster() {
+  return (
+    <ToastProvider>
+      <ToastViewport />
+      {/*
+        Toast items will be dynamically rendered here by the useToast hook
+      */}
+    </ToastProvider>
+  );
+}
