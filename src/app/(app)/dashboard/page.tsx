@@ -658,7 +658,7 @@ export default function DashboardPage() {
                     Popular assets getting funded right now
                   </p>
                 </div>
-                <Link href="/assets">
+                <Link href="/marketplace">
                   <Button variant="outline" size="sm">
                     View All
                     <ArrowUpRight className="w-4 h-4 ml-1" />
@@ -711,7 +711,7 @@ export default function DashboardPage() {
                       Request an Asset
                     </Button>
                   </Link>
-                  <Link href="/assets" className="block">
+                  <Link href="/marketplace" className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Browse Marketplace
@@ -807,7 +807,7 @@ export default function DashboardPage() {
                     <div className="text-center py-6 text-muted-foreground">
                       <Wallet className="w-10 h-10 mx-auto mb-2 opacity-50" />
                       <p className="text-sm">No contributions yet</p>
-                      <Link href="/assets">
+                      <Link href="/marketplace">
                         <Button size="sm" variant="outline" className="mt-3">
                           Start Contributing
                         </Button>

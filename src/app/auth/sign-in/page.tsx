@@ -105,12 +105,7 @@ export default function SignInPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -163,14 +158,7 @@ export default function SignInPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          By signing in, you agree to our{' '}
-          <Link href="/terms" className="underline hover:text-foreground">
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link href="/privacy" className="underline hover:text-foreground">
-            Privacy Policy
-          </Link>
+          By signing in, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
     </div>

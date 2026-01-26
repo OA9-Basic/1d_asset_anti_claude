@@ -542,7 +542,7 @@ export default function MyAssetsPage() {
                   </TabsList>
                 </Tabs>
 
-                <Link href="/assets">
+                <Link href="/marketplace">
                   <Button variant="outline" size="sm">
                     Browse More Assets
                     <ArrowUpRight className="w-4 h-4 ml-1" />
@@ -578,7 +578,7 @@ export default function MyAssetsPage() {
                       {activeTab === 'completed' && 'No funded assets yet.'}
                       {activeTab === 'all' && 'Start contributing to assets to see them here.'}
                     </p>
-                    <Link href="/assets">
+                    <Link href="/marketplace">
                       <Button className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
                         <ShoppingCart className="w-4 h-4 mr-2" />
                         Browse Assets
