@@ -9,6 +9,7 @@ export interface ProcessingResult {
   message: string;
   contributorsRefunded?: number;
   totalRefunded?: number;
+  errors?: string[];
 }
 
 /**
@@ -66,34 +67,45 @@ export async function processFundedAsset(
     const basePrice = asset.targetPrice;
 
     let contributorsProcessed = 0;
+    let errors: string[] = [];
 
+    // Process all contributors - ensure they get access
     for (const contribution of asset.contributions) {
-      if (!contribution.user.wallet) continue;
+      try {
+        if (!contribution.user.wallet) {
+          errors.push(`User ${contribution.userId} has no wallet`);
+          continue;
+        }
 
-      // Create asset purchase record for contributor
-      const existingPurchase = await tx.assetPurchase.findFirst({
-        where: {
-          userId: contribution.userId,
-          assetId: assetId,
-        },
-      });
-
-      if (!existingPurchase) {
-        // SECURITY FIX: Use cryptographically secure random key generation
-        const accessKey = generateSecureAccessKey();
-
-        await tx.assetPurchase.create({
-          data: {
+        // Create asset purchase record for contributor
+        const existingPurchase = await tx.assetPurchase.findFirst({
+          where: {
             userId: contribution.userId,
             assetId: assetId,
-            purchaseAmount: basePrice, // They "paid" base price for the product
-            deliveryAccessKey: accessKey,
-            deliveryExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
           },
         });
-      }
 
-      contributorsProcessed++;
+        if (!existingPurchase) {
+          // SECURITY FIX: Use cryptographically secure random key generation
+          const accessKey = generateSecureAccessKey();
+
+          await tx.assetPurchase.create({
+            data: {
+              userId: contribution.userId,
+              assetId: assetId,
+              purchaseAmount: 1, // Contributors effectively paid $1 for access
+              deliveryAccessKey: accessKey,
+              deliveryExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+            },
+          });
+        }
+
+        contributorsProcessed++;
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        errors.push(`Failed to process contribution ${contribution.id}: ${errorMsg}`);
+        console.error('Error processing contribution:', error);
+      }
     }
 
     // Update asset status to AVAILABLE and save delivery info
@@ -117,12 +129,17 @@ export async function processFundedAsset(
 
     const totalExcessInvestment = asset.contributions.reduce((sum, c) => sum + c.excessAmount, 0);
 
+    const message = `Asset processed successfully. ${contributorsProcessed} contributors granted access. Total excess investment: $${totalExcessInvestment.toFixed(2)} (will be refunded through profit distribution)${
+      errors.length > 0 ? `. ${errors.length} error(s) occurred.` : ''
+    }`;
+
     return {
       success: true,
       assetId,
-      message: `Asset processed successfully. ${contributorsProcessed} contributors granted access. Total excess investment: $${totalExcessInvestment.toFixed(2)} (will be refunded through profit distribution)`,
+      message,
       contributorsRefunded: contributorsProcessed,
-      totalRefunded: 0,
+      totalRefunded: totalExcessInvestment,
+      errors: errors.length > 0 ? errors : undefined,
     };
   });
 }
