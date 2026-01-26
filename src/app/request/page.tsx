@@ -137,12 +137,12 @@ export default function RequestAssetPage() {
       description: '',
       type: undefined,
       deliveryType: undefined,
-      estimatedPrice: 0,
+      estimatedPrice: undefined,
       sourceUrl: '',
       whyThisAsset: '',
       additionalNotes: '',
     },
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const watchedValues = form.watch();
@@ -445,7 +445,11 @@ export default function RequestAssetPage() {
                                       min="1"
                                       max="10000"
                                       step="0.01"
-                                      {...field}
+                                      value={field.value || ''}
+                                      onChange={(e) => {
+                                        const value = e.target.value ? parseFloat(e.target.value) : undefined;
+                                        field.onChange(value);
+                                      }}
                                       disabled={isSubmitting}
                                       className="h-11 pl-7 bg-zinc-50 dark:bg-zinc-900"
                                     />

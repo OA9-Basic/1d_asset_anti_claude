@@ -42,7 +42,8 @@ export interface Contributor {
   amount: number;
   userId?: string;
   userName?: string;
-  timestamp?: Date;
+  userImage?: string;
+  createdAt?: string;
 }
 
 // =============================================================================

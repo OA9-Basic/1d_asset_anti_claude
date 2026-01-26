@@ -1,5 +1,6 @@
 import { type Metadata } from 'next';
 
+import { ScrollProgressBar } from '@/components/animated/reveal-on-scroll';
 import { BentoGridFeatures } from '@/components/page/bento-features';
 import { CTASection } from '@/components/page/cta-section';
 import { Footer } from '@/components/page/footer';
@@ -60,6 +61,7 @@ async function getStats(): Promise<{
 
 /**
  * Fetch featured campaign for the hero card
+ * Fetches real data from the database
  */
 async function getFeaturedCampaign(): Promise<{
   id: string;
@@ -69,27 +71,23 @@ async function getFeaturedCampaign(): Promise<{
   backerCount: number;
   daysLeft: number;
   avgPledge: number;
-  recentContributors: Array<{ id: string; amount: number }>;
+  recentContributors: Array<{ id: string; amount: number; userId?: string; userName?: string; userImage?: string; createdAt?: string }>;
 } | null> {
-  // TODO: Replace with actual database query
-  // Example: return await db.asset.findFirst({ where: { featured: true }, include: { contributions: true } })
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/campaigns/featured`, {
+      cache: 'no-store', // Always fresh data
+    });
 
-  // Simulating featured campaign data
-  // In production, this would come from the database
-  return {
-    id: 'featured-1',
-    title: 'Advanced React & Next.js Masterclass',
-    raisedAmount: 8450,
-    goalAmount: 10000,
-    backerCount: 247,
-    daysLeft: 12,
-    avgPledge: 34,
-    recentContributors: [
-      { id: '1', amount: 50 },
-      { id: '2', amount: 25 },
-      { id: '3', amount: 100 },
-    ],
-  };
+    if (res.ok) {
+      const data = await res.json();
+      return data;
+    }
+  } catch (error) {
+    console.error('Failed to fetch featured campaign:', error);
+  }
+
+  return null;
 }
 
 // =============================================================================
@@ -107,6 +105,9 @@ export default async function HomePage() {
     <>
       {/* Single Global Header */}
       <Header />
+
+      {/* Awwwards-style Scroll Progress Bar */}
+      <ScrollProgressBar />
 
       <main className="min-h-screen">
         <HeroSection featuredCampaign={featuredCampaign} />

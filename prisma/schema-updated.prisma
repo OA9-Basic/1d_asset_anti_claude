@@ -1,0 +1,328 @@
+// ============================================================================
+// UPDATED SCHEMA FOR CRYPTO PAYMENT SYSTEM
+// Add these enums and models to your existing schema.prisma
+// ============================================================================
+
+// ============================================================================
+// NEW ENUMS
+// ============================================================================
+
+enum CryptoNetwork {
+  ETHEREUM_MAINNET
+  POLYGON_MAINNET
+  BSC_MAINNET
+  BITCOIN_MAINNET
+}
+
+enum CryptoCurrency {
+  ETH
+  USDT_POLYGON
+  USDC_POLYGON
+  USDT_BSC
+  USDC_BSC
+  BNB
+  BTC
+  MATIC
+}
+
+enum DepositOrderStatus {
+  CREATED
+  AWAITING_PAYMENT
+  CONFIRMING
+  COMPLETED
+  EXPIRED
+  UNDERPAID
+  OVERPAID
+}
+
+enum WebhookType {
+  ALCHEMY_NOTIFY
+  CUSTOM
+}
+
+// ============================================================================
+// UPDATED TRANSACTION MODEL
+// ============================================================================
+
+// Add these fields to your existing Transaction model:
+model Transaction {
+  // ... existing fields ...
+
+  // NEW FIELDS FOR CRYPTO VERIFICATION
+  txHash           String?
+  confirmations    Int              @default(0)
+  verified         Boolean          @default(false)
+  verifiedAt       DateTime?
+  verifiedFrom     String?          // e.g., "ALCHEMY", "ETHERSCAN"
+  blockNumber      BigInt?
+  blockTimestamp   DateTime?
+  network          CryptoNetwork?
+
+  // NEW FIELDS FOR DEPOSIT ORDERS
+  depositOrderId   String?          @unique // Relation to DepositOrder
+  gasUsed          BigInt?
+  gasPrice         BigInt?
+  transactionIndex Int?
+
+  @@index([txHash])
+  @@index([depositOrderId])
+  @@index([verified, network])
+}
+
+// ============================================================================
+// NEW MODELS TO ADD
+// ============================================================================
+
+/// Deposit Orders - User-initiated deposit requests with price locking
+model DepositOrder {
+  id                String             @id @default(cuid())
+  userId            String
+
+  // Order Details
+  usdAmount         Float              // Amount in USD user wants to deposit
+  cryptoAmount      Float              // Exact crypto amount needed
+  cryptoCurrency    CryptoCurrency
+  network           CryptoNetwork
+
+  // Price Locking
+  priceAtCreation   Float              // Crypto price in USD at order creation
+  priceExpiresAt    DateTime           // When price lock expires (15 mins)
+
+  // Address Generation
+  depositAddress    String             @unique // HD-derived address
+  derivationPath    String             // BIP44 path (e.g., "m/44'/60'/0'/0/5")
+  privateKeyEncrypted String?         // AES-256 encrypted private key
+
+  // Order Status
+  status            DepositOrderStatus @default(CREATED)
+  expiresAt         DateTime           // Order expiry (15 mins from creation)
+
+  // Transaction Details
+  txHash            String?            @unique
+  confirmations     Int                @default(0)
+  requiredConfirmations Int            @default(12) // Network-specific
+
+  // Payment Verification
+  receivedAmount    Float?             // Actual amount received
+  overpaid          Boolean            @default(false)
+  underpaid         Boolean            @default(false)
+  slippageTolerance Float              @default(0.01) // 1%
+
+  // Timestamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  confirmedAt       DateTime?
+  completedAt       DateTime?
+
+  // Relations
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([depositAddress])
+  @@index([txHash])
+  @@index([expiresAt])
+  @@index([createdAt])
+}
+
+/// HD Wallet Configuration - Master keys (NEVER store xpriv here!)
+model HDWalletConfig {
+  id                String             @id @default(cuid())
+  network           CryptoNetwork     @unique // One config per network
+
+  // Public Keys Only (Safe to store on hot server)
+  xpub              String             // Extended public key (BIP32)
+  derivationPath    String             // Base derivation path (e.g., "m/44'/60'/0'/0")
+
+  // Address Index Tracking
+  lastUsedIndex     Int                @default(0)
+  nextUnusedIndex   Int                @default(0)
+
+  // Cold Storage Configuration
+  coldWalletAddress String            // Main cold wallet address
+  sweepThreshold   Float              // Auto-forward when balance exceeds this (in native currency)
+  sweepMinAmount   Float              @default(0.001) // Minimum amount to sweep
+
+  // Network Configuration
+  chainId           Int
+  rpcUrl            String
+  explorerUrl       String
+
+  // Alchemy Configuration
+  alchemyApiKey     String?            // For webhooks and enhanced APIs
+  webhookId         String?            // Alchemy webhook ID
+  webhookSignature  String?            // For webhook verification
+
+  // Timestamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Relations
+  walletAddresses   WalletAddress[]
+
+  @@index([network])
+}
+
+/// Generated Wallet Addresses - Track all derived addresses
+model WalletAddress {
+  id                String             @id @default(cuid())
+  hdWalletConfigId  String
+
+  // Address Details
+  address           String
+  derivationPath    String             // Full path (e.g., "m/44'/60'/0'/0/5")
+  derivationIndex   Int                // The index used
+
+  // Usage Tracking
+  isUsed            Boolean            @default(false)
+  firstUsedAt       DateTime?
+  lastUsedAt        DateTime?
+  totalReceived     Float              @default(0) // Total amount received
+
+  // Status
+  isActive          Boolean            @default(true)
+  isSwept           Boolean            @default(false) // Whether funds were forwarded to cold storage
+  sweptAt           DateTime?
+
+  // Private Key Storage (ENCRYPTED with AES-256)
+  privateKeyEncrypted String?
+
+  // Timestamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Relations
+  hdWalletConfig    HDWalletConfig     @relation(fields: [hdWalletConfigId], references: [id], onDelete: Cascade)
+
+  @@unique([hdWalletConfigId, derivationIndex])
+  @@index([address])
+  @@index([isUsed])
+  @@index([isSwept])
+}
+
+/// Webhook Logs - Track all incoming webhooks
+model WebhookLog {
+  id                String             @id @default(cuid())
+  type              WebhookType
+
+  // Webhook Details
+  webhookId         String?            // e.g., Alchemy webhook ID
+  source            String             // e.g., "alchemy-notify"
+  eventId           String?            // Unique event ID for deduplication
+
+  // Payload
+  payload           String             // JSON payload
+  signature         String?            // Webhook signature for verification
+
+  // Processing
+  processed         Boolean            @default(false)
+  processingError   String?
+  processingTime    Int?               // Processing time in ms
+
+  // Related Data
+  txHash            String?            @db.Text
+  depositOrderId    String?
+
+  // Timestamps
+  receivedAt        DateTime           @default(now())
+  processedAt       DateTime?
+
+  @@index([source, eventId])
+  @@index([txHash])
+  @@index([depositOrderId])
+  @@index([processed])
+}
+
+/// Network Configuration - Store chain-specific settings
+model NetworkConfig {
+  id                String             @id @default(cuid())
+  network           CryptoNetwork     @unique
+
+  // Chain Details
+  chainId           Int
+  name              String
+  symbol            String             // e.g., "ETH", "BNB", "MATIC"
+
+  // RPC Endpoints
+  rpcUrl            String
+  fallbackRpcUrls   String             // JSON array of fallback URLs
+
+  // Block Explorer
+  explorerUrl       String
+  apiEndpoint       String?            // For Etherscan/BscScan APIs
+
+  // Gas Settings
+  gasPriceMultiplier Float             @default(1.1) // Add 10% to estimated gas
+  maxGasPrice       Float?             // Maximum gas price willing to pay
+
+  // Confirmation Requirements
+  requiredConfirmations Int            @default(12)
+  targetConfirmations   Int            @default(12)
+
+  // Token Contracts (for USDT, USDC, etc.)
+  nativeCurrency   String             @default("ETH")
+  tokenContracts   String?            // JSON map: {"USDT": "0x...", "USDC": "0x..."}
+
+  // Status
+  isActive          Boolean            @default(true)
+  maintenanceMode  Boolean            @default(false)
+
+  // Timestamps
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([isActive])
+}
+
+// ============================================================================
+// UPDATED USER MODEL
+// ============================================================================
+
+// Add these relations to User model:
+model User {
+  // ... existing fields ...
+
+  // NEW RELATIONS
+  depositOrders     DepositOrder[]
+
+  @@index([id])
+}
+
+// ============================================================================
+// SECURITY AUDIT LOG
+// ============================================================================
+
+/// Security Audit Log - Track all sensitive operations
+model AuditLog {
+  id                String             @id @default(cuid())
+  userId            String?            // Null for system operations
+
+  // Event Details
+  action            String             // e.g., "DEPOSIT_CREATED", "WEBHOOK_RECEIVED"
+  category          String             // e.g., "CRYPTO", "AUTH", "ADMIN"
+  severity          String             @default("INFO") // INFO, WARNING, ERROR, CRITICAL
+
+  // Data
+  details           String             // JSON payload
+  ipAddress         String?
+  userAgent         String?
+
+  // Related Entities
+  relatedUserId     String?
+  relatedOrderId    String?
+  relatedTxHash     String?
+
+  // Result
+  success           Boolean            @default(true)
+  errorCode         String?
+  errorMessage      String?
+
+  // Timestamp
+  createdAt         DateTime           @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([severity])
+}

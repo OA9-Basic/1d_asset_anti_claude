@@ -64,10 +64,10 @@ export async function processFundedAsset(
     }
 
     // Calculate base price (without platform fee)
-    const basePrice = asset.targetPrice;
+    // const basePrice = asset.targetPrice;
 
     let contributorsProcessed = 0;
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     // Process all contributors - ensure they get access
     for (const contribution of asset.contributions) {

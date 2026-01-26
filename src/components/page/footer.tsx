@@ -14,25 +14,25 @@ const footerSections = {
   product: {
     title: 'Product',
     links: [
-      { label: 'Browse Assets', href: '/marketplace' },
-      { label: 'Request Asset', href: '/request' },
-      { label: 'Create Campaign', href: '/create' },
+      { label: 'Browse Assets', href: '/marketplace', id: 'browse-assets' },
+      { label: 'Request Asset', href: '/request', id: 'request-asset' },
+      { label: 'Create Campaign', href: '/create', id: 'create-campaign' },
     ],
   },
   company: {
     title: 'Company',
     links: [
-      { label: 'About', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Careers', href: '#' },
+      { label: 'About', href: '#', id: 'about' },
+      { label: 'Blog', href: '#', id: 'blog' },
+      { label: 'Careers', href: '#', id: 'careers' },
     ],
   },
   legal: {
     title: 'Legal',
     links: [
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
-      { label: 'Security', href: '#' },
+      { label: 'Privacy', href: '#', id: 'privacy' },
+      { label: 'Terms', href: '#', id: 'terms' },
+      { label: 'Security', href: '#', id: 'security' },
     ],
   },
 };
@@ -60,7 +60,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">{footerSections.product.title}</h4>
             <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
               {footerSections.product.links.map((link) => (
-                <li key={link.href}>
+                <li key={link.id}>
                   {link.href === '#' ? (
                     <span className="text-zinc-400 cursor-not-allowed">{link.label}</span>
                   ) : (
@@ -83,7 +83,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">{footerSections.company.title}</h4>
             <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
               {footerSections.company.links.map((link) => (
-                <li key={link.href}>
+                <li key={link.id}>
                   {link.href === '#' ? (
                     <span className="text-zinc-400 cursor-not-allowed">{link.label}</span>
                   ) : (
@@ -106,7 +106,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">{footerSections.legal.title}</h4>
             <ul className="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
               {footerSections.legal.links.map((link) => (
-                <li key={link.href}>
+                <li key={link.id}>
                   {link.href === '#' ? (
                     <span className="text-zinc-400 cursor-not-allowed">{link.label}</span>
                   ) : (
