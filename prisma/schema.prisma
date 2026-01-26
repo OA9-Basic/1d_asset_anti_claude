@@ -59,6 +59,14 @@ enum DeliveryType {
   HYBRID
 }
 
+enum ProfitDistributionTiming {
+  IMMEDIATE
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}
+
 enum AssetRequestStatus {
   PENDING
   UNDER_REVIEW
@@ -157,19 +165,20 @@ model Transaction {
 }
 
 model Asset {
-  id                    String              @id @default(cuid())
+  id                    String                    @id @default(cuid())
   title                 String
   description           String
-  slug                  String              @unique
+  slug                  String                    @unique
   type                  AssetType
-  deliveryType          DeliveryType        @default(DOWNLOAD)
+  deliveryType          DeliveryType              @default(DOWNLOAD)
   targetPrice           Float
-  platformFee           Float               @default(0.15)
-  currentCollected      Float               @default(0)
-  status                AssetStatus         @default(REQUESTED)
-  totalPurchases        Int                 @default(0)
-  totalRevenue          Float               @default(0)
-  totalProfitDistributed Float              @default(0)
+  platformFee           Float                     @default(0.15)
+  platformFeeAfterExcess Float                   @default(0.15)
+  currentCollected      Float                     @default(0)
+  status                AssetStatus               @default(REQUESTED)
+  totalPurchases        Int                       @default(0)
+  totalRevenue          Float                     @default(0)
+  totalProfitDistributed Float                    @default(0)
   deliveryUrl           String?
   deliveryKey           String?
   streamUrl             String?
@@ -178,18 +187,25 @@ model Asset {
   thumbnail             String?
   sourceUrl             String?
   metadata              Json?
-  featured              Boolean             @default(false)
+  featured              Boolean                   @default(false)
+
+  // Profit Distribution Settings
+  profitDistributionTiming ProfitDistributionTiming @default(IMMEDIATE)
+  customDistributionInterval Int?                   // Custom interval in hours
+  lastDistributionAt    DateTime?
+
   approvedAt            DateTime?
   purchasedAt           DateTime?
   availableAt           DateTime?
   votingStartsAt        DateTime?
   votingEndsAt          DateTime?
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
 
   contributions         Contribution[]
   assetPurchases        AssetPurchase[]
   profitShares          ProfitShare[]
+  profitDistributions   ProfitDistribution[]
   request               AssetRequest?
 
   @@index([status])
@@ -198,6 +214,7 @@ model Asset {
   @@index([createdAt])
   @@index([featured])
   @@index([deliveryType])
+  @@index([profitDistributionTiming])
 }
 
 model AssetRequest {
@@ -342,6 +359,8 @@ model ProfitDistribution {
   distributedShares Int      @default(0)
   distributionDate  DateTime @default(now())
   createdAt         DateTime @default(now())
+
+  asset             Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@index([assetId])
   @@index([distributionDate])

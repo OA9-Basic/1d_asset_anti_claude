@@ -21,6 +21,7 @@ export interface DistributionResult {
   contributorProfit: number;
   distributedShares: number;
   message: string;
+  isAfterExcessRefund?: boolean;
 }
 
 /**
@@ -31,7 +32,11 @@ export interface DistributionResult {
  * 1. Asset is purchased for $1 by a user
  * 2. Platform takes its fee (e.g., 15% = $0.15)
  * 3. Remaining profit ($0.85) is distributed to over-contributors
- * 4. Distribution is proportional to their excess contribution amounts
+ * 4. Distribution is PROPORTIONAL based on excess contribution amounts (priority-based)
+ *
+ * Priority Distribution:
+ * - Contributors with larger excess amounts get larger shares
+ * - Share ratio = (individual excess) / (total remaining excess owed)
  */
 
 // Helper type for Transaction Client
@@ -68,7 +73,20 @@ export async function distributeProfit(
       };
     }
 
-    const platformFee = asset.platformFee || 0.15;
+    // Determine platform fee based on whether all excess has been refunded
+    const totalExcessInvested = await prisma.contribution.aggregate({
+      where: { assetId, isInvestment: true },
+      _sum: { excessAmount: true, totalProfitReceived: true },
+    });
+
+    const totalExcess = totalExcessInvested._sum.excessAmount || 0;
+    const totalReceived = totalExcessInvested._sum.totalProfitReceived || 0;
+    const isAfterExcessRefund = !moneyLessThan(totalReceived, totalExcess);
+
+    // Use appropriate platform fee
+    const platformFee = isAfterExcessRefund
+      ? (asset.platformFeeAfterExcess || 1.0) // After excess refund: 100% to platform (default)
+      : (asset.platformFee || 0.15); // During refund: default 15%
 
     // SECURITY FIX: Use safe financial calculations
     const platformProfit = roundToCents(purchaseAmount * platformFee);
@@ -82,6 +100,7 @@ export async function distributeProfit(
         isInvestment: true,
         status: 'ACTIVE',
       },
+      orderBy: { excessAmount: 'desc' }, // Higher contributors first (priority)
     });
 
     // SECURITY FIX: Use safe comparison instead of floating point
@@ -89,8 +108,8 @@ export async function distributeProfit(
       moneyLessThan(c.totalProfitReceived, c.excessAmount)
     );
 
-    if (activeInvestors.length === 0) {
-      // No investors need refunds - all profit goes to platform
+    if (activeInvestors.length === 0 || moneyLessThan(contributorProfit, 0.01)) {
+      // No investors need refunds or no profit to distribute
       return {
         success: true,
         assetId,
@@ -98,7 +117,10 @@ export async function distributeProfit(
         platformProfit: purchaseAmount,
         contributorProfit: 0,
         distributedShares: 0,
-        message: 'All investors fully refunded - profit goes to platform',
+        message: isAfterExcessRefund
+          ? 'All investors fully refunded - 100% profit goes to platform'
+          : 'No profit to distribute',
+        isAfterExcessRefund,
       };
     }
 
@@ -220,7 +242,8 @@ export async function distributeProfit(
       platformProfit,
       contributorProfit,
       distributedShares,
-      message: `Distributed $${contributorProfit.toFixed(2)} to ${distributedShares} investors`,
+      message: `Distributed $${contributorProfit.toFixed(2)} to ${distributedShares} investors (Platform: ${(platformFee * 100).toFixed(0)}%)`,
+      isAfterExcessRefund,
     };
   };
 

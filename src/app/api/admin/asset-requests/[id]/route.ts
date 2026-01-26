@@ -14,6 +14,9 @@ const updateRequestSchema = z.object({
 
 const approveRequestSchema = z.object({
   platformFee: z.number().min(0).max(1).default(0.15),
+  platformFeeAfterExcess: z.number().min(0).max(1).default(1.0),
+  profitDistributionTiming: z.enum(['IMMEDIATE', 'DAILY', 'WEEKLY', 'MONTHLY', 'CUSTOM']).default('IMMEDIATE'),
+  customDistributionInterval: z.number().int().min(1).max(8760).optional(),
   deliveryUrl: z.string().optional(),
   deliveryKey: z.string().optional(),
   streamUrl: z.string().optional(),
@@ -177,6 +180,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           deliveryType: request.deliveryType,
           targetPrice: request.estimatedPrice,
           platformFee: data.platformFee,
+          platformFeeAfterExcess: data.platformFeeAfterExcess,
+          profitDistributionTiming: data.profitDistributionTiming,
+          customDistributionInterval: data.customDistributionInterval,
           status: 'COLLECTING',
           sourceUrl: request.sourceUrl,
           thumbnail: request.thumbnail,
