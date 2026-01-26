@@ -1,10 +1,11 @@
 'use client';
 
-import { ArrowRight, Menu, X, Sparkles } from 'lucide-react';
+import { ArrowRight, Menu, X, Sparkles, User, LayoutDashboard, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
 /**
@@ -12,16 +13,29 @@ import { cn } from '@/lib/utils';
  * Single instance - sticky glassmorphism header
  */
 
-const navItems = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon?: LucideIcon;
+}
+
+const publicNavItems: NavItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Browse', href: '/assets' },
-  { label: 'Request', href: '/assets/request' },
-  { label: 'Create', href: '/assets/create' },
+  { label: 'Browse', href: '/marketplace' },
+  { label: 'How It Works', href: '/#how-it-works' },
+];
+
+const authenticatedNavItems: NavItem[] = [
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Marketplace', href: '/marketplace' },
+  { label: 'My Assets', href: '/my-assets' },
+  { label: 'Wallet', href: '/wallet' },
 ];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user, isLoading } = useAuth();
 
   // Handle scroll for glassmorphism effect (client-side only)
   useEffect(() => {
@@ -29,6 +43,8 @@ export function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const navItems = user ? authenticatedNavItems : publicNavItems;
 
   return (
     <header
@@ -52,8 +68,9 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+              className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors flex items-center gap-1"
             >
+              {item.icon && <item.icon className="w-4 h-4" />}
               {item.label}
             </Link>
           ))}
@@ -61,23 +78,44 @@ export function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/auth/sign-in">
-            <Button variant="ghost" size="sm" className="text-sm font-medium">
-              Sign In
-            </Button>
-          </Link>
-          <Link href="/auth/sign-up">
-            <Button
-              size="sm"
-              className="text-sm font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 relative overflow-hidden group"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Get Started
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            </Button>
-          </Link>
+          {!isLoading && user ? (
+            <>
+              <Link href="/wallet">
+                <Button variant="ghost" size="sm" className="text-sm font-medium">
+                  Wallet
+                </Button>
+              </Link>
+              <Link href="/profile">
+                <Button
+                  size="sm"
+                  className="text-sm font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+                >
+                  <User className="w-4 h-4 mr-1" />
+                  {user.firstName || user.name || user.email?.split('@')[0] || 'Account'}
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/sign-in">
+                <Button variant="ghost" size="sm" className="text-sm font-medium">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/auth/sign-up">
+                <Button
+                  size="sm"
+                  className="text-sm font-medium bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 relative overflow-hidden group"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    Get Started
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -94,23 +132,42 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium py-2 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                className="text-sm font-medium py-2 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 flex items-center gap-2"
                 onClick={() => setIsOpen(false)}
               >
+                {item.icon && <item.icon className="w-4 h-4" />}
                 {item.label}
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-              <Link href="/auth/sign-in" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" size="sm" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/sign-up" onClick={() => setIsOpen(false)}>
-                <Button size="sm" className="w-full bg-gradient-to-r from-violet-600 to-indigo-600">
-                  Get Started
-                </Button>
-              </Link>
+              {!isLoading && user ? (
+                <>
+                  <Link href="/wallet" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Wallet
+                    </Button>
+                  </Link>
+                  <Link href="/profile" onClick={() => setIsOpen(false)}>
+                    <Button size="sm" className="w-full bg-gradient-to-r from-violet-600 to-indigo-600">
+                      <User className="w-4 h-4 mr-2" />
+                      {user.firstName || user.name || user.email?.split('@')[0] || 'Account'}
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/sign-in" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/auth/sign-up" onClick={() => setIsOpen(false)}>
+                    <Button size="sm" className="w-full bg-gradient-to-r from-violet-600 to-indigo-600">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
