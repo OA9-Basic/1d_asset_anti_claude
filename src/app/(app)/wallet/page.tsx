@@ -1,6 +1,5 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertCircle,
   ArrowDownCircle,
@@ -8,17 +7,17 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  CreditCard as CreditCardIcon,
   DollarSign,
-  Eye,
-  EyeOff,
   Filter,
   Loader2,
   RefreshCw,
   TrendingDown,
   TrendingUp,
-  Wallet,
+  Wallet as WalletIcon,
   XCircle,
+  Landmark,
+  ArrowRight,
+  CreditCard,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -53,8 +52,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
-import { buttonTap, modalScaleUp, staggerContainer, staggerItem } from '@/lib/animations';
-import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -83,140 +80,22 @@ interface TransactionsData {
   transactions: Transaction[];
 }
 
-// Credit Card Visual Component
-function CreditCard({ balance, user }: { balance: number; user: { id: string; name?: string | null; email?: string | null; firstName?: string | null } }) {
-  const [showNumber, setShowNumber] = useState(false);
-
-  // Generate a mock card number based on user ID
-  const cardNumber = showNumber ? '4532 •••• •••• 1234' : '•••• •••• •••• ••••';
-  const _lastFour = '1234';
-  const expiryDate = '12/28';
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
-      animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-      transition={{ duration: 0.6, type: 'spring' }}
-      whileHover={{ scale: 1.05, rotateX: 5, rotateY: 5 }}
-      className="relative"
-    >
-      <div className="relative w-full max-w-md mx-auto">
-        {/* Card Glow */}
-        <motion.div
-          animate={{
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl blur-lg"
-        />
-
-        {/* Card */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 shadow-2xl">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <motion.div
-              animate={{ x: [0, 50, 0] }}
-              transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-              className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2"
-            />
-            <motion.div
-              animate={{ x: [0, -50, 0] }}
-              transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-              className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2"
-            />
-          </div>
-
-          {/* Chip */}
-          <motion.div
-            className="absolute top-8 right-8"
-            whileHover={{ rotate: 180, scale: 1.1 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="w-12 h-9 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-md flex items-center justify-center shadow-lg">
-              <div className="w-8 h-6 border border-yellow-600/30 rounded-sm" />
-            </div>
-          </motion.div>
-
-          {/* Content */}
-          <div className="relative z-10 space-y-8">
-            {/* Balance Display */}
-            <div>
-              <p className="text-violet-100 text-sm font-medium mb-1">Total Balance</p>
-              <motion.p
-                key={balance}
-                initial={{ scale: 1.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-                className="text-4xl font-bold text-white tracking-tight"
-              >
-                ${balance.toFixed(2)}
-              </motion.p>
-            </div>
-
-            {/* Card Number */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-violet-100 text-xs font-medium mb-2">Card Number</p>
-                <div className="flex items-center gap-6">
-                  <p className="text-xl text-white tracking-widest font-mono">{cardNumber}</p>
-                  <motion.button
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setShowNumber(!showNumber)}
-                    className="text-violet-200 hover:text-white transition-colors"
-                  >
-                    {showNumber ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </motion.button>
-                </div>
-              </div>
-            </div>
-
-            {/* Card Details */}
-            <div className="flex items-center justify-between pt-4 border-t border-white/20">
-              <div>
-                <p className="text-violet-100 text-xs font-medium mb-1">Card Holder</p>
-                <p className="text-white font-medium uppercase tracking-wide">
-                  {user?.firstName || user?.email?.split('@')[0] || 'User'}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-violet-100 text-xs font-medium mb-1">Expires</p>
-                <p className="text-white font-medium tracking-wide">{expiryDate}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Card Type Badge */}
-          <div className="absolute bottom-8 right-8">
-            <motion.div whileHover={{ scale: 1.1 }}>
-              <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-                <CreditCardIcon className="w-3 h-3 mr-1" />
-                VISA
-              </Badge>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 // Transaction Status Badge
 function TransactionStatus({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string; icon: IconType }> = {
+  const statusConfig: Record<string, { label: string; className: string; icon: any }> = {
     COMPLETED: {
       label: 'Success',
-      className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
       icon: CheckCircle2,
     },
     PENDING: {
       label: 'Pending',
-      className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+      className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
       icon: Clock,
     },
     FAILED: {
       label: 'Failed',
-      className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+      className: 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400 border-red-200 dark:border-red-900/50',
       icon: XCircle,
     },
   };
@@ -225,7 +104,7 @@ function TransactionStatus({ status }: { status: string }) {
   const StatusIcon = config.icon;
 
   return (
-    <Badge className={config.className}>
+    <Badge variant="outline" className={config.className}>
       <StatusIcon className="w-3 h-3 mr-1" />
       {config.label}
     </Badge>
@@ -234,99 +113,67 @@ function TransactionStatus({ status }: { status: string }) {
 
 // Transaction Type Badge
 function TransactionType({ type }: { type: string }) {
-  const typeConfig: Record<string, { label: string; className: string; icon: IconType }> = {
+  const typeConfig: Record<string, { label: string; className: string; icon: any }> = {
     DEPOSIT: {
       label: 'Deposit',
-      className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
       icon: ArrowDownCircle,
     },
     WITHDRAWAL: {
       label: 'Withdrawal',
-      className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+      className: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30',
       icon: ArrowUpCircle,
     },
     WITHDRAWAL_REQUEST: {
       label: 'Withdrawal Request',
-      className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+      className: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30',
       icon: Clock,
     },
     CONTRIBUTION: {
       label: 'Contribution',
-      className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      className: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
       icon: TrendingUp,
     },
     CONTRIBUTION_REFUND: {
       label: 'Refund',
-      className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      className: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30',
       icon: TrendingDown,
     },
     PROFIT_SHARE: {
       label: 'Profit',
-      className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+      className: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/30',
       icon: DollarSign,
     },
     PURCHASE: {
       label: 'Purchase',
-      className: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+      className: 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30',
       icon: CheckCircle2,
     },
   };
 
   const config = typeConfig[type] || {
     label: type,
-    className: 'bg-gray-100 text-gray-700',
+    className: 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/30',
     icon: DollarSign,
   };
   const TypeIcon = config.icon;
 
   return (
     <div className="flex items-center gap-2">
-      <TypeIcon className="w-4 h-4 text-muted-foreground" />
-      <span className="text-sm">{config.label}</span>
+      <div className={`p-1.5 rounded-lg ${config.className}`}>
+        <TypeIcon className="w-3.5 h-3.5" />
+      </div>
+      <span className="text-sm font-medium">{config.label}</span>
     </div>
-  );
-}
-
-// Stat Row Component
-function StatRow({
-  label,
-  value,
-  valueClassName = '',
-  delay,
-}: {
-  label: string;
-  value: string | number;
-  valueClassName?: string;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      variants={staggerItem}
-      whileHover={{ x: 4, backgroundColor: 'rgba(var(--muted) / 0.3)' }}
-      className="flex items-center justify-between py-3 border-b last:border-0 rounded transition-colors px-2 -mx-2"
-    >
-      <span className="text-muted-foreground">{label}</span>
-      <motion.span
-        key={value}
-        initial={{ scale: 1.2, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: (delay || 0) + 0.2 }}
-        className={`font-semibold ${valueClassName}`}
-      >
-        {value}
-      </motion.span>
-    </motion.div>
   );
 }
 
 export default function WalletPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [cryptoCurrency, setCryptoCurrency] = useState('MOCK');
+  const [cryptoCurrency, setCryptoCurrency] = useState('ETH');
   const [walletAddress, setWalletAddress] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -357,37 +204,6 @@ export default function WalletPage() {
       router.push('/auth/sign-in');
     }
   }, [user, authLoading, router]);
-
-  const handleDeposit = async () => {
-    if (!depositAmount || parseFloat(depositAmount) <= 0) return;
-
-    setIsProcessing(true);
-    try {
-      const res = await fetch('/api/wallet/deposit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: parseFloat(depositAmount),
-          cryptoCurrency,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setDepositOpen(false);
-        setDepositAmount('');
-        mutateBalance();
-        mutateTransactions();
-      } else {
-        alert(data.error || 'Deposit failed');
-      }
-    } catch {
-      alert('An error occurred');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   const handleWithdraw = async () => {
     if (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || !walletAddress) return;
@@ -422,7 +238,6 @@ export default function WalletPage() {
     }
   };
 
-  // Filter transactions
   const filteredTransactions =
     transactionsData?.transactions?.filter((tx) => {
       if (statusFilter !== 'all' && tx.status !== statusFilter) return false;
@@ -439,52 +254,46 @@ export default function WalletPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-muted/20 to-background"
-    >
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="border-b bg-background/95 backdrop-blur sticky top-0 z-10"
-      >
-        <div className="container-custom py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      {/* Header */}
+      <div className="border-b border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold">Wallet</h1>
-              <p className="text-muted-foreground">Manage your funds and transactions</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <WalletIcon className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                  Wallet
+                </h1>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Manage your funds and transactions
+                </p>
+              </div>
             </div>
-            <motion.div {...buttonTap}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  mutateBalance();
-                  mutateTransactions();
-                }}
-                disabled={balanceLoading || transactionsLoading}
-              >
-                <motion.div
-                  animate={balanceLoading || transactionsLoading ? { rotate: 360 } : {}}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                </motion.div>
-                Refresh
-              </Button>
-            </motion.div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                mutateBalance();
+                mutateTransactions();
+              }}
+              disabled={balanceLoading || transactionsLoading}
+              className="border-slate-200 dark:border-slate-700"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${balanceLoading || transactionsLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
           </div>
         </div>
-      </motion.header>
+      </div>
 
-      <div className="container-custom py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {balanceError || transactionsError ? (
-          <Card className="border-destructive">
+          <Card className="border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30">
             <CardContent className="p-6">
-              <div className="flex items-center gap-3 text-destructive">
+              <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
                 <AlertCircle className="w-5 h-5" />
                 <div>
                   <p className="font-medium">Failed to load wallet data</p>
@@ -505,394 +314,329 @@ export default function WalletPage() {
           </Card>
         ) : (
           <>
-            {/* Credit Card Visual */}
-            <section className="flex justify-center">
-              {balanceLoading ? (
-                <Card className="w-full max-w-md h-64">
-                  <CardContent className="h-full flex items-center justify-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  </CardContent>
-                </Card>
-              ) : balanceData ? (
-                <CreditCard balance={balanceData.balance} user={user} />
-              ) : null}
-            </section>
-
-            {/* Action Buttons */}
-            <section className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-lg shadow-green-500/30"
-                onClick={() => setDepositOpen(true)}
-              >
-                <ArrowDownCircle className="w-5 h-5 mr-2" />
-                Deposit Funds
-              </Button>
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 shadow-lg shadow-orange-500/30"
-                onClick={() => setWithdrawOpen(true)}
-              >
-                <ArrowUpCircle className="w-5 h-5 mr-2" />
-                Withdraw Funds
-              </Button>
-            </section>
-
-            {/* Balance Breakdown */}
-            <section>
-              <Card className="border-2">
-                <CardHeader>
-                  <CardTitle>Balance Breakdown</CardTitle>
-                  <CardDescription>Your wallet balances at a glance</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {balanceLoading ? (
-                    <div className="space-y-4">
-                      {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="h-12 bg-muted animate-pulse rounded" />
-                      ))}
+            {/* Balance Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {/* Total Balance */}
+              <Card className="border-2 border-blue-200 dark:border-blue-900/50 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/30 dark:to-slate-900/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-900/50">
+                      <WalletIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                  ) : balanceData ? (
-                    <motion.div
-                      variants={staggerContainer}
-                      initial="hidden"
-                      animate="show"
-                      className="space-y-1"
-                    >
-                      <StatRow
-                        label="Available Balance"
-                        value={`$${balanceData.balance.toFixed(2)}`}
-                        valueClassName="text-xl text-gradient"
-                        delay={0}
-                      />
-                      <StatRow
-                        label="Withdrawable Balance"
-                        value={`$${balanceData.withdrawableBalance.toFixed(2)}`}
-                        valueClassName="text-green-600"
-                        delay={0.1}
-                      />
-                      <StatRow
-                        label="Store Credit"
-                        value={`$${balanceData.storeCredit.toFixed(2)}`}
-                        valueClassName="text-purple-600"
-                        delay={0.2}
-                      />
-                      <StatRow
-                        label="Total Deposited"
-                        value={`$${balanceData.totalDeposited.toFixed(2)}`}
-                        delay={0.3}
-                      />
-                      <StatRow
-                        label="Total Withdrawn"
-                        value={`$${balanceData.totalWithdrawn.toFixed(2)}`}
-                        delay={0.4}
-                      />
-                      <StatRow
-                        label="Total Contributed"
-                        value={`$${balanceData.totalContributed.toFixed(2)}`}
-                        delay={0.5}
-                      />
-                      <StatRow
-                        label="Total Profit Received"
-                        value={`$${balanceData.totalProfitReceived.toFixed(2)}`}
-                        valueClassName="text-emerald-600"
-                        delay={0.6}
-                      />
-                    </motion.div>
-                  ) : null}
-                </CardContent>
-              </Card>
-            </section>
-
-            {/* Transaction History */}
-            <section>
-              <Card className="border-2">
-                <CardHeader>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                      <CardTitle>Transaction History</CardTitle>
-                      <CardDescription>Your recent wallet activity</CardDescription>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Select value={typeFilter} onValueChange={setTypeFilter}>
-                        <SelectTrigger className="w-[140px]">
-                          <Filter className="w-4 h-4 mr-2" />
-                          <SelectValue placeholder="Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="DEPOSIT">Deposits</SelectItem>
-                          <SelectItem value="WITHDRAWAL">Withdrawals</SelectItem>
-                          <SelectItem value="CONTRIBUTION">Contributions</SelectItem>
-                          <SelectItem value="PROFIT_SHARE">Profits</SelectItem>
-                          <SelectItem value="PURCHASE">Purchases</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[140px]">
-                          <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Status</SelectItem>
-                          <SelectItem value="COMPLETED">Completed</SelectItem>
-                          <SelectItem value="PENDING">Pending</SelectItem>
-                          <SelectItem value="FAILED">Failed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2.5 py-1 rounded-full">
+                      Primary
+                    </span>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {transactionsLoading ? (
-                    <div className="space-y-4">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <div key={i} className="h-16 bg-muted animate-pulse rounded" />
-                      ))}
-                    </div>
-                  ) : filteredTransactions.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                            <TableHead className="text-center">Status</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {filteredTransactions.map((transaction, index) => (
-                            <motion.tr
-                              key={transaction.id}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.05 }}
-                              className="hover:bg-muted/50 transition-colors"
-                            >
-                              <TableCell className="font-medium">
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                                  {new Date(transaction.createdAt).toLocaleDateString()}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <TransactionType type={transaction.type} />
-                              </TableCell>
-                              <TableCell className="max-w-xs truncate">
-                                {transaction.description}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <span
-                                  className={`font-semibold ${
-                                    transaction.type === 'DEPOSIT' ||
-                                    transaction.type === 'PROFIT_SHARE' ||
-                                    transaction.type === 'CONTRIBUTION_REFUND'
-                                      ? 'text-green-600'
-                                      : transaction.type === 'WITHDRAWAL' ||
-                                          transaction.type === 'CONTRIBUTION' ||
-                                          transaction.type === 'PURCHASE'
-                                        ? 'text-red-600'
-                                        : ''
-                                  }`}
-                                >
-                                  {transaction.type === 'DEPOSIT' ||
-                                  transaction.type === 'PROFIT_SHARE' ||
-                                  transaction.type === 'CONTRIBUTION_REFUND'
-                                    ? '+'
-                                    : '-'}
-                                  ${transaction.amount.toFixed(2)}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <TransactionStatus status={transaction.status} />
-                              </TableCell>
-                            </motion.tr>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Total Balance</p>
+                  {balanceLoading ? (
+                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
                   ) : (
-                    <div className="text-center py-12">
-                      <Wallet className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-                      <p className="text-muted-foreground">No transactions found</p>
-                    </div>
+                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                      ${balanceData?.balance.toFixed(2) || '0.00'}
+                    </p>
                   )}
                 </CardContent>
               </Card>
-            </section>
+
+              {/* Withdrawable */}
+              <Card className="border-slate-200 dark:border-slate-700/50 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/50">
+                      <Landmark className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Withdrawable</p>
+                  {balanceLoading ? (
+                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  ) : (
+                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                      ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Store Credit */}
+              <Card className="border-slate-200 dark:border-slate-700/50 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2.5 rounded-xl bg-violet-100 dark:bg-violet-900/50">
+                      <CreditCard className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Store Credit</p>
+                  {balanceLoading ? (
+                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  ) : (
+                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                      ${balanceData?.storeCredit.toFixed(2) || '0.00'}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Total Deposited */}
+              <Card className="border-slate-200 dark:border-slate-700/50 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/50">
+                      <TrendingUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                  </div>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Total Deposited</p>
+                  {balanceLoading ? (
+                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  ) : (
+                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                      ${balanceData?.totalDeposited.toFixed(2) || '0.00'}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <button
+                onClick={() => router.push('/wallet/deposit')}
+                className="group relative overflow-hidden rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/50 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-slate-900/50 p-6 text-left hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                      <ArrowDownCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                    Deposit Funds
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Add funds using cryptocurrency
+                  </p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setWithdrawOpen(true)}
+                className="group relative overflow-hidden rounded-2xl border-2 border-orange-200 dark:border-orange-900/50 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-slate-900/50 p-6 text-left hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300"
+              >
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform duration-300">
+                      <ArrowUpCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <ArrowRight className="w-5 h-5 text-orange-600 dark:text-orange-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                    Withdraw Funds
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Request withdrawal to crypto
+                  </p>
+                </div>
+              </button>
+            </div>
+
+            {/* Transaction History */}
+            <Card className="border-slate-200/60 dark:border-slate-700/50 shadow-xl shadow-slate-200/50 dark:shadow-black/50">
+              <CardHeader className="border-b border-slate-200/60 dark:border-slate-700/50">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-xl">Transaction History</CardTitle>
+                    <CardDescription>Your recent wallet activity</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select value={typeFilter} onValueChange={setTypeFilter}>
+                      <SelectTrigger className="w-[140px]">
+                        <Filter className="w-4 h-4 mr-2" />
+                        <SelectValue placeholder="Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="DEPOSIT">Deposits</SelectItem>
+                        <SelectItem value="WITHDRAWAL">Withdrawals</SelectItem>
+                        <SelectItem value="CONTRIBUTION">Contributions</SelectItem>
+                        <SelectItem value="PROFIT_SHARE">Profits</SelectItem>
+                        <SelectItem value="PURCHASE">Purchases</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="COMPLETED">Completed</SelectItem>
+                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="FAILED">Failed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {transactionsLoading ? (
+                  <div className="p-8 space-y-4">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : filteredTransactions.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-slate-200/60 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                          <TableHead className="font-semibold">Date</TableHead>
+                          <TableHead className="font-semibold">Type</TableHead>
+                          <TableHead className="font-semibold">Description</TableHead>
+                          <TableHead className="text-right font-semibold">Amount</TableHead>
+                          <TableHead className="text-center font-semibold">Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredTransactions.map((transaction) => (
+                          <TableRow
+                            key={transaction.id}
+                            className="border-slate-200/60 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+                          >
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-slate-400" />
+                                {new Date(transaction.createdAt).toLocaleDateString()}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <TransactionType type={transaction.type} />
+                            </TableCell>
+                            <TableCell className="max-w-xs truncate text-slate-600 dark:text-slate-400">
+                              {transaction.description}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <span
+                                className={`font-semibold ${
+                                  transaction.type === 'DEPOSIT' ||
+                                  transaction.type === 'PROFIT_SHARE' ||
+                                  transaction.type === 'CONTRIBUTION_REFUND'
+                                    ? 'text-emerald-600 dark:text-emerald-400'
+                                    : 'text-slate-900 dark:text-white'
+                                }`}
+                              >
+                                {transaction.type === 'DEPOSIT' ||
+                                transaction.type === 'PROFIT_SHARE' ||
+                                transaction.type === 'CONTRIBUTION_REFUND'
+                                  ? '+'
+                                  : ''}
+                                ${transaction.amount.toFixed(2)}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <TransactionStatus status={transaction.status} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                      <WalletIcon className="w-8 h-8 text-slate-400 dark:text-slate-600" />
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">No transactions found</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
+                      Your transaction history will appear here
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </>
         )}
       </div>
 
-      {/* Deposit Dialog */}
-      <AnimatePresence>
-        <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
-          <DialogContent className="sm:max-w-md">
-            <motion.div variants={modalScaleUp} initial="initial" animate="animate" exit="exit">
-              <DialogHeader>
-                <DialogTitle>Deposit Funds</DialogTitle>
-                <DialogDescription>Add funds to your wallet using cryptocurrency</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="deposit-amount">Amount</Label>
-                  <Input
-                    id="deposit-amount"
-                    type="number"
-                    placeholder="100.00"
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    min="1"
-                    step="0.01"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="crypto-currency">Cryptocurrency</Label>
-                  <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
-                    <SelectTrigger id="crypto-currency">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="MOCK">MOCK (Test Mode)</SelectItem>
-                      <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
-                      <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-                      <SelectItem value="USDT">Tether (USDT)</SelectItem>
-                      <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
-                      <SelectItem value="XMR">Monero (XMR)</SelectItem>
-                      <SelectItem value="LTC">Litecoin (LTC)</SelectItem>
-                      <SelectItem value="BCH">Bitcoin Cash (BCH)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {cryptoCurrency === 'MOCK' && (
-                  <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm">
-                    <p className="font-medium mb-1">Test Mode</p>
-                    <p className="text-xs">
-                      This will add test funds to your wallet for development purposes.
-                    </p>
-                  </div>
-                )}
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDepositOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleDeposit}
-                  disabled={isProcessing || !depositAmount || parseFloat(depositAmount) <= 0}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <ArrowDownCircle className="w-4 h-4 mr-2" />
-                      Deposit
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </motion.div>
-          </DialogContent>
-        </Dialog>
-      </AnimatePresence>
-
       {/* Withdraw Dialog */}
-      <AnimatePresence>
-        <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
-          <DialogContent className="sm:max-w-md">
-            <motion.div variants={modalScaleUp} initial="initial" animate="animate" exit="exit">
-              <DialogHeader>
-                <DialogTitle>Withdraw Funds</DialogTitle>
-                <DialogDescription>
-                  Withdraw funds from your wallet to cryptocurrency
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="withdraw-amount">Amount</Label>
-                  <Input
-                    id="withdraw-amount"
-                    type="number"
-                    placeholder="100.00"
-                    value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    min="1"
-                    step="0.01"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Available: ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="withdraw-crypto">Cryptocurrency</Label>
-                  <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
-                    <SelectTrigger id="withdraw-crypto">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
-                      <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
-                      <SelectItem value="USDT">Tether (USDT)</SelectItem>
-                      <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
-                      <SelectItem value="XMR">Monero (XMR)</SelectItem>
-                      <SelectItem value="LTC">Litecoin (LTC)</SelectItem>
-                      <SelectItem value="BCH">Bitcoin Cash (BCH)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="wallet-address">Wallet Address</Label>
-                  <Input
-                    id="wallet-address"
-                    placeholder="Enter your wallet address"
-                    value={walletAddress}
-                    onChange={(e) => setWalletAddress(e.target.value)}
-                  />
-                </div>
-                <div className="p-3 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-sm">
-                  <p className="font-medium mb-1">Withdrawal Request</p>
-                  <p className="text-xs">
-                    Your withdrawal will be processed by an admin. Funds will be locked until
-                    approval.
-                  </p>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setWithdrawOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleWithdraw}
-                  disabled={
-                    isProcessing ||
-                    !withdrawAmount ||
-                    parseFloat(withdrawAmount) <= 0 ||
-                    !walletAddress
-                  }
-                  className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <ArrowUpCircle className="w-4 h-4 mr-2" />
-                      Withdraw
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </motion.div>
-          </DialogContent>
-        </Dialog>
-      </AnimatePresence>
-    </motion.div>
+      <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+        <DialogContent className="sm:max-w-md border-slate-200 dark:border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Withdraw Funds</DialogTitle>
+            <DialogDescription>
+              Withdraw funds from your wallet to cryptocurrency
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="withdraw-amount">Amount</Label>
+              <Input
+                id="withdraw-amount"
+                type="number"
+                placeholder="100.00"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                min="1"
+                step="0.01"
+              />
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Available: ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="withdraw-crypto">Cryptocurrency</Label>
+              <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
+                <SelectTrigger id="withdraw-crypto">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
+                  <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
+                  <SelectItem value="USDT">Tether (USDT)</SelectItem>
+                  <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="wallet-address">Wallet Address</Label>
+              <Input
+                id="wallet-address"
+                placeholder="Enter your wallet address"
+                value={walletAddress}
+                onChange={(e) => setWalletAddress(e.target.value)}
+              />
+            </div>
+            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">Withdrawal Request</p>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                Your withdrawal will be processed by an admin. Funds will be locked until approval.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setWithdrawOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleWithdraw}
+              disabled={
+                isProcessing ||
+                !withdrawAmount ||
+                parseFloat(withdrawAmount) <= 0 ||
+                !walletAddress
+              }
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Withdraw'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
