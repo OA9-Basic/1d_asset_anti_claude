@@ -8,6 +8,7 @@ import { createHash } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { NETWORKS, TOKEN_CONTRACTS, verifyTransaction } from '@/lib/blockchain/alchemy';
+import { autoSweepIfRequired } from '@/lib/blockchain/sweep';
 import { db } from '@/lib/db';
 
 // ============================================================================
@@ -144,6 +145,18 @@ export async function POST(req: NextRequest) {
 
     // 7. Update deposit order status
     if (verification.verified) {
+      // Get user's wallet first to calculate balances correctly
+      const userWallet = await db.wallet.findUnique({
+        where: { userId: depositOrder.userId },
+      });
+
+      if (!userWallet) {
+        throw new Error(`Wallet not found for user ${depositOrder.userId}`);
+      }
+
+      const balanceBefore = userWallet.balance;
+      const balanceAfter = balanceBefore + depositOrder.usdAmount;
+
       // Transaction verified!
       await db.$transaction([
         // Update deposit order
@@ -159,16 +172,16 @@ export async function POST(req: NextRequest) {
           },
         }),
 
-        // Create transaction record
+        // Create transaction record with correct balances
         db.transaction.create({
           data: {
-            walletId: depositOrder.userId, // Will be updated below
+            walletId: userWallet.id,
             userId: depositOrder.userId,
             type: 'DEPOSIT',
             amount: depositOrder.usdAmount,
-            currency: 'USD', // Store as USD value
-            balanceBefore: 0, // Will be calculated properly
-            balanceAfter: depositOrder.usdAmount,
+            currency: 'USD',
+            balanceBefore,
+            balanceAfter,
             status: 'COMPLETED',
             network: depositOrder.network,
             txHash,
@@ -182,10 +195,11 @@ export async function POST(req: NextRequest) {
 
         // Update wallet balance
         db.wallet.update({
-          where: { userId: depositOrder.userId },
+          where: { id: userWallet.id },
           data: {
-            balance: { increment: depositOrder.usdAmount },
+            balance: balanceAfter,
             withdrawableBalance: { increment: depositOrder.usdAmount },
+            totalDeposited: { increment: depositOrder.usdAmount },
           },
         }),
 
@@ -219,7 +233,11 @@ export async function POST(req: NextRequest) {
         }),
       ]);
 
-      // TODO: Trigger sweep to cold storage if balance exceeds threshold
+      // Auto-sweep to cold storage if balance exceeds threshold
+      // Run asynchronously in background
+      autoSweepIfRequired(depositOrder.id).catch((error) => {
+        console.error('Auto-sweep failed:', error);
+      });
 
       return NextResponse.json({
         success: true,
