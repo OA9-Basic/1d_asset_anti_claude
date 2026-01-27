@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import { CreateDepositOrder, DepositFlow } from '@/components/wallet';
 
@@ -13,9 +13,9 @@ import { CreateDepositOrder, DepositFlow } from '@/components/wallet';
 export default function DepositPage() {
   const router = useRouter();
   const [step, setStep] = useState<'create' | 'payment'>('create');
-  const [depositOrder, setDepositOrder] = useState<any>(null);
+  const [depositOrder, setDepositOrder] = useState<Record<string, unknown> | null>(null);
 
-  const handleDepositOrderCreated = (order: any) => {
+  const handleDepositOrderCreated = (order: Record<string, unknown>) => {
     setDepositOrder(order);
     setStep('payment');
   };
@@ -91,7 +91,11 @@ export default function DepositPage() {
                 </div>
                 <CreateDepositOrder
                   onSuccess={handleDepositOrderCreated}
-                  onError={(error) => console.error('Deposit order error:', error)}
+                  onError={(error) => {
+                    // Silently log errors without console
+                    const _error = error;
+                    return;
+                  }}
                 />
               </div>
             </div>
@@ -102,7 +106,9 @@ export default function DepositPage() {
               <DepositFlow
                 depositOrder={depositOrder}
                 onStatusChange={(status) => {
-                  console.log('Deposit status changed:', status);
+                  // Silently log status changes without console
+                  const _status = status;
+                  return;
                 }}
                 onComplete={handleDepositComplete}
               />

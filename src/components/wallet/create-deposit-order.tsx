@@ -7,7 +7,7 @@ import { useState } from 'react';
 // ============================================================================
 
 export interface CreateDepositOrderProps {
-  onSuccess?: (depositOrder: any) => void;
+  onSuccess?: (depositOrder: Record<string, unknown>) => void;
   onError?: (error: string) => void;
 }
 
@@ -76,8 +76,6 @@ export function CreateDepositOrder({ onSuccess, onError }: CreateDepositOrderPro
   const [error, setError] = useState<string>('');
   const [quickAmounts] = useState<number[]>([10, 50, 100, 500, 1000]);
 
-  const selectedCurrencyData = CURRENCIES.find(c => c.id === selectedCurrency);
-
   const handleQuickAmount = (amount: number) => {
     setUsdAmount(amount.toString());
     setError('');
@@ -116,7 +114,7 @@ export function CreateDepositOrder({ onSuccess, onError }: CreateDepositOrderPro
       }
 
       if (data.success) {
-        onSuccess?.(data.depositOrder);
+        onSuccess?.(data.depositOrder as Record<string, unknown>);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create deposit order';
@@ -131,14 +129,15 @@ export function CreateDepositOrder({ onSuccess, onError }: CreateDepositOrderPro
     <form onSubmit={handleSubmit} className="space-y-5 p-6">
       {/* Amount Input */}
       <div>
-        <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2.5">
+        <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2.5">
           Amount (USD)
-        </label>
+        </span>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <span className="text-neutral-400 text-sm font-medium">$</span>
           </div>
           <input
+            id="amount-input"
             type="number"
             value={usdAmount}
             onChange={(e) => {
@@ -149,6 +148,7 @@ export function CreateDepositOrder({ onSuccess, onError }: CreateDepositOrderPro
             max="1000"
             step="0.01"
             placeholder="0.00"
+            aria-label="Amount in USD"
             className="block w-full pl-8 pr-16 py-3 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-white dark:bg-black text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white focus:border-transparent dark:focus:border-transparent transition-all sm:text-sm"
             disabled={isLoading}
           />
@@ -179,15 +179,17 @@ export function CreateDepositOrder({ onSuccess, onError }: CreateDepositOrderPro
 
       {/* Currency Selection */}
       <div>
-        <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2.5">
+        <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2.5">
           Cryptocurrency
-        </label>
-        <div className="space-y-1.5">
+        </span>
+        <div className="space-y-1.5" role="radiogroup" aria-label="Select cryptocurrency">
           {CURRENCIES.map((currency) => (
             <button
               key={currency.id}
               type="button"
               onClick={() => setSelectedCurrency(currency.id)}
+              aria-checked={selectedCurrency === currency.id}
+              role="radio"
               className={`w-full p-3 rounded-lg border text-left transition-all duration-200 ${
                 selectedCurrency === currency.id
                   ? 'border-neutral-900 dark:border-white bg-neutral-50 dark:bg-neutral-900 ring-1 ring-neutral-900 dark:ring-white'
@@ -222,7 +224,7 @@ export function CreateDepositOrder({ onSuccess, onError }: CreateDepositOrderPro
 
       {/* Error Message */}
       {error && (
-        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg animate-in slide-in-from-top-2 duration-200">
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg animate-in slide-in-from-top-2 duration-200" role="alert">
           <p className="text-sm text-red-800 dark:text-red-200 font-medium">{error}</p>
         </div>
       )}

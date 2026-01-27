@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
+import { useEffect, useState } from 'react';
 
 // ============================================================================
 // TYPES
@@ -212,14 +212,15 @@ export function DepositFlow({ depositOrder, onStatusChange, onComplete }: Deposi
 
       {/* Deposit Address */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <span className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Deposit Address ({depositOrder.network})
-        </label>
+        </span>
         <div className="relative">
           <input
             type="text"
             readOnly
             value={depositOrder.depositAddress}
+            aria-label={`Deposit address for ${depositOrder.network}`}
             className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-mono text-gray-900 dark:text-white"
           />
           <CopyButton text={depositOrder.depositAddress} />
@@ -271,9 +272,9 @@ export function DepositFlow({ depositOrder, onStatusChange, onComplete }: Deposi
       {/* Transaction Hash */}
       {depositOrder.txHash && (
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <span className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Transaction Hash
-          </label>
+          </span>
           <a
             href={`https://etherscan.io/tx/${depositOrder.txHash}`}
             target="_blank"

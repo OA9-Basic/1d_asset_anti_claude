@@ -6,9 +6,9 @@
 
 import { ethers } from 'ethers';
 
+import { NETWORKS } from '@/lib/blockchain/alchemy';
 import { db } from '@/lib/db';
 import { decrypt } from '@/lib/encryption';
-import { NETWORKS } from '@/lib/blockchain/alchemy';
 
 // Get RPC URL from network config
 function getNetworkRpcUrl(network: keyof typeof NETWORKS): string {
@@ -95,7 +95,6 @@ export async function checkSweepRequired(depositOrderId: string): Promise<boolea
 
   const config = SWEEP_CONFIGS[depositOrder.network];
   if (!config || !config.coldWalletAddress) {
-    console.log(`No sweep config for ${depositOrder.network}`);
     return false;
   }
 
@@ -320,21 +319,18 @@ export async function autoSweepIfRequired(depositOrderId: string): Promise<void>
     if (!needsSweep) return;
 
     // Execute sweep
-    const sweepTxHash = await executeSweep(depositOrderId);
-
-    console.log(`Auto-sweep executed for order ${depositOrderId}, tx: ${sweepTxHash}`);
+    await executeSweep(depositOrderId);
 
     // If it's a token deposit, also sweep tokens
     if (depositOrder.cryptoCurrency.startsWith('USDT') ||
         depositOrder.cryptoCurrency.startsWith('USDC')) {
-      const tokenSweepTxHash = await executeTokenSweep(
+      await executeTokenSweep(
         depositOrderId,
         depositOrder.cryptoCurrency
       );
-      console.log(`Token sweep executed, tx: ${tokenSweepTxHash}`);
     }
   } catch (error) {
-    console.error('Auto-sweep failed:', error);
+    // Silently handle sweep failures
 
     // Log failure but don't throw - we don't want to break deposit verification
     await db.auditLog.create({
