@@ -15,9 +15,6 @@ import {
   TrendingUp,
   Wallet as WalletIcon,
   XCircle,
-  Landmark,
-  ArrowRight,
-  CreditCard,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,7 +22,7 @@ import useSWR from 'swr';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -35,7 +32,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -82,7 +78,7 @@ interface TransactionsData {
 
 // Transaction Status Badge
 function TransactionStatus({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string; icon: any }> = {
+  const statusConfig: Record<string, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
     COMPLETED: {
       label: 'Success',
       className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
@@ -113,7 +109,7 @@ function TransactionStatus({ status }: { status: string }) {
 
 // Transaction Type Badge
 function TransactionType({ type }: { type: string }) {
-  const typeConfig: Record<string, { label: string; className: string; icon: any }> = {
+  const typeConfig: Record<string, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
     DEPOSIT: {
       label: 'Deposit',
       className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
@@ -153,7 +149,7 @@ function TransactionType({ type }: { type: string }) {
 
   const config = typeConfig[type] || {
     label: type,
-    className: 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/30',
+    className: 'text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-950/30',
     icon: DollarSign,
   };
   const TypeIcon = config.icon;
@@ -247,28 +243,26 @@ export default function WalletPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-900 dark:text-white" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <div className="border-b border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl sticky top-0 z-10">
+      <div className="border-b border-neutral-200 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <WalletIcon className="w-5 h-5 text-white" />
-              </div>
+            <div className="flex items-center gap-4">
+              <div className="h-8 w-1 bg-neutral-900 dark:bg-white" />
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                <h1 className="text-xl font-semibold text-neutral-900 dark:text-white tracking-tight">
                   Wallet
                 </h1>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Manage your funds and transactions
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+                  Manage your funds
                 </p>
               </div>
             </div>
@@ -280,7 +274,7 @@ export default function WalletPage() {
                 mutateTransactions();
               }}
               disabled={balanceLoading || transactionsLoading}
-              className="border-slate-200 dark:border-slate-700"
+              className="border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${balanceLoading || transactionsLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -289,7 +283,7 @@ export default function WalletPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-10">
         {balanceError || transactionsError ? (
           <Card className="border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30">
             <CardContent className="p-6">
@@ -317,21 +311,21 @@ export default function WalletPage() {
             {/* Balance Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {/* Total Balance */}
-              <Card className="border-2 border-blue-200 dark:border-blue-900/50 bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/30 dark:to-slate-900/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
+              <Card className="border-2 border-neutral-200 dark:border-neutral-800 hover:border-neutral-900 dark:hover:border-white transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-900/50">
-                      <WalletIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <div className="p-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-900">
+                      <WalletIcon className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
                     </div>
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2.5 py-1 rounded-full">
+                    <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-900 px-2.5 py-1 rounded-full">
                       Primary
                     </span>
                   </div>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Total Balance</p>
+                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Total Balance</p>
                   {balanceLoading ? (
-                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
                       ${balanceData?.balance.toFixed(2) || '0.00'}
                     </p>
                   )}
@@ -339,18 +333,18 @@ export default function WalletPage() {
               </Card>
 
               {/* Withdrawable */}
-              <Card className="border-slate-200 dark:border-slate-700/50 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300">
+              <Card className="border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/50">
-                      <Landmark className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30">
+                      <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Withdrawable</p>
+                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Withdrawable</p>
                   {balanceLoading ? (
-                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
                       ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
                     </p>
                   )}
@@ -358,18 +352,18 @@ export default function WalletPage() {
               </Card>
 
               {/* Store Credit */}
-              <Card className="border-slate-200 dark:border-slate-700/50 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300">
+              <Card className="border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-violet-100 dark:bg-violet-900/50">
-                      <CreditCard className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                    <div className="p-2.5 rounded-xl bg-violet-50 dark:bg-violet-950/30">
+                      <WalletIcon className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Store Credit</p>
+                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Store Credit</p>
                   {balanceLoading ? (
-                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
                       ${balanceData?.storeCredit.toFixed(2) || '0.00'}
                     </p>
                   )}
@@ -377,18 +371,18 @@ export default function WalletPage() {
               </Card>
 
               {/* Total Deposited */}
-              <Card className="border-slate-200 dark:border-slate-700/50 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300">
+              <Card className="border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/50">
+                    <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30">
                       <TrendingUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Total Deposited</p>
+                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Total Deposited</p>
                   {balanceLoading ? (
-                    <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
                       ${balanceData?.totalDeposited.toFixed(2) || '0.00'}
                     </p>
                   )}
@@ -400,19 +394,18 @@ export default function WalletPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               <button
                 onClick={() => router.push('/wallet/deposit')}
-                className="group relative overflow-hidden rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/50 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-slate-900/50 p-6 text-left hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
+                className="group relative overflow-hidden rounded-xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-6 text-left hover:border-neutral-900 dark:hover:border-white transition-all duration-300 shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500"
               >
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
-                      <ArrowDownCircle className="w-6 h-6 text-white" />
+                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 group-hover:scale-110 transition-transform duration-300">
+                      <ArrowDownCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <ArrowRight className="w-5 h-5 text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
                     Deposit Funds
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
                     Add funds using cryptocurrency
                   </p>
                 </div>
@@ -420,19 +413,18 @@ export default function WalletPage() {
 
               <button
                 onClick={() => setWithdrawOpen(true)}
-                className="group relative overflow-hidden rounded-2xl border-2 border-orange-200 dark:border-orange-900/50 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-slate-900/50 p-6 text-left hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300"
+                className="group relative overflow-hidden rounded-xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-6 text-left hover:border-neutral-900 dark:hover:border-white transition-all duration-300 shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100"
               >
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform duration-300">
-                      <ArrowUpCircle className="w-6 h-6 text-white" />
+                    <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/30 group-hover:scale-110 transition-transform duration-300">
+                      <ArrowUpCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                     </div>
-                    <ArrowRight className="w-5 h-5 text-orange-600 dark:text-orange-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
                     Withdraw Funds
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
                     Request withdrawal to crypto
                   </p>
                 </div>
@@ -440,16 +432,20 @@ export default function WalletPage() {
             </div>
 
             {/* Transaction History */}
-            <Card className="border-slate-200/60 dark:border-slate-700/50 shadow-xl shadow-slate-200/50 dark:shadow-black/50">
-              <CardHeader className="border-b border-slate-200/60 dark:border-slate-700/50">
+            <Card className="border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+              <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <CardTitle className="text-xl">Transaction History</CardTitle>
-                    <CardDescription>Your recent wallet activity</CardDescription>
+                    <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
+                      Transaction History
+                    </h2>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                      Your recent wallet activity
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Select value={typeFilter} onValueChange={setTypeFilter}>
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[140px] border-neutral-200 dark:border-neutral-800">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
@@ -463,7 +459,7 @@ export default function WalletPage() {
                       </SelectContent>
                     </Select>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-[140px]">
+                      <SelectTrigger className="w-[140px] border-neutral-200 dark:border-neutral-800">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -475,19 +471,19 @@ export default function WalletPage() {
                     </Select>
                   </div>
                 </div>
-              </CardHeader>
+              </div>
               <CardContent className="p-0">
                 {transactionsLoading ? (
                   <div className="p-8 space-y-4">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="h-16 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse" />
+                      <div key={i} className="h-16 bg-neutral-100 dark:bg-neutral-900 rounded-lg animate-pulse" />
                     ))}
                   </div>
                 ) : filteredTransactions.length > 0 ? (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-slate-200/60 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                        <TableRow className="border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50">
                           <TableHead className="font-semibold">Date</TableHead>
                           <TableHead className="font-semibold">Type</TableHead>
                           <TableHead className="font-semibold">Description</TableHead>
@@ -499,18 +495,18 @@ export default function WalletPage() {
                         {filteredTransactions.map((transaction) => (
                           <TableRow
                             key={transaction.id}
-                            className="border-slate-200/60 dark:border-slate-700/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors"
+                            className="border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors"
                           >
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-slate-400" />
+                                <Calendar className="w-4 h-4 text-neutral-400" />
                                 {new Date(transaction.createdAt).toLocaleDateString()}
                               </div>
                             </TableCell>
                             <TableCell>
                               <TransactionType type={transaction.type} />
                             </TableCell>
-                            <TableCell className="max-w-xs truncate text-slate-600 dark:text-slate-400">
+                            <TableCell className="max-w-xs truncate text-neutral-600 dark:text-neutral-400">
                               {transaction.description}
                             </TableCell>
                             <TableCell className="text-right">
@@ -520,7 +516,7 @@ export default function WalletPage() {
                                   transaction.type === 'PROFIT_SHARE' ||
                                   transaction.type === 'CONTRIBUTION_REFUND'
                                     ? 'text-emerald-600 dark:text-emerald-400'
-                                    : 'text-slate-900 dark:text-white'
+                                    : 'text-neutral-900 dark:text-white'
                                 }`}
                               >
                                 {transaction.type === 'DEPOSIT' ||
@@ -541,11 +537,11 @@ export default function WalletPage() {
                   </div>
                 ) : (
                   <div className="text-center py-16">
-                    <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                      <WalletIcon className="w-8 h-8 text-slate-400 dark:text-slate-600" />
+                    <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center mx-auto mb-4">
+                      <WalletIcon className="w-8 h-8 text-neutral-400 dark:text-neutral-600" />
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400 font-medium">No transactions found</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-500 mt-1">
+                    <p className="text-neutral-600 dark:text-neutral-400 font-medium">No transactions found</p>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-500 mt-1">
                       Your transaction history will appear here
                     </p>
                   </div>
@@ -558,33 +554,37 @@ export default function WalletPage() {
 
       {/* Withdraw Dialog */}
       <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
-        <DialogContent className="sm:max-w-md border-slate-200 dark:border-slate-700">
+        <DialogContent className="sm:max-w-md border-neutral-200 dark:border-neutral-800 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-xl">Withdraw Funds</DialogTitle>
             <DialogDescription>
               Withdraw funds from your wallet to cryptocurrency
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label htmlFor="withdraw-amount">Amount</Label>
+              <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Amount (USD)
+              </span>
               <Input
-                id="withdraw-amount"
                 type="number"
                 placeholder="100.00"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
                 min="1"
                 step="0.01"
+                className="border-neutral-200 dark:border-neutral-800"
               />
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
                 Available: ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="withdraw-crypto">Cryptocurrency</Label>
+              <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Cryptocurrency
+              </span>
               <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
-                <SelectTrigger id="withdraw-crypto">
+                <SelectTrigger className="border-neutral-200 dark:border-neutral-800">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -596,12 +596,14 @@ export default function WalletPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="wallet-address">Wallet Address</Label>
+              <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Wallet Address
+              </span>
               <Input
-                id="wallet-address"
                 placeholder="Enter your wallet address"
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
+                className="border-neutral-200 dark:border-neutral-800"
               />
             </div>
             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50">
@@ -612,7 +614,7 @@ export default function WalletPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setWithdrawOpen(false)}>
+            <Button variant="outline" onClick={() => setWithdrawOpen(false)} className="border-neutral-200 dark:border-neutral-800">
               Cancel
             </Button>
             <Button
@@ -623,7 +625,7 @@ export default function WalletPage() {
                 parseFloat(withdrawAmount) <= 0 ||
                 !walletAddress
               }
-              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+              className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90"
             >
               {isProcessing ? (
                 <>
