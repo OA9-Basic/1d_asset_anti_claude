@@ -28,8 +28,6 @@ export function SmoothScrollProvider({ children, options = {} }: SmoothScrollPro
     const lenis = new Lenis({
       duration: options.duration || 1.2,
       easing: options.easing || ((t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))),
-      smooth: options.smooth !== false,
-      smoothTouch: options.smoothTouch || false,
       touchMultiplier: options.touchMultiplier || 2,
     });
 

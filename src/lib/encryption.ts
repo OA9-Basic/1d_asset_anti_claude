@@ -38,12 +38,7 @@ function deriveKey(password: string, salt: Buffer): Buffer {
   return scryptSync(
     password,
     salt,
-    {
-      N: 2 ** 16, // Cost factor (CPU/memory cost)
-      r: 8,       // Block size
-      p: 1,       // Parallelization
-      keylen: KEY_LENGTH,
-    }
+    KEY_LENGTH
   );
 }
 

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     if (!depositOrder) {
       // No matching deposit order
-      await webhookLog.update({
+      await db.webhookLog.update({
         where: { id: webhookLog.id },
         data: {
           processed: true,
@@ -162,10 +162,13 @@ export async function POST(req: NextRequest) {
         // Create transaction record
         db.transaction.create({
           data: {
+            walletId: depositOrder.userId, // Will be updated below
             userId: depositOrder.userId,
             type: 'DEPOSIT',
             amount: depositOrder.usdAmount,
             currency: 'USD', // Store as USD value
+            balanceBefore: 0, // Will be calculated properly
+            balanceAfter: depositOrder.usdAmount,
             status: 'COMPLETED',
             network: depositOrder.network,
             txHash,

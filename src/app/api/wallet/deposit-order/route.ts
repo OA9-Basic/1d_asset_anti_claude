@@ -7,8 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { getServerSession } from '@/lib/auth';
-import { NETWORKS, TOKEN_CONTRACTS } from '@/lib/blockchain/alchemy';
-import { usdToCrypto, formatCryptoAmount } from '@/lib/blockchain/coingecko';
+import { NETWORKS, TOKEN_CONTRACTS, formatCryptoAmount as formatCryptoAmountAlchemy } from '@/lib/blockchain/alchemy';
+import { usdToCrypto } from '@/lib/blockchain/coingecko';
 import { deriveWalletWithPrivateKey, toChecksumAddress } from '@/lib/blockchain/hd-wallet';
 import { db } from '@/lib/db';
 
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     // 5. Generate HD wallet address
     // Get next unused index from database
     const lastOrder = await db.depositOrder.findFirst({
-      where: { network, userId: session.user.id },
+      where: { network: network as any, userId: session.user.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
     const wallet = await deriveWalletWithPrivateKey(
       hdWalletMnemonic,
       nextIndex,
-      network,
+      network as 'ETHEREUM' | 'POLYGON' | 'BSC' | 'BITCOIN',
       encryptionKey
     );
 
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
         usdAmount,
         cryptoAmount: priceQuote.cryptoAmount,
         cryptoCurrency,
-        network,
+        network: network as any,
         priceAtCreation: priceQuote.usdPrice,
         priceExpiresAt: priceQuote.expiresAt,
         depositAddress: toChecksumAddress(wallet.address),
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
       depositOrder: {
         id: depositOrder.id,
         usdAmount,
-        cryptoAmount: formatCryptoAmount(
+        cryptoAmount: formatCryptoAmountAlchemy(
           BigInt(Math.floor(priceQuote.cryptoAmount * 1e18)),
           18
         ),

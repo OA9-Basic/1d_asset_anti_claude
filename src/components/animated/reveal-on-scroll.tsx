@@ -50,7 +50,7 @@ const revealVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: { opacity: 1, scale: 1 },
   },
-} as const;
+};
 
 export function RevealOnScroll({
   children,
@@ -73,7 +73,7 @@ export function RevealOnScroll({
       transition: {
         duration,
         delay,
-        ease: [0.16, 1, 0.3, 1], // Awwwards-style easing
+        ease: [0.16, 1, 0.3, 1] as any, // Awwwards-style easing
       },
     },
   };
@@ -174,7 +174,7 @@ export function StaggerReveal({
             variants={itemVariants}
             transition={{
               duration: 0.5,
-              ease: [0.16, 1, 0.3, 1],
+              ease: [0.16, 1, 0.3, 1] as any,
             }}
             style={{ display: 'inline-block' }}
           >
@@ -327,7 +327,7 @@ export function TextReveal({ text, className = '', delay = 0, stagger = 0.03 }: 
           transition={{
             delay: delay + i * stagger,
             duration: 0.5,
-            ease: [0.16, 1, 0.3, 1],
+            ease: [0.16, 1, 0.3, 1] as any,
           }}
           style={{ display: 'inline-block', whiteSpace: 'pre' }}
         >

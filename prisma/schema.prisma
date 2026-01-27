@@ -40,14 +40,9 @@ enum AssetStatus {
   REJECTED
 }
 
-enum AssetType {
-  COURSE
-  AI_MODEL
-  SAAS
-  SOFTWARE
-  TEMPLATE
-  CODE
-  MODEL_3D
+enum WebhookType {
+  ALCHEMY_NOTIFY
+  CUSTOM
 }
 
 enum CryptoNetwork {
@@ -73,11 +68,6 @@ enum DepositOrderStatus {
   COMPLETED
   EXPIRED
   FAILED
-}
-
-enum WebhookType {
-  ALCHEMY_NOTIFY
-  CUSTOM
 }
 
 enum AssetType {
@@ -212,6 +202,7 @@ model Transaction {
   depositOrderId    String?            @unique
 
   wallet            Wallet             @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  depositOrder      DepositOrder?      @relation(fields: [depositOrderId], references: [id], onDelete: Cascade)
 
   @@index([walletId])
   @@index([userId])
@@ -578,7 +569,7 @@ model WebhookLog {
   processingTime    Int?               // Processing time in ms
 
   // Related Data
-  txHash            String?            @db.Text
+  txHash            String?
   depositOrderId    String?
 
   // Timestamps

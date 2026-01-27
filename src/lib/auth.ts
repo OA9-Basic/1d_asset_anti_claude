@@ -55,3 +55,42 @@ export async function getUserFromToken(req: Request) {
 export function generateSecureAccessKey(): string {
   return crypto.randomBytes(32).toString('base64url');
 }
+
+/**
+ * Get server session from request
+ * Extracts and validates user from auth token cookie
+ */
+export async function getServerSession(req: Request) {
+  const userId = await getUserFromToken(req);
+  if (!userId) return null;
+
+  const { db } = await import('@/lib/db');
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+      role: true,
+      isActive: true,
+    },
+  });
+
+  if (!user || !user.isActive) return null;
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      name: user.firstName && user.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user.username || user.email,
+      image: user.avatar,
+      role: user.role,
+    },
+  };
+}

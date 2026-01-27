@@ -165,7 +165,7 @@ export async function verifyTransaction(
 }> {
   const config = NETWORKS[network];
   if (!config) {
-    return { verified: false, error: 'Unsupported network' };
+    return { verified: false, confirmations: 0, error: 'Unsupported network' };
   }
 
   try {
@@ -207,7 +207,7 @@ export async function verifyTransaction(
       const receivedAmount = tx.value;
 
       // Check amount (allow 1% tolerance for dust/gas)
-      const tolerance = expectedAmount / 100n; // 1%
+      const tolerance = expectedAmount / BigInt(100); // 1%
       const difference = receivedAmount > expectedAmount
         ? receivedAmount - expectedAmount
         : expectedAmount - receivedAmount;
@@ -231,10 +231,16 @@ export async function verifyTransaction(
 
     // Find Transfer log to our address
     const transferLog = receipt.logs.find((log) => {
+      const topics = log.topics;
+      const transferEvent = transferInterface.getEvent('Transfer');
+      if (!transferEvent) return false;
+      const transferEventTopic = transferEvent.topicHash;
       return (
         log.address.toLowerCase() === tokenAddress?.toLowerCase() &&
-        log.topics[0] === transferInterface.getEvent('Transfer').topicHash &&
-        log.topics[2].toLowerCase() === expectedAddress.toLowerCase()
+        topics &&
+        topics[0] !== null &&
+        topics[0] === transferEventTopic &&
+        topics[2]?.toLowerCase() === expectedAddress.toLowerCase()
       );
     });
 
@@ -244,10 +250,10 @@ export async function verifyTransaction(
 
     // Parse amount from log data
     const parsed = transferInterface.parseLog(transferLog);
-    const receivedAmount = parsed.args.value;
+    const receivedAmount = parsed?.args.value as bigint;
 
     // Check amount
-    const tolerance = expectedAmount / 100n;
+    const tolerance = expectedAmount / BigInt(100);
     const difference = receivedAmount > expectedAmount
       ? receivedAmount - expectedAmount
       : expectedAmount - receivedAmount;
@@ -309,7 +315,7 @@ export async function getTransactionDetails(
     blockNumber: receipt.blockNumber,
     confirmations: currentBlock - receipt.blockNumber,
     gasUsed: receipt.gasUsed,
-    gasPrice: tx.gasPrice || 0n,
+    gasPrice: tx.gasPrice || BigInt(0),
   };
 }
 
