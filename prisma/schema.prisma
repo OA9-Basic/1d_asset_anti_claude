@@ -216,6 +216,8 @@ model Transaction {
   @@index([depositOrderId])
   @@index([verified, network])
   @@index([createdAt])
+  @@index([walletId, type, status])
+  @@index([userId, type])
 }
 
 model Asset {
@@ -270,6 +272,8 @@ model Asset {
   @@index([featured])
   @@index([deliveryType])
   @@index([profitDistributionTiming])
+  @@index([status, featured])
+  @@index([status, type])
 }
 
 model AssetRequest {
@@ -339,6 +343,8 @@ model Contribution {
   @@index([userId])
   @@index([status])
   @@index([isInvestment])
+  @@index([assetId, status])
+  @@index([userId, status])
 }
 
 model GapLoan {

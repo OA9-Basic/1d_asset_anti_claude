@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+
+// Validation schema for profile updates
+const profileUpdateSchema = z.object({
+  firstName: z.string().min(1).max(100).optional(),
+  lastName: z.string().min(1).max(100).optional(),
+  phone: z.string().regex(/^\+?[\d\s-]+$/, 'Invalid phone number').optional(),
+  location: z.string().max(200).optional(),
+  website: z.string().url('Invalid URL').optional(),
+  bio: z.string().max(500).optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -43,21 +54,27 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const {
-      firstName,
-      lastName,
-      phone: _phone,
-      location: _location,
-      website: _website,
-      bio: _bio,
-    } = body;
+
+    // Validate input
+    const validatedData = profileUpdateSchema.safeParse(body);
+    if (!validatedData.success) {
+      return NextResponse.json(
+        {
+          error: 'Validation failed',
+          details: validatedData.error.errors,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { firstName, lastName } = validatedData.data;
 
     // Update user profile
     const updatedUser = await db.user.update({
       where: { id: userId },
       data: {
-        firstName: firstName || undefined,
-        lastName: lastName || undefined,
+        firstName,
+        lastName,
       },
       select: {
         id: true,
