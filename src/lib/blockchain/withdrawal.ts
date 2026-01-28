@@ -40,7 +40,8 @@ const CURRENCY_NETWORK_MAP: Record<string, keyof typeof NETWORKS> = {
 };
 
 // Token contract addresses for ERC20 tokens
-const TOKEN_ADDRESSES: Record<string, { network: keyof typeof NETWORKS; address: string }> = {
+// Note: TOKEN_ADDRESSES reserved for future use with dynamic token lookups
+const _TOKEN_ADDRESSES: Record<string, { network: keyof typeof NETWORKS; address: string }> = {
   USDT_POLYGON: { network: 'POLYGON_MAINNET', address: TOKEN_CONTRACTS.POLYGON.USDT },
   USDT_BSC: { network: 'BSC_MAINNET', address: TOKEN_CONTRACTS.BSC.USDT },
   USDC_POLYGON: { network: 'POLYGON_MAINNET', address: TOKEN_CONTRACTS.POLYGON.USDC },
@@ -66,7 +67,7 @@ export interface WithdrawalResult {
 /**
  * Validate wallet address format
  */
-export function validateAddress(address: string, network: keyof typeof NETWORKS): boolean {
+export function validateAddress(address: string, _network: keyof typeof NETWORKS): boolean {
   try {
     ethers.getAddress(address);
     return true;

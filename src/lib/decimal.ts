@@ -5,6 +5,7 @@
  * This ensures precise decimal arithmetic without floating-point precision issues.
  */
 
+// eslint-disable-next-line import/no-named-as-default
 import Decimal from 'decimal.js';
 
 // Configure Decimal for monetary calculations (2 decimal places for USD)

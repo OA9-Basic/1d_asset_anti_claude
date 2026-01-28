@@ -1,5 +1,6 @@
 'use client';
 
+// eslint-disable-next-line import/no-named-as-default
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 

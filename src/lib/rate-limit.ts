@@ -289,5 +289,10 @@ export const RateLimitPresets = {
     limit: 5,
     windowMs: 60 * 60 * 1000, // 1 hour
   },
+  /** Very strict rate limit for access checks (prevents scraping) */
+  strict: {
+    limit: 20,
+    windowMs: 60 * 1000, // 1 minute
+  },
 } as const;
 

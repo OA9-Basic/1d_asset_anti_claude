@@ -45,7 +45,8 @@ const cardVariants: Variants = {
 export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
   const targetPrice = prismaDecimalToNumber(asset.targetPrice);
   const currentCollected = prismaDecimalToNumber(asset.currentCollected);
-  const platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
+  // Note: platformFee reserved for future use (e.g., displaying fee breakdown)
+  const _platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
 
   return (
     <motion.div variants={cardVariants} initial="hidden" animate="visible" whileHover={{ y: -4 }}>

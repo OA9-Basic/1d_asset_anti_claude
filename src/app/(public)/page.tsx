@@ -1,5 +1,3 @@
-import { type Metadata } from 'next';
-
 import { ScrollProgressBar } from '@/components/animated/reveal-on-scroll';
 import { BentoGridFeatures } from '@/components/page/bento-features';
 import { CTASection } from '@/components/page/cta-section';
@@ -9,21 +7,20 @@ import { HeroSection } from '@/components/page/hero-section';
 import { HowItWorks } from '@/components/page/how-it-works';
 import { LiveStats } from '@/components/page/live-stats';
 
-export const metadata: Metadata = {
-  title: 'Digital Assets - Community-Powered Asset Marketplace',
-  description:
-    'Pool resources with others to purchase premium courses, software, and digital products. Contribute any amount — when funded, everyone gets permanent access.',
-};
+export { metadata } from '../metadata';
 
 // =============================================================================
 // SERVER-SIDE DATA FETCHING
 // =============================================================================
 
-// TODO: Replace with actual database queries
-// Example: const stats = await db.$queryRaw`SELECT COUNT(*) as users FROM User`
-
 /**
  * Fetch real-time statistics from the database
+ *
+ * Uses the /api/stats endpoint which queries the database for:
+ * - Total users count
+ * - Funded assets count
+ * - Total collected amount
+ * - Active campaigns count
  */
 async function getStats(): Promise<{
   users: number;
@@ -31,26 +28,28 @@ async function getStats(): Promise<{
   totalCollected: number;
   activeCampaigns: number;
 }> {
-  // Simulating DB call delay
-  // In production: return await db.stat.findFirst()
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/stats`, {
-      cache: 'no-store', // Always fresh data
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/stats`, {
+      cache: 'no-store', // Always fresh data for homepage stats
     });
+
     if (res.ok) {
       const data = await res.json();
       return {
-        users: data.users || 0,
-        fundedAssets: data.fundedAssets || 0,
-        totalCollected: data.totalCollected || 0,
-        activeCampaigns: data.activeAssets || 0,
+        users: data.users ?? 0,
+        fundedAssets: data.fundedAssets ?? 0,
+        totalCollected: data.totalCollected ?? 0,
+        activeCampaigns: data.activeAssets ?? 0,
       };
     }
-  } catch (error) {
-    console.error('Failed to fetch stats:', error);
+  } catch {
+    // Silently fail - stats are non-critical for homepage
+    // In production, consider logging to monitoring service
   }
 
-  // Fallback values
+  // Return empty state when API is unavailable
+  // The LiveStats component will handle displaying appropriate UI
   return {
     users: 0,
     fundedAssets: 0,
@@ -61,7 +60,11 @@ async function getStats(): Promise<{
 
 /**
  * Fetch featured campaign for the hero card
- * Fetches real data from the database
+ *
+ * Uses the /api/campaigns/featured endpoint which:
+ * 1. Queries for assets with status 'COLLECTING'
+ * 2. Sorts by progress percentage
+ * 3. Returns the most promising active campaign
  */
 async function getFeaturedCampaign(): Promise<{
   id: string;
@@ -71,20 +74,28 @@ async function getFeaturedCampaign(): Promise<{
   backerCount: number;
   daysLeft: number;
   avgPledge: number;
-  recentContributors: Array<{ id: string; amount: number; userId?: string; userName?: string; userImage?: string; createdAt?: string }>;
+  recentContributors: Array<{
+    id: string;
+    amount: number;
+    userId?: string;
+    userName?: string;
+    userImage?: string;
+    createdAt?: string;
+  }>;
 } | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const res = await fetch(`${baseUrl}/api/campaigns/featured`, {
-      cache: 'no-store', // Always fresh data
+      cache: 'no-store', // Always fresh data for featured campaign
     });
 
     if (res.ok) {
       const data = await res.json();
       return data;
     }
-  } catch (error) {
-    console.error('Failed to fetch featured campaign:', error);
+  } catch {
+    // Silently fail - featured campaign is non-critical
+    // In production, consider logging to monitoring service
   }
 
   return null;
@@ -96,6 +107,7 @@ async function getFeaturedCampaign(): Promise<{
 
 export default async function HomePage() {
   // Fetch all data in parallel at the top level
+  // This optimizes performance by running both fetches concurrently
   const [stats, featuredCampaign] = await Promise.all([
     getStats(),
     getFeaturedCampaign(),

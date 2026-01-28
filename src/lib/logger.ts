@@ -3,6 +3,7 @@
  * Uses Pino for high-performance structured logging
  */
 
+// eslint-disable-next-line import/no-named-as-default
 import pino from 'pino';
 
 const isDevelopment = process.env.NODE_ENV === 'development';

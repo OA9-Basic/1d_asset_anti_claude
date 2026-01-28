@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { signToken, verifyPassword } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { createLogger, logError } from '@/lib/logger';
+import { logError } from '@/lib/logger';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
-
-const logger = createLogger('auth:sign-in');
 
 /**
  * Sign in endpoint with rate limiting

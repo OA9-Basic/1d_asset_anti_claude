@@ -21,8 +21,8 @@ const COIN_IDS = {
   USDC: '3890',   // USD Coin (stablecoin)
 } as const;
 
-// Network-specific currencies
-const NETWORK_CURRENCIES = {
+// Note: NETWORK_CURRENCIES reserved for future use with network-specific pricing
+const _NETWORK_CURRENCIES = {
   // BSC Network
   BNB: '2710',    // Binance Coin
   USDT_BSC: '2721', // USDT on BSC
