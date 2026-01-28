@@ -88,12 +88,12 @@ export const NETWORKS: Record<string, NetworkConfig> = {
 // ERC-20 Token Contracts (for USDT, USDC)
 export const TOKEN_CONTRACTS = {
   POLYGON: {
-    USDT: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', // USDT on Polygon
-    USDC: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', // USDC on Polygon
+    USDT: process.env.USDT_POLYGON_ADDRESS || '0xc2132d05d31c914a87c6611c10748aeb04b58e8f', // USDT on Polygon
+    USDC: process.env.USDC_POLYGON_ADDRESS || '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', // USDC on Polygon
   },
   BSC: {
-    USDT: '0x55d398326f99059fF775485246999027B3197955', // USDT on BSC
-    USDC: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', // USDC on BSC
+    USDT: process.env.USDT_BSC_ADDRESS || '0x55d398326f99059fF775485246999027B3197955', // USDT on BSC
+    USDC: process.env.USDC_BSC_ADDRESS || '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', // USDC on BSC
   },
 };
 

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { checkUserAssetAccess } from '@/lib/asset-processing';
-import { getUserFromToken, generateSecureAccessKey } from '@/lib/auth';
+import { generateSecureAccessKey } from '@/lib/auth';
+import { requireVerifiedUser } from '@/lib/auth-middleware';
 import { db } from '@/lib/db';
 import { isPrismaDecimalLessThan, subtractPrismaDecimals } from '@/lib/prisma-decimal';
 import { distributeProfit } from '@/lib/profit-distribution';
@@ -26,14 +27,16 @@ const purchaseSchema = z.object({
  */
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const userId = await getUserFromToken(req);
+    const authResult = await requireVerifiedUser(req);
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
     }
 
+    const { user } = authResult;
+
     // Rate limiting for purchases
-    const rateLimit = checkRateLimit(`purchase:${userId}`, RateLimitPresets.purchase);
+    const rateLimit = checkRateLimit(`purchase:${user.id}`, RateLimitPresets.purchase);
     if (!rateLimit.success) {
       return NextResponse.json(
         {
@@ -49,7 +52,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const { amount } = purchaseSchema.parse(body);
 
     // SECURITY: Check if user already has access through contribution or purchase
-    const accessCheck = await checkUserAssetAccess(userId, assetId);
+    const accessCheck = await checkUserAssetAccess(user.id, assetId);
 
     if (accessCheck.hasAccess) {
       return NextResponse.json(
@@ -65,7 +68,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     // SECURITY: Also check if user has contributed (even if asset not yet processed)
     const contribution = await db.contribution.findFirst({
       where: {
-        userId,
+        userId: user.id,
         assetId,
         status: { in: ['ACTIVE', 'CONVERTED_TO_INVESTMENT'] },
       },
@@ -86,12 +89,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     const result = await db.$transaction(async (tx) => {
       // Get user wallet
-      const user = await tx.user.findUnique({
-        where: { id: userId },
+      const userRecord = await tx.user.findUnique({
+        where: { id: user.id },
         include: { wallet: true },
       });
 
-      if (!user?.wallet) {
+      if (!userRecord?.wallet) {
         throw new Error('Wallet not found');
       }
 
@@ -134,17 +137,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       }
 
       // Check balance
-      if (isPrismaDecimalLessThan(user.wallet.balance, amount)) {
+      if (isPrismaDecimalLessThan(userRecord.wallet.balance, amount)) {
         throw new Error('Insufficient balance');
       }
 
       // Deduct from wallet
-      const balanceBefore = user.wallet.balance;
+      const balanceBefore = userRecord.wallet.balance;
       const balanceAfter = subtractPrismaDecimals(balanceBefore, amount);
 
       await tx.transaction.create({
         data: {
-          walletId: user.wallet.id,
+          walletId: userRecord.wallet.id,
           type: 'ASSET_PURCHASE',
           status: 'COMPLETED',
           amount: amount,
@@ -157,7 +160,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       });
 
       await tx.wallet.update({
-        where: { id: user.wallet.id },
+        where: { id: userRecord.wallet.id },
         data: { balance: balanceAfter },
       });
 

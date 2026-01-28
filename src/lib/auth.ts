@@ -70,6 +70,7 @@ export async function getServerSession(req: Request) {
     select: {
       id: true,
       email: true,
+      emailVerified: true,
       username: true,
       firstName: true,
       lastName: true,
@@ -85,6 +86,7 @@ export async function getServerSession(req: Request) {
     user: {
       id: user.id,
       email: user.email,
+      emailVerified: user.emailVerified,
       username: user.username,
       name: user.firstName && user.lastName
         ? `${user.firstName} ${user.lastName}`

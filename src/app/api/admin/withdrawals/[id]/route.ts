@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
+import { processWithdrawal } from '@/lib/blockchain/withdrawal';
 import { db } from '@/lib/db';
-import { addPrismaDecimals } from '@/lib/prisma-decimal';
+import { createLogger } from '@/lib/logger';
+import { prismaDecimalToNumber, addPrismaDecimals } from '@/lib/prisma-decimal';
+
+const logger = createLogger('api:admin:withdrawals');
 
 const processWithdrawalSchema = z.object({
   status: z.enum(['PROCESSING', 'COMPLETED', 'REJECTED']),
@@ -64,7 +68,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
     return NextResponse.json(withdrawal);
   } catch (error) {
-    console.error('Withdrawal fetch error:', error);
+    logger.error({ error }, 'Withdrawal fetch error');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -98,9 +102,57 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       }
 
       let updatedWithdrawal: Awaited<ReturnType<typeof tx.withdrawalRequest.update>>;
+      let actualTxHash: string | undefined = txHash;
 
       if (status === 'COMPLETED') {
-        // Mark as completed
+        // REAL BLOCKCHAIN TRANSACTION: Send the withdrawal to blockchain
+        const withdrawalAmount = prismaDecimalToNumber(withdrawal.amount);
+
+        logger.info(
+          {
+            withdrawalId: withdrawal.id,
+            to: withdrawal.walletAddress,
+            amount: withdrawalAmount,
+            currency: withdrawal.cryptoCurrency,
+          },
+          'Processing withdrawal - sending to blockchain'
+        );
+
+        // Send transaction to blockchain
+        const blockchainResult = await processWithdrawal({
+          toAddress: withdrawal.walletAddress,
+          amount: withdrawalAmount,
+          currency: withdrawal.cryptoCurrency,
+        });
+
+        if (!blockchainResult.success) {
+          logger.error(
+            {
+              withdrawalId: withdrawal.id,
+              error: blockchainResult.error,
+            },
+            'Blockchain transaction failed'
+          );
+
+          throw new Error(
+            `Failed to send blockchain transaction: ${blockchainResult.error}. Withdrawal not completed.`
+          );
+        }
+
+        actualTxHash = blockchainResult.txHash;
+
+        logger.info(
+          {
+            withdrawalId: withdrawal.id,
+            txHash: actualTxHash,
+            blockNumber: blockchainResult.blockNumber,
+            gasUsed: blockchainResult.gasUsed?.toString(),
+            actualAmount: blockchainResult.actualAmount,
+          },
+          'Blockchain withdrawal transaction confirmed'
+        );
+
+        // Mark as completed with real transaction hash
         updatedWithdrawal = await tx.withdrawalRequest.update({
           where: { id: params.id },
           data: {
@@ -110,7 +162,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
           },
         });
 
-        // Final transaction record
+        // Final transaction record with real blockchain data
         await tx.transaction.create({
           data: {
             walletId: withdrawal.walletId,
@@ -123,7 +175,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             referenceType: 'WITHDRAWAL',
             description: `Withdrawal completed: ${withdrawal.amount} ${withdrawal.cryptoCurrency}`,
             metadata: {
-              txHash,
+              txHash: actualTxHash,
+              blockNumber: blockchainResult.blockNumber,
+              gasUsed: blockchainResult.gasUsed?.toString(),
+              actualAmount: blockchainResult.actualAmount,
               walletAddress: withdrawal.walletAddress,
             },
           },
@@ -183,12 +238,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         });
       }
 
-      return updatedWithdrawal;
+      return { updatedWithdrawal, txHash: actualTxHash };
     });
 
     return NextResponse.json({
       success: true,
-      withdrawal: result,
+      withdrawal: result.updatedWithdrawal,
+      txHash: result.txHash,
       message: `Withdrawal ${status.toLowerCase()}`,
     });
   } catch (error) {
@@ -201,7 +257,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    console.error('Withdrawal processing error:', error);
+    logger.error({ error }, 'Withdrawal processing error');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { getUserFromToken } from '@/lib/auth';
+import { requireVerifiedUser } from '@/lib/auth-middleware';
 import { db } from '@/lib/db';
 import { createLogger } from '@/lib/logger';
 import {
@@ -30,14 +30,16 @@ const withdrawalRequestSchema = z.object({
 // GET - Get user's withdrawal requests
 export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserFromToken(req);
+    const authResult = await requireVerifiedUser(req);
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
     }
 
+    const { user } = authResult;
+
     const withdrawals = await db.withdrawalRequest.findMany({
-      where: { userId },
+      where: { userId: user.id },
       include: {
         wallet: {
           select: {
@@ -72,14 +74,16 @@ export async function GET(req: NextRequest) {
 // POST - Create withdrawal request
 export async function POST(req: NextRequest) {
   try {
-    const userId = await getUserFromToken(req);
+    const authResult = await requireVerifiedUser(req);
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
     }
 
+    const { user } = authResult;
+
     // Rate limiting for withdrawals
-    const rateLimit = checkRateLimit(`withdrawal:${userId}`, RateLimitPresets.withdrawal);
+    const rateLimit = checkRateLimit(`withdrawal:${user.id}`, RateLimitPresets.withdrawal);
     if (!rateLimit.success) {
       return NextResponse.json(
         {
@@ -96,7 +100,7 @@ export async function POST(req: NextRequest) {
     const result = await db.$transaction(async (tx) => {
       // Get user wallet
       const wallet = await tx.wallet.findUnique({
-        where: { userId },
+        where: { userId: user.id },
       });
 
       if (!wallet) {
@@ -127,7 +131,7 @@ export async function POST(req: NextRequest) {
       const withdrawal = await tx.withdrawalRequest.create({
         data: {
           walletId: wallet.id,
-          userId,
+          userId: user.id,
           amount,
           cryptoCurrency,
           walletAddress,
@@ -193,11 +197,13 @@ export async function POST(req: NextRequest) {
 // DELETE - Cancel withdrawal request
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = await getUserFromToken(req);
+    const authResult = await requireVerifiedUser(req);
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
     }
+
+    const { user } = authResult;
 
     const { searchParams } = new URL(req.url);
     const withdrawalId = searchParams.get('id');
@@ -215,7 +221,7 @@ export async function DELETE(req: NextRequest) {
         throw new Error('Withdrawal request not found');
       }
 
-      if (withdrawal.userId !== userId) {
+      if (withdrawal.userId !== user.id) {
         throw new Error('Unauthorized');
       }
 
