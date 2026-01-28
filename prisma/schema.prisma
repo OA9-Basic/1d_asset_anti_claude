@@ -139,6 +139,7 @@ model User {
   isActive          Boolean            @default(true)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?          // Soft delete timestamp
 
   wallet            Wallet?
   contributions     Contribution[]
@@ -152,6 +153,7 @@ model User {
 
   @@index([role])
   @@index([isActive])
+  @@index([deletedAt])  // Support soft delete queries
 }
 
 model Wallet {
@@ -257,6 +259,7 @@ model Asset {
   votingEndsAt          DateTime?
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
+  deletedAt             DateTime?                 // Soft delete timestamp
 
   contributions         Contribution[]
   assetPurchases        AssetPurchase[]
@@ -271,6 +274,7 @@ model Asset {
   @@index([createdAt])
   @@index([featured])
   @@index([deliveryType])
+  @@index([deletedAt])  // Support soft delete queries
   @@index([profitDistributionTiming])
   @@index([status, featured])
   @@index([status, type])

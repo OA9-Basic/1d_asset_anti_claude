@@ -1,7 +1,18 @@
 import { db } from './db';
+import { subtract, add, parseMoney } from './decimal';
+import { createLogger } from './logger';
 
+const logger = createLogger('distribution');
+
+/**
+ * Distribute revenue from an asset
+ * - First repays any active gap loan
+ * - Remaining goes to platform profit
+ */
 export async function distributeRevenue(assetId: string, amount: number | string) {
-  const revenueAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  const revenueAmount = typeof amount === 'string' ? parseMoney(amount) : amount;
+
+  logger.info({ assetId, amount: revenueAmount }, 'Starting revenue distribution');
 
   return await db.$transaction(async (tx) => {
     const asset = await tx.asset.findUnique({
@@ -31,7 +42,7 @@ export async function distributeRevenue(assetId: string, amount: number | string
         where: { id: assetId },
         data: {
           metadata: {
-            ...((asset.metadata as any) || {}),
+            ...((asset.metadata as Record<string, unknown>) || {}),
             lastRevenueDistribution: {
               amount: revenueAmount,
               timestamp: new Date().toISOString(),
@@ -41,6 +52,8 @@ export async function distributeRevenue(assetId: string, amount: number | string
         },
       });
 
+      logger.info({ assetId, amount: revenueAmount }, 'No active gap loan, revenue goes to platform');
+
       return {
         type: 'PLATFORM_PROFIT',
         amount: revenueAmount,
@@ -48,12 +61,13 @@ export async function distributeRevenue(assetId: string, amount: number | string
       };
     }
 
-    const remainingLoan = activeGapLoan.loanAmount - activeGapLoan.repaidAmount;
+    // Calculate loan repayment using safe decimal operations
+    const remainingLoan = parseMoney(subtract(activeGapLoan.loanAmount, activeGapLoan.repaidAmount));
     const repaymentAmount = Math.min(revenueAmount, remainingLoan);
-    const platformProfit = revenueAmount - repaymentAmount;
+    const platformProfit = parseMoney(subtract(revenueAmount, repaymentAmount));
 
     const balanceBefore = activeGapLoan.user.wallet.balance;
-    const balanceAfter = balanceBefore + repaymentAmount;
+    const balanceAfter = parseMoney(add(balanceBefore, repaymentAmount));
 
     await tx.transaction.create({
       data: {
@@ -74,10 +88,10 @@ export async function distributeRevenue(assetId: string, amount: number | string
       data: { balance: balanceAfter },
     });
 
-    const newRepaidAmount = activeGapLoan.repaidAmount + repaymentAmount;
-    const newRemainingAmount = activeGapLoan.loanAmount - newRepaidAmount;
+    const newRepaidAmount = parseMoney(add(activeGapLoan.repaidAmount, repaymentAmount));
+    const newRemainingAmount = parseMoney(subtract(activeGapLoan.loanAmount, newRepaidAmount));
 
-    const loanUpdateData: any = {
+    const loanUpdateData: Record<string, unknown> = {
       repaidAmount: newRepaidAmount,
       remainingAmount: newRemainingAmount,
     };
@@ -96,7 +110,7 @@ export async function distributeRevenue(assetId: string, amount: number | string
       where: { id: assetId },
       data: {
         metadata: {
-          ...((asset.metadata as any) || {}),
+          ...((asset.metadata as Record<string, unknown>) || {}),
           lastRevenueDistribution: {
             amount: revenueAmount,
             timestamp: new Date().toISOString(),
@@ -108,6 +122,14 @@ export async function distributeRevenue(assetId: string, amount: number | string
         },
       },
     });
+
+    logger.info({
+      assetId,
+      loanId: activeGapLoan.id,
+      repaymentAmount,
+      platformProfit,
+      loanStatus: loanUpdateData.status || 'ACTIVE',
+    }, 'Revenue distributed to gap loan');
 
     return {
       type: 'LOAN_REPAYMENT',
@@ -121,3 +143,4 @@ export async function distributeRevenue(assetId: string, amount: number | string
     };
   });
 }
+
