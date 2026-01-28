@@ -9,6 +9,9 @@ import { ethers } from 'ethers';
 import { NETWORKS } from '@/lib/blockchain/alchemy';
 import { db } from '@/lib/db';
 import { decrypt } from '@/lib/encryption';
+import { createLogger, logError } from '@/lib/logger';
+
+const logger = createLogger('blockchain:sweep');
 
 // Get RPC URL from network config
 function getNetworkRpcUrl(network: keyof typeof NETWORKS): string {
@@ -113,7 +116,7 @@ export async function checkSweepRequired(depositOrderId: string): Promise<boolea
     const balanceInEth = Number(ethers.formatEther(balance));
     return balanceInEth >= config.minBalance;
   } catch (error) {
-    console.error('Error checking sweep required:', error);
+    logError(error, 'check_sweep_required_failed', { depositOrderId });
     return false;
   }
 }
@@ -318,6 +321,8 @@ export async function autoSweepIfRequired(depositOrderId: string): Promise<void>
     const needsSweep = await checkSweepRequired(depositOrderId);
     if (!needsSweep) return;
 
+    logger.info({ depositOrderId, network: depositOrder.network }, 'Executing auto-sweep');
+
     // Execute sweep
     await executeSweep(depositOrderId);
 
@@ -331,6 +336,7 @@ export async function autoSweepIfRequired(depositOrderId: string): Promise<void>
     }
   } catch (error) {
     // Silently handle sweep failures
+    logError(error, 'auto_sweep_failed', { depositOrderId });
 
     // Log failure but don't throw - we don't want to break deposit verification
     await db.auditLog.create({

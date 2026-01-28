@@ -2,16 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { signToken, verifyPassword } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { createLogger, logError } from '@/lib/logger';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+
+const logger = createLogger('auth:sign-in');
 
 /**
  * Sign in endpoint with rate limiting
  * SECURITY: 5 attempts per 15 minutes per IP address
  */
 export async function POST(req: NextRequest) {
+  // SECURITY: Rate limiting based on IP address
+  const ip = req.headers.get('x-forwarded-for') || 'unknown';
+
   try {
-    // SECURITY: Rate limiting based on IP address
-    const ip = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimit = checkRateLimit(`signin:${ip}`, RateLimitPresets.auth);
 
     if (!rateLimit.success) {
@@ -78,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Sign in error:', error);
+    logError(error, 'sign_in_failed', { ip });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

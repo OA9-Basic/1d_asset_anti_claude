@@ -2,16 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { hashPassword, signToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { sendVerificationEmail } from '@/lib/email';
+import { createLogger, logError } from '@/lib/logger';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+import { generateVerificationToken } from '@/lib/verification';
+
+const logger = createLogger('auth:sign-up');
 
 /**
- * Sign up endpoint with rate limiting
+ * Sign up endpoint with rate limiting and email verification
  * SECURITY: 5 attempts per 15 minutes per IP address
  */
 export async function POST(req: NextRequest) {
+  // SECURITY: Rate limiting based on IP address
+  const ip = req.headers.get('x-forwarded-for') || 'unknown';
+
   try {
-    // SECURITY: Rate limiting based on IP address
-    const ip = req.headers.get('x-forwarded-for') || 'unknown';
     const rateLimit = checkRateLimit(`signup:${ip}`, RateLimitPresets.auth);
 
     if (!rateLimit.success) {
@@ -66,11 +72,18 @@ export async function POST(req: NextRequest) {
         email,
         passwordHash,
         firstName: name,
+        emailVerified: false, // Require email verification
         wallet: {
           create: {},
         },
       },
     });
+
+    // Generate verification token and send email
+    const verificationToken = await generateVerificationToken(email, 'email');
+    await sendVerificationEmail(email, verificationToken);
+
+    logger.info({ userId: user.id, email }, 'User created, verification email sent');
 
     const token = signToken(user.id);
 
@@ -80,7 +93,9 @@ export async function POST(req: NextRequest) {
           id: user.id,
           email: user.email,
           name: user.firstName,
+          emailVerified: false,
         },
+        message: 'Account created. Please check your email to verify your account.',
       },
       {
         headers: {
@@ -102,7 +117,7 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Sign up error:', error);
+    logError(error, 'sign_up_failed', { ip });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

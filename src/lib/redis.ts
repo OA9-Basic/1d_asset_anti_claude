@@ -1,5 +1,9 @@
 import Redis from 'ioredis';
 
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('redis');
+
 const redisUrl = process.env.REDIS_URL;
 
 // Create Redis client if REDIS_URL is configured
@@ -22,23 +26,23 @@ export const redis = redisUrl
 // Handle connection events
 if (redis) {
   redis.on('connect', () => {
-    console.log('✅ Redis connected successfully');
+    logger.info('Redis connected successfully');
   });
 
   redis.on('ready', () => {
-    console.log('✅ Redis ready to accept commands');
+    logger.info('Redis ready to accept commands');
   });
 
   redis.on('error', (err) => {
-    console.error('❌ Redis connection error:', err);
+    logger.error({ err }, 'Redis connection error');
   });
 
   redis.on('close', () => {
-    console.log('⚠️ Redis connection closed');
+    logger.warn('Redis connection closed');
   });
 
   redis.on('reconnecting', () => {
-    console.log('⚠️ Redis reconnecting...');
+    logger.warn('Redis reconnecting');
   });
 }
 
@@ -50,7 +54,7 @@ export const redisHelper = {
     try {
       return await redis.get(key);
     } catch (error) {
-      console.error('Redis GET error:', error);
+      logger.error({ error, key }, 'Redis GET error');
       return null;
     }
   },
@@ -64,7 +68,7 @@ export const redisHelper = {
       }
       return await redis.set(key, value);
     } catch (error) {
-      console.error('Redis SET error:', error);
+      logger.error({ error, key, ttl }, 'Redis SET error');
       return null;
     }
   },
@@ -75,7 +79,7 @@ export const redisHelper = {
     try {
       return await redis.del(key);
     } catch (error) {
-      console.error('Redis DEL error:', error);
+      logger.error({ error, key }, 'Redis DEL error');
       return 0;
     }
   },
@@ -86,7 +90,7 @@ export const redisHelper = {
     try {
       return await redis.flushdb();
     } catch (error) {
-      console.error('Redis FLUSHDB error:', error);
+      logger.error({ error }, 'Redis FLUSHDB error');
       return null;
     }
   },
@@ -97,7 +101,7 @@ export const redisHelper = {
     try {
       return await redis.incr(key);
     } catch (error) {
-      console.error('Redis INCR error:', error);
+      logger.error({ error, key }, 'Redis INCR error');
       return null;
     }
   },
@@ -108,7 +112,7 @@ export const redisHelper = {
     try {
       return await redis.incrby(key, amount);
     } catch (error) {
-      console.error('Redis INCRBY error:', error);
+      logger.error({ error, key, amount }, 'Redis INCRBY error');
       return null;
     }
   },
@@ -119,7 +123,7 @@ export const redisHelper = {
     try {
       return await redis.mset(...keyValuePairs);
     } catch (error) {
-      console.error('Redis MSET error:', error);
+      logger.error({ error }, 'Redis MSET error');
       return null;
     }
   },
@@ -130,7 +134,7 @@ export const redisHelper = {
     try {
       return await redis.mget(...keys);
     } catch (error) {
-      console.error('Redis MGET error:', error);
+      logger.error({ error, keys }, 'Redis MGET error');
       return null;
     }
   },
@@ -141,7 +145,7 @@ export const redisHelper = {
     try {
       return await redis.exists(key);
     } catch (error) {
-      console.error('Redis EXISTS error:', error);
+      logger.error({ error, key }, 'Redis EXISTS error');
       return 0;
     }
   },
@@ -153,7 +157,7 @@ export const redisHelper = {
       const result = await redis.expire(key, seconds);
       return result === 1;
     } catch (error) {
-      console.error('Redis EXPIRE error:', error);
+      logger.error({ error, key, seconds }, 'Redis EXPIRE error');
       return false;
     }
   },

@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { NETWORKS, TOKEN_CONTRACTS, verifyTransaction } from '@/lib/blockchain/alchemy';
 import { autoSweepIfRequired } from '@/lib/blockchain/sweep';
 import { db } from '@/lib/db';
+import { logError } from '@/lib/logger';
 
 // ============================================================================
 // WEBHOOK SECRET (from env)
@@ -243,7 +244,7 @@ export async function POST(req: NextRequest) {
       // Auto-sweep to cold storage if balance exceeds threshold
       // Run asynchronously in background
       autoSweepIfRequired(depositOrder.id).catch((error) => {
-        console.error('Auto-sweep failed:', error);
+        logError(error, 'auto_sweep_failed', { depositOrderId: depositOrder.id });
       });
 
       return NextResponse.json({
@@ -296,8 +297,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Webhook processing error:', error);
-
+    logError(error, 'webhook_processing_failed');
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }
