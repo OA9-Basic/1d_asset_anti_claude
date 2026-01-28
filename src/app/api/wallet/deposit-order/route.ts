@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { getServerSession } from '@/lib/auth';
 import { NETWORKS, TOKEN_CONTRACTS, formatCryptoAmount as formatCryptoAmountAlchemy } from '@/lib/blockchain/alchemy';
-import { usdToCrypto } from '@/lib/blockchain/coingecko';
+import { usdToCrypto } from '@/lib/blockchain/coinlore';
 import { deriveWalletWithPrivateKey, toChecksumAddress } from '@/lib/blockchain/hd-wallet';
 import { db } from '@/lib/db';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
