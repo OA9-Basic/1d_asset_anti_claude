@@ -159,15 +159,15 @@ model User {
 model Wallet {
   id                    String             @id @default(cuid())
   userId                String             @unique
-  balance               Float              @default(0)
-  withdrawableBalance   Float              @default(0)
-  storeCredit           Float              @default(0)
-  totalDeposited        Float              @default(0)
-  totalWithdrawn        Float              @default(0)
-  totalConvertedToCredit Float             @default(0)
-  totalContributed      Float              @default(0)
-  totalProfitReceived   Float              @default(0)
-  lockedBalance         Float              @default(0)
+  balance               Decimal            @default(0)
+  withdrawableBalance   Decimal            @default(0)
+  storeCredit           Decimal            @default(0)
+  totalDeposited        Decimal            @default(0)
+  totalWithdrawn        Decimal            @default(0)
+  totalConvertedToCredit Decimal           @default(0)
+  totalContributed      Decimal            @default(0)
+  totalProfitReceived   Decimal            @default(0)
+  lockedBalance         Decimal            @default(0)
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
 
@@ -182,10 +182,10 @@ model Transaction {
   userId            String?
   type              TransactionType
   status            TransactionStatus  @default(PENDING)
-  amount            Float
+  amount            Decimal
   currency          String             @default("USD")
-  balanceBefore     Float
-  balanceAfter      Float
+  balanceBefore     Decimal
+  balanceAfter      Decimal
   referenceId       String?
   referenceType     String?
   description       String?
@@ -229,14 +229,14 @@ model Asset {
   slug                  String                    @unique
   type                  AssetType
   deliveryType          DeliveryType              @default(DOWNLOAD)
-  targetPrice           Float
-  platformFee           Float                     @default(0.15)
-  platformFeeAfterExcess Float                   @default(0.15)
-  currentCollected      Float                     @default(0)
+  targetPrice           Decimal
+  platformFee           Decimal                   @default(0.15)
+  platformFeeAfterExcess Decimal                  @default(0.15)
+  currentCollected      Decimal                   @default(0)
   status                AssetStatus               @default(REQUESTED)
   totalPurchases        Int                       @default(0)
-  totalRevenue          Float                     @default(0)
-  totalProfitDistributed Float                    @default(0)
+  totalRevenue          Decimal                   @default(0)
+  totalProfitDistributed Decimal                  @default(0)
   deliveryUrl           String?
   deliveryKey           String?
   streamUrl             String?
@@ -288,7 +288,7 @@ model AssetRequest {
   description       String
   type              AssetType
   deliveryType      DeliveryType        @default(DOWNLOAD)
-  estimatedPrice    Float
+  estimatedPrice    Decimal
   sourceUrl         String
   thumbnail         String?
   metadata          Json?
@@ -329,10 +329,10 @@ model Contribution {
   id                String             @id @default(cuid())
   userId            String
   assetId           String
-  amount            Float
-  excessAmount      Float              @default(0)
-  profitShareRatio  Float              @default(0)
-  totalProfitReceived Float            @default(0)
+  amount            Decimal
+  excessAmount      Decimal            @default(0)
+  profitShareRatio  Decimal            @default(0)
+  totalProfitReceived Decimal          @default(0)
   status            ContributionStatus @default(ACTIVE)
   isInvestment      Boolean            @default(false)
   refundedAt        DateTime?
@@ -355,9 +355,9 @@ model GapLoan {
   id                String   @id @default(cuid())
   userId            String
   assetId           String
-  loanAmount        Float
-  repaidAmount      Float    @default(0)
-  remainingAmount   Float
+  loanAmount        Decimal
+  repaidAmount      Decimal  @default(0)
+  remainingAmount   Decimal
   status            String   @default("ACTIVE")
   fullyRepaidAt     DateTime?
   createdAt         DateTime @default(now())
@@ -376,9 +376,9 @@ model ProfitShare {
   contributionId    String
   assetId           String
   userId            String
-  amount            Float
-  shareRatio        Float
-  dailyRevenue      Float
+  amount            Decimal
+  shareRatio        Decimal
+  dailyRevenue      Decimal
   distributedAt     DateTime     @default(now())
   createdAt         DateTime     @default(now())
 
@@ -396,7 +396,7 @@ model AssetPurchase {
   id                String   @id @default(cuid())
   userId            String
   assetId           String
-  purchaseAmount    Float    @default(1)
+  purchaseAmount    Decimal  @default(1)
   deliveryAccessKey String?
   deliveryExpiry    DateTime?
   accessCount       Int      @default(0)
@@ -416,7 +416,7 @@ model WithdrawalRequest {
   id                String           @id @default(cuid())
   walletId          String
   userId            String
-  amount            Float
+  amount            Decimal
   cryptoCurrency    String
   walletAddress     String
   status            WithdrawalStatus @default(PENDING)
@@ -438,9 +438,9 @@ model WithdrawalRequest {
 model ProfitDistribution {
   id                String   @id @default(cuid())
   assetId           String
-  totalRevenue      Float
-  platformProfit    Float
-  contributorProfit Float
+  totalRevenue      Decimal
+  platformProfit    Decimal
+  contributorProfit Decimal
   distributedShares Int      @default(0)
   distributionDate  DateTime @default(now())
   createdAt         DateTime @default(now())
@@ -461,13 +461,13 @@ model DepositOrder {
   userId            String
 
   // Order Details
-  usdAmount         Float              // Amount in USD user wants to deposit
-  cryptoAmount      Float              // Exact crypto amount needed
+  usdAmount         Decimal            // Amount in USD user wants to deposit
+  cryptoAmount      Decimal            // Exact crypto amount needed
   cryptoCurrency    CryptoCurrency
   network           CryptoNetwork
 
   // Price Locking
-  priceAtCreation   Float              // Crypto price in USD at order creation
+  priceAtCreation   Decimal            // Crypto price in USD at order creation
   priceExpiresAt    DateTime           // When price lock expires (15 mins)
 
   // Address Generation
@@ -485,7 +485,7 @@ model DepositOrder {
   requiredConfirmations Int            @default(12) // Network-specific
 
   // Payment Verification
-  receivedAmount    Float?             // Actual amount received
+  receivedAmount    Decimal?           // Actual amount received
   overpaid          Boolean            @default(false)
   underpaid         Boolean            @default(false)
   slippageTolerance Float              @default(0.01) // 1%
@@ -523,8 +523,8 @@ model HDWalletConfig {
 
   // Cold Storage Configuration
   coldWalletAddress String            // Main cold wallet address
-  sweepThreshold   Float              // Auto-forward when balance exceeds this (in native currency)
-  sweepMinAmount   Float              @default(0.001) // Minimum amount to sweep
+  sweepThreshold   Decimal            // Auto-forward when balance exceeds this (in native currency)
+  sweepMinAmount   Decimal            @default(0.001) // Minimum amount to sweep
 
   // Network Configuration
   chainId           Int
@@ -560,7 +560,7 @@ model WalletAddress {
   isUsed            Boolean            @default(false)
   firstUsedAt       DateTime?
   lastUsedAt        DateTime?
-  totalReceived     Float              @default(0) // Total amount received
+  totalReceived     Decimal            @default(0) // Total amount received
 
   // Status
   isActive          Boolean            @default(true)
@@ -635,8 +635,8 @@ model NetworkConfig {
   apiEndpoint       String?            // For Etherscan/BscScan APIs
 
   // Gas Settings
-  gasPriceMultiplier Float             @default(1.1) // Add 10% to estimated gas
-  maxGasPrice       Float?             // Maximum gas price willing to pay
+  gasPriceMultiplier Decimal           @default(1.1) // Add 10% to estimated gas
+  maxGasPrice       Decimal?           // Maximum gas price willing to pay
 
   // Confirmation Requirements
   requiredConfirmations Int            @default(12)

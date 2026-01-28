@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,9 +32,9 @@ export async function GET(req: NextRequest) {
         id: tx.id,
         type: tx.type,
         status: tx.status,
-        amount: tx.amount,
-        balanceBefore: tx.balanceBefore,
-        balanceAfter: tx.balanceAfter,
+        amount: prismaDecimalToNumber(tx.amount),
+        balanceBefore: prismaDecimalToNumber(tx.balanceBefore),
+        balanceAfter: prismaDecimalToNumber(tx.balanceAfter),
         description: tx.description,
         createdAt: tx.createdAt.toISOString(),
       })),

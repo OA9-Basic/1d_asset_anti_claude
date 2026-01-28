@@ -11,6 +11,7 @@ import { NETWORKS, TOKEN_CONTRACTS, verifyTransaction } from '@/lib/blockchain/a
 import { autoSweepIfRequired } from '@/lib/blockchain/sweep';
 import { db } from '@/lib/db';
 import { logError } from '@/lib/logger';
+import { prismaDecimalToNumber, addPrismaDecimals } from '@/lib/prisma-decimal';
 
 // ============================================================================
 // WEBHOOK SECRET (from env)
@@ -141,7 +142,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Verify transaction on blockchain
-    const expectedAmount = BigInt(Math.floor(depositOrder.cryptoAmount * 1e18));
+    const expectedAmount = BigInt(Math.floor(prismaDecimalToNumber(depositOrder.cryptoAmount) * 1e18));
 
     const verification = await verifyTransaction(
       txHash,
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
       }
 
       const balanceBefore = userWallet.balance;
-      const balanceAfter = balanceBefore + depositOrder.usdAmount;
+      const balanceAfter = addPrismaDecimals(balanceBefore, depositOrder.usdAmount);
 
       // Transaction verified!
       await db.$transaction([

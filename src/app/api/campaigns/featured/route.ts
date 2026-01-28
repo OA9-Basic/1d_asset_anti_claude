@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 /**
  * GET /api/campaigns/featured
@@ -71,13 +72,13 @@ export async function GET(_req: NextRequest) {
     // Calculate average pledge
     const completedContributions = asset.contributions.length;
     const avgPledge = completedContributions > 0
-      ? Math.round(asset.currentCollected / completedContributions)
+      ? Math.round(prismaDecimalToNumber(asset.currentCollected) / completedContributions)
       : 0;
 
     // Format recent contributors
     const recentContributors = asset.contributions.map(c => ({
       id: c.id,
-      amount: c.amount,
+      amount: prismaDecimalToNumber(c.amount),
       userId: c.user.id,
       userName: c.user.username || `${c.user.firstName || ''} ${c.user.lastName || ''}`.trim() || 'Anonymous',
       userImage: c.user.avatar,
@@ -88,8 +89,8 @@ export async function GET(_req: NextRequest) {
       id: asset.id,
       title: asset.title,
       description: asset.description,
-      raisedAmount: asset.currentCollected,
-      goalAmount: asset.targetPrice,
+      raisedAmount: prismaDecimalToNumber(asset.currentCollected),
+      goalAmount: prismaDecimalToNumber(asset.targetPrice),
       backerCount: asset._count.contributions,
       daysLeft,
       avgPledge,

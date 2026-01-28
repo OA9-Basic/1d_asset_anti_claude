@@ -6,6 +6,7 @@ import { getUserFromToken, generateSecureAccessKey } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { distributeProfit } from '@/lib/profit-distribution';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+import { isPrismaDecimalLessThan, subtractPrismaDecimals, prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 const purchaseSchema = z.object({
   amount: z
@@ -133,13 +134,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       }
 
       // Check balance
-      if (user.wallet.balance < amount) {
+      if (isPrismaDecimalLessThan(user.wallet.balance, amount)) {
         throw new Error('Insufficient balance');
       }
 
       // Deduct from wallet
       const balanceBefore = user.wallet.balance;
-      const balanceAfter = balanceBefore - amount;
+      const balanceAfter = subtractPrismaDecimals(balanceBefore, amount);
 
       await tx.transaction.create({
         data: {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { prismaDecimalToNumber, addPrismaDecimals } from '@/lib/prisma-decimal';
 
 // Helper: Verify admin role
 async function verifyAdmin(req: NextRequest) {
@@ -39,7 +40,7 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    const revenue = assets.reduce((sum, a) => sum + (a.totalRevenue || 0), 0);
+    const revenue = assets.reduce((sum, a) => sum + prismaDecimalToNumber(a.totalRevenue || 0), 0);
 
     return NextResponse.json({ count, revenue });
   } catch (error) {

@@ -123,8 +123,8 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
   const StatusIcon = statusInfo.icon;
 
   // Calculate progress including platform fee
-  const platformFee = asset.platformFee || 0.15;
-  const targetWithFee = asset.targetPrice * (1 + platformFee);
+  const platformFee = Number(asset.platformFee) || 0.15;
+  const targetWithFee = Number(asset.targetPrice) * (1 + platformFee);
   const progressPercent = Math.min((Number(asset.currentCollected) / targetWithFee) * 100, 100);
   const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0);
 

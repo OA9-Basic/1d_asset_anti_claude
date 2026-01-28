@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { db } from '@/lib/db';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 export async function GET() {
   try {
@@ -87,7 +88,7 @@ export async function GET() {
       totalContributions,
       activeContributors: activeContributors.length,
       avgFundingHours: Math.round(avgFundingHours),
-      totalCollected: Math.round(totalCollectedResult._sum.currentCollected || 0),
+      totalCollected: Math.round(prismaDecimalToNumber(totalCollectedResult._sum.currentCollected || 0)),
     };
 
     return NextResponse.json(stats);

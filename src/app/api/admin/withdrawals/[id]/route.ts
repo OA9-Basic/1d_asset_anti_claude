@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { addPrismaDecimals } from '@/lib/prisma-decimal';
 
 const processWithdrawalSchema = z.object({
   status: z.enum(['PROCESSING', 'COMPLETED', 'REJECTED']),
@@ -165,7 +166,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
             status: 'REVERSED',
             amount: withdrawal.amount,
             balanceBefore: withdrawal.wallet.withdrawableBalance,
-            balanceAfter: withdrawal.wallet.withdrawableBalance + withdrawal.amount,
+            balanceAfter: addPrismaDecimals(withdrawal.wallet.withdrawableBalance, withdrawal.amount),
             referenceId: withdrawal.id,
             referenceType: 'WITHDRAWAL_REVERSAL',
             description: `Withdrawal rejected: ${rejectionReason || 'Admin rejected'}`,

@@ -1,71 +1,73 @@
 /**
  * Decimal Money Handling
  *
- * Provides safe decimal arithmetic for financial calculations.
- * Uses a string-based approach to avoid floating-point precision issues.
- *
- * NOTE: This is a lightweight implementation. For production, consider:
- * - decimal.js (https://github.com/MikeMcl/decimal.js)
- * - big.js (https://github.com/MikeMcl/big.js)
- * - Prisma.Decimal (built-in)
+ * Provides safe decimal arithmetic for financial calculations using decimal.js.
+ * This ensures precise decimal arithmetic without floating-point precision issues.
  */
+
+import Decimal from 'decimal.js';
+
+// Configure Decimal for monetary calculations (2 decimal places for USD)
+Decimal.set({
+  precision: 28, // Total significant digits
+  rounding: Decimal.ROUND_HALF_UP, // Standard rounding
+  toExpNeg: -7, // Exponential notation threshold
+  toExpPos: 21,
+  maxE: 9e15,
+  minE: -9e15,
+  modulo: Decimal.ROUND_DOWN,
+});
+
+/**
+ * Convert value to Decimal instance
+ */
+function toDecimal(value: number | string | Decimal): Decimal {
+  return new Decimal(value);
+}
+
+/**
+ * Convert Decimal to Prisma Decimal
+ */
+export function toPrismaDecimal(value: number | string | Decimal): string {
+  return toDecimal(value).toFixed(2);
+}
 
 /**
  * Safe addition for money amounts
- * Uses string manipulation to avoid floating-point errors
  */
 export function add(a: number | string, b: number | string): string {
-  const aStr = typeof a === 'number' ? a.toString() : a;
-  const bStr = typeof b === 'number' ? b.toString() : b;
-
-  // Parse to fixed-point with 2 decimal places for USD
-  const aFixed = parseFloat(aStr).toFixed(2);
-  const bFixed = parseFloat(bStr).toFixed(2);
-
-  const sum = (parseFloat(aFixed) + parseFloat(bFixed)).toFixed(2);
-  return sum;
+  const result = toDecimal(a).plus(toDecimal(b));
+  return result.toFixed(2);
 }
 
 /**
  * Safe subtraction for money amounts
  */
 export function subtract(a: number | string, b: number | string): string {
-  const aStr = typeof a === 'number' ? a.toString() : a;
-  const bStr = typeof b === 'number' ? b.toString() : b;
-
-  const aFixed = parseFloat(aStr).toFixed(2);
-  const bFixed = parseFloat(bStr).toFixed(2);
-
-  const diff = (parseFloat(aFixed) - parseFloat(bFixed)).toFixed(2);
-  return diff;
+  const result = toDecimal(a).minus(toDecimal(b));
+  return result.toFixed(2);
 }
 
 /**
  * Safe multiplication for money amounts
- * Returns result with 2 decimal places
  */
 export function multiply(a: number | string, b: number | string): string {
-  const aStr = typeof a === 'number' ? a.toString() : a;
-  const bStr = typeof b === 'number' ? b.toString() : b;
-
-  const product = (parseFloat(aStr) * parseFloat(bStr)).toFixed(2);
-  return product;
+  const result = toDecimal(a).times(toDecimal(b));
+  return result.toFixed(2);
 }
 
 /**
  * Safe division for money amounts
- * Returns result with 2 decimal places
  */
 export function divide(a: number | string, b: number | string): string {
-  const aStr = typeof a === 'number' ? a.toString() : a;
-  const bStr = typeof b === 'number' ? b.toString() : b;
+  const denominator = toDecimal(b);
 
-  if (parseFloat(bStr) === 0) {
+  if (denominator.isZero()) {
     throw new Error('Division by zero');
   }
 
-  const quotient = (parseFloat(aStr) / parseFloat(bStr)).toFixed(2);
-  return quotient;
+  const result = toDecimal(a).dividedBy(denominator);
+  return result.toFixed(2);
 }
 
 /**
@@ -79,8 +81,7 @@ export function percentage(amount: number | string, percent: number | string): s
  * Format money for display
  */
 export function formatMoney(amount: number | string, currency: string = 'USD'): string {
-  const amountStr = typeof amount === 'number' ? amount.toString() : amount;
-  const num = parseFloat(amountStr);
+  const num = toDecimal(amount).toNumber();
 
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -93,8 +94,8 @@ export function formatMoney(amount: number | string, currency: string = 'USD'): 
 /**
  * Parse string to number safely
  */
-export function parseMoney(value: string): number {
-  return parseFloat(parseFloat(value).toFixed(2));
+export function parseMoney(value: string | number): number {
+  return toDecimal(value).toNumber();
 }
 
 /**
@@ -102,33 +103,69 @@ export function parseMoney(value: string): number {
  * Returns: -1 if a < b, 0 if a == b, 1 if a > b
  */
 export function compare(a: number | string, b: number | string): number {
-  const aNum = parseFloat(typeof a === 'number' ? a.toString() : a);
-  const bNum = parseFloat(typeof b === 'number' ? b.toString() : b);
+  const cmp = toDecimal(a).comparedTo(toDecimal(b));
 
-  if (Math.abs(aNum - bNum) < 0.01) return 0; // Consider equal if within 1 cent
-  return aNum < bNum ? -1 : 1;
+  if (cmp < 0) return -1;
+  if (cmp > 0) return 1;
+  return 0;
 }
 
 /**
  * Check if amount is zero
  */
 export function isZero(amount: number | string): boolean {
-  const num = parseFloat(typeof amount === 'number' ? amount.toString() : amount);
-  return Math.abs(num) < 0.01;
+  return toDecimal(amount).isZero();
 }
 
 /**
  * Round to 2 decimal places (cents)
  */
 export function round(amount: number | string): string {
-  const num = parseFloat(typeof amount === 'number' ? amount.toString() : amount);
-  return num.toFixed(2);
+  return toDecimal(amount).toFixed(2);
 }
 
 /**
  * Validate money amount
  */
 export function isValidMoney(amount: number | string): boolean {
-  const num = parseFloat(typeof amount === 'number' ? amount.toString() : amount);
-  return !isNaN(num) && isFinite(num) && num >= 0;
+  try {
+    const decimal = toDecimal(amount);
+    return decimal.isFinite() && decimal.greaterThanOrEqualTo(0);
+  } catch {
+    return false;
+  }
 }
+
+/**
+ * Check if amount is greater than another
+ */
+export function isGreaterThan(a: number | string, b: number | string): boolean {
+  return toDecimal(a).greaterThan(toDecimal(b));
+}
+
+/**
+ * Check if amount is less than another
+ */
+export function isLessThan(a: number | string, b: number | string): boolean {
+  return toDecimal(a).lessThan(toDecimal(b));
+}
+
+/**
+ * Get the minimum of two amounts
+ */
+export function min(a: number | string, b: number | string): string {
+  return Decimal.min(toDecimal(a), toDecimal(b)).toFixed(2);
+}
+
+/**
+ * Get the maximum of two amounts
+ */
+export function max(a: number | string, b: number | string): string {
+  return Decimal.max(toDecimal(a), toDecimal(b)).toFixed(2);
+}
+
+/**
+ * Export Decimal class for advanced usage
+ */
+export { Decimal };
+

@@ -12,6 +12,7 @@ import {
   subtractMoney,
   addMoney,
 } from './financial';
+import { prismaDecimalToNumber } from './prisma-decimal';
 
 export interface DistributionResult {
   success: boolean;
@@ -79,8 +80,8 @@ export async function distributeProfit(
       _sum: { excessAmount: true, totalProfitReceived: true },
     });
 
-    const totalExcess = totalExcessInvested._sum.excessAmount || 0;
-    const totalReceived = totalExcessInvested._sum.totalProfitReceived || 0;
+    const totalExcess = prismaDecimalToNumber(totalExcessInvested._sum.excessAmount || 0);
+    const totalReceived = prismaDecimalToNumber(totalExcessInvested._sum.totalProfitReceived || 0);
     const isAfterExcessRefund = !moneyLessThan(totalReceived, totalExcess);
 
     // Use appropriate platform fee
@@ -89,7 +90,7 @@ export async function distributeProfit(
       : (asset.platformFee || 0.15); // During refund: default 15%
 
     // SECURITY FIX: Use safe financial calculations
-    const platformProfit = roundToCents(purchaseAmount * platformFee);
+    const platformProfit = roundToCents(purchaseAmount * prismaDecimalToNumber(platformFee));
     const contributorProfit = subtractMoney(purchaseAmount, platformProfit);
 
     // Get all investor contributions (those with excess amounts)
@@ -105,7 +106,7 @@ export async function distributeProfit(
 
     // SECURITY FIX: Use safe comparison instead of floating point
     const activeInvestors = contributions.filter((c) =>
-      moneyLessThan(c.totalProfitReceived, c.excessAmount)
+      moneyLessThan(prismaDecimalToNumber(c.totalProfitReceived), prismaDecimalToNumber(c.excessAmount))
     );
 
     if (activeInvestors.length === 0 || moneyLessThan(contributorProfit, 0.01)) {
@@ -127,7 +128,7 @@ export async function distributeProfit(
     // SECURITY FIX: Use safe financial calculations
     // Recalculate profit share ratios based on remaining amounts owed
     const totalRemainingOwed = activeInvestors.reduce(
-      (sum, c) => addMoney(sum, subtractMoney(c.excessAmount, c.totalProfitReceived)),
+      (sum, c) => addMoney(sum, subtractMoney(prismaDecimalToNumber(c.excessAmount), prismaDecimalToNumber(c.totalProfitReceived))),
       0
     );
 
@@ -136,8 +137,8 @@ export async function distributeProfit(
 
     for (const contribution of activeInvestors) {
       const remainingOwed = subtractMoney(
-        contribution.excessAmount,
-        contribution.totalProfitReceived
+        prismaDecimalToNumber(contribution.excessAmount),
+        prismaDecimalToNumber(contribution.totalProfitReceived)
       );
 
       if (moneyLessThan(remainingOwed, 0) || moneyEquals(remainingOwed, 0)) continue;
@@ -162,7 +163,7 @@ export async function distributeProfit(
 
       // SECURITY FIX: Use safe financial calculations
       // Add to withdrawable balance
-      const balanceBefore = wallet.withdrawableBalance;
+      const balanceBefore = prismaDecimalToNumber(wallet.withdrawableBalance);
       const balanceAfter = addMoney(balanceBefore, shareAmount);
 
       await prisma.transaction.create({
@@ -183,13 +184,13 @@ export async function distributeProfit(
         where: { id: wallet.id },
         data: {
           withdrawableBalance: balanceAfter,
-          totalProfitReceived: addMoney(wallet.totalProfitReceived, shareAmount),
+          totalProfitReceived: addMoney(prismaDecimalToNumber(wallet.totalProfitReceived), shareAmount),
         },
       });
 
       // Update contribution profit tracking
-      const newTotalProfitReceived = addMoney(contribution.totalProfitReceived, shareAmount);
-      const isFullyRefunded = !moneyLessThan(newTotalProfitReceived, contribution.excessAmount);
+      const newTotalProfitReceived = addMoney(prismaDecimalToNumber(contribution.totalProfitReceived), shareAmount);
+      const isFullyRefunded = !moneyLessThan(newTotalProfitReceived, prismaDecimalToNumber(contribution.excessAmount));
 
       await prisma.contribution.update({
         where: { id: contribution.id },
@@ -219,8 +220,8 @@ export async function distributeProfit(
     await prisma.asset.update({
       where: { id: assetId },
       data: {
-        totalRevenue: addMoney(asset.totalRevenue, purchaseAmount),
-        totalProfitDistributed: addMoney(asset.totalProfitDistributed, contributorProfit),
+        totalRevenue: addMoney(prismaDecimalToNumber(asset.totalRevenue), purchaseAmount),
+        totalProfitDistributed: addMoney(prismaDecimalToNumber(asset.totalProfitDistributed), contributorProfit),
       },
     });
 
@@ -242,7 +243,7 @@ export async function distributeProfit(
       platformProfit,
       contributorProfit,
       distributedShares,
-      message: `Distributed $${contributorProfit.toFixed(2)} to ${distributedShares} investors (Platform: ${(platformFee * 100).toFixed(0)}%)`,
+      message: `Distributed $${contributorProfit.toFixed(2)} to ${distributedShares} investors (Platform: ${(prismaDecimalToNumber(platformFee) * 100).toFixed(0)}%)`,
       isAfterExcessRefund,
     };
   };
@@ -320,9 +321,9 @@ export async function getAssetDistributionHistory(assetId: string) {
     orderBy: { distributionDate: 'desc' },
   });
 
-  const totalRevenue = distributions.reduce((sum, d) => sum + d.totalRevenue, 0);
-  const totalPlatformProfit = distributions.reduce((sum, d) => sum + d.platformProfit, 0);
-  const totalContributorProfit = distributions.reduce((sum, d) => sum + d.contributorProfit, 0);
+  const totalRevenue = distributions.reduce((sum, d) => sum + prismaDecimalToNumber(d.totalRevenue), 0);
+  const totalPlatformProfit = distributions.reduce((sum, d) => sum + prismaDecimalToNumber(d.platformProfit), 0);
+  const totalContributorProfit = distributions.reduce((sum, d) => sum + prismaDecimalToNumber(d.contributorProfit), 0);
 
   return {
     totalRevenue,
@@ -330,9 +331,9 @@ export async function getAssetDistributionHistory(assetId: string) {
     totalContributorProfit,
     distributions: distributions.map((d) => ({
       date: d.distributionDate,
-      revenue: d.totalRevenue,
-      platformProfit: d.platformProfit,
-      contributorProfit: d.contributorProfit,
+      revenue: prismaDecimalToNumber(d.totalRevenue),
+      platformProfit: prismaDecimalToNumber(d.platformProfit),
+      contributorProfit: prismaDecimalToNumber(d.contributorProfit),
       shares: d.distributedShares,
     })),
   };
@@ -371,17 +372,17 @@ export async function getUserProfitShares(userId: string) {
 
     const data = byAsset.get(share.assetId);
     if (data) {
-      data.totalReceived += share.amount;
+      data.totalReceived += prismaDecimalToNumber(share.amount);
       data.shareCount++;
       data.shares.push({
-        amount: share.amount,
-        ratio: share.shareRatio,
+        amount: prismaDecimalToNumber(share.amount),
+        ratio: prismaDecimalToNumber(share.shareRatio),
         date: share.distributedAt,
       });
     }
   }
 
-  const totalReceived = shares.reduce((sum, s) => sum + s.amount, 0);
+  const totalReceived = shares.reduce((sum, s) => sum + prismaDecimalToNumber(s.amount), 0);
 
   return {
     totalReceived,

@@ -3,6 +3,12 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import {
+  isPrismaDecimalLessThan,
+  subtractPrismaDecimals,
+  addPrismaDecimals,
+  prismaDecimalToNumber,
+} from '@/lib/prisma-decimal';
 
 const convertSchema = z.object({
   amount: z
@@ -36,16 +42,16 @@ export async function POST(req: NextRequest) {
       }
 
       // Check withdrawable balance
-      if (wallet.withdrawableBalance < amount) {
+      if (isPrismaDecimalLessThan(wallet.withdrawableBalance, amount)) {
         throw new Error(
-          `Insufficient withdrawable balance. Available: $${wallet.withdrawableBalance.toFixed(2)}`
+          `Insufficient withdrawable balance. Available: $${prismaDecimalToNumber(wallet.withdrawableBalance).toFixed(2)}`
         );
       }
 
       const withdrawableBefore = wallet.withdrawableBalance;
       const creditBefore = wallet.storeCredit;
-      const withdrawableAfter = withdrawableBefore - amount;
-      const creditAfter = creditBefore + amount;
+      const withdrawableAfter = subtractPrismaDecimals(withdrawableBefore, amount);
+      const creditAfter = addPrismaDecimals(creditBefore, amount);
 
       // Create transaction
       await tx.transaction.create({
@@ -70,7 +76,7 @@ export async function POST(req: NextRequest) {
         data: {
           withdrawableBalance: withdrawableAfter,
           storeCredit: creditAfter,
-          totalConvertedToCredit: wallet.totalConvertedToCredit + amount,
+          totalConvertedToCredit: addPrismaDecimals(wallet.totalConvertedToCredit, amount),
         },
       });
 

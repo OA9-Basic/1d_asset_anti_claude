@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { processFundedAsset } from '@/lib/asset-processing';
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import {
+  prismaDecimalToNumber,
+  isPrismaDecimalGreaterThan,
+  isPrismaDecimalGreaterThanOrEqual,
+  addPrismaDecimals,
+} from '@/lib/prisma-decimal';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -112,21 +118,21 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 
     // Calculate processing summary
-    const basePrice = asset.targetPrice;
-    const platformFee = asset.platformFee || 0.15;
+    const basePrice = prismaDecimalToNumber(asset.targetPrice);
+    const platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
     const targetAmount = basePrice * (1 + platformFee);
 
     const contributionsWithRefundInfo = asset.contributions.map((c) => {
-      const excessAmount = c.excessAmount;
-      const refundEligible = excessAmount > 0 ? excessAmount : 0;
+      const excessAmount = prismaDecimalToNumber(c.excessAmount);
+      const refundEligible = isPrismaDecimalGreaterThan(c.excessAmount, 0) ? excessAmount : 0;
       const effectivePrice = basePrice;
 
       return {
         id: c.id,
         userId: c.userId,
         userName: c.user.firstName || c.user.email,
-        amount: c.amount,
-        excessAmount: c.excessAmount,
+        amount: prismaDecimalToNumber(c.amount),
+        excessAmount: excessAmount,
         refundEligible,
         effectivePrice,
         createdAt: c.createdAt,
@@ -146,15 +152,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         targetPrice: basePrice,
         platformFee,
         targetAmount,
-        currentCollected: asset.currentCollected,
-        isFullyFunded: asset.currentCollected >= targetAmount,
+        currentCollected: prismaDecimalToNumber(asset.currentCollected),
+        isFullyFunded: isPrismaDecimalGreaterThanOrEqual(asset.currentCollected, targetAmount),
       },
       contributions: contributionsWithRefundInfo,
       summary: {
         totalContributors: asset.contributions.length,
-        totalRefundable,
-        totalCollected: asset.currentCollected,
-        netCost: targetAmount - totalRefundable,
+        totalRefundable: prismaDecimalToNumber(totalRefundable),
+        totalCollected: prismaDecimalToNumber(asset.currentCollected),
+        netCost: targetAmount - prismaDecimalToNumber(totalRefundable),
       },
     });
   } catch (error) {

@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
 import type { AssetListItem } from '@/types/assets';
+import {
+  prismaDecimalToNumber,
+  addPrismaDecimals,
+  multiplyPrismaDecimals,
+  subtractPrismaDecimals,
+} from '@/lib/prisma-decimal';
 
 export async function GET(req: NextRequest) {
   try {
@@ -35,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     // Calculate stats
     const stats = {
-      totalInvested: contributions.reduce((sum, c) => sum + c.amount, 0),
+      totalInvested: contributions.reduce((sum, c) => sum + prismaDecimalToNumber(c.amount), 0),
       assetsOwned: purchases.length,
       contributingCount: contributions.filter((c) => c.asset?.status === 'COLLECTING').length,
       ownedCount: purchases.length,
@@ -52,10 +58,10 @@ export async function GET(req: NextRequest) {
       const asset = contribution.asset;
       if (!asset) return;
 
-      const platformFee = asset.platformFee || 0.15;
-      const targetWithFee = asset.targetPrice * (1 + platformFee);
-      const progressPercent = Math.min((Number(asset.currentCollected) / targetWithFee) * 100, 100);
-      const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0);
+      const platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
+      const targetWithFee = multiplyPrismaDecimals(asset.targetPrice, 1 + platformFee);
+      const progressPercent = Math.min((prismaDecimalToNumber(asset.currentCollected) / prismaDecimalToNumber(targetWithFee)) * 100, 100);
+      const remainingAmount = Math.max(prismaDecimalToNumber(subtractPrismaDecimals(targetWithFee, asset.currentCollected)), 0);
 
       allAssets.push({
         id: asset.id,
@@ -63,23 +69,23 @@ export async function GET(req: NextRequest) {
         description: asset.description,
         type: asset.type,
         deliveryType: asset.deliveryType,
-        targetPrice: asset.targetPrice,
-        platformFee: asset.platformFee,
-        currentCollected: asset.currentCollected,
+        targetPrice: prismaDecimalToNumber(asset.targetPrice),
+        platformFee: prismaDecimalToNumber(asset.platformFee),
+        currentCollected: prismaDecimalToNumber(asset.currentCollected),
         status: asset.status,
         totalPurchases: asset.totalPurchases,
-        totalRevenue: asset.totalRevenue,
+        totalRevenue: prismaDecimalToNumber(asset.totalRevenue),
         thumbnail: asset.thumbnail,
         featured: asset.featured,
         createdAt: asset.createdAt.toISOString(),
-        userContribution: contribution.amount,
-        userExcessAmount: contribution.excessAmount,
-        profitShareRatio: contribution.profitShareRatio,
-        totalProfitReceived: contribution.totalProfitReceived,
+        userContribution: prismaDecimalToNumber(contribution.amount),
+        userExcessAmount: prismaDecimalToNumber(contribution.excessAmount),
+        profitShareRatio: prismaDecimalToNumber(contribution.profitShareRatio),
+        totalProfitReceived: prismaDecimalToNumber(contribution.totalProfitReceived),
         relationship: 'contributing',
         progressPercent,
         remainingAmount,
-        targetWithFee,
+        targetWithFee: prismaDecimalToNumber(targetWithFee),
         contributionId: contribution.id,
         contributionStatus: contribution.status,
       });
@@ -92,10 +98,10 @@ export async function GET(req: NextRequest) {
 
       const existingAsset = allAssets.find((a) => a.id === purchase.assetId);
       if (!existingAsset) {
-        const platformFee = asset.platformFee || 0.15;
-        const targetWithFee = asset.targetPrice * (1 + platformFee);
+        const platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
+        const targetWithFee = multiplyPrismaDecimals(asset.targetPrice, 1 + platformFee);
         const progressPercent = Math.min(
-          (Number(asset.currentCollected) / targetWithFee) * 100,
+          (prismaDecimalToNumber(asset.currentCollected) / prismaDecimalToNumber(targetWithFee)) * 100,
           100
         );
 
@@ -105,30 +111,30 @@ export async function GET(req: NextRequest) {
           description: asset.description,
           type: asset.type,
           deliveryType: asset.deliveryType,
-          targetPrice: asset.targetPrice,
-          platformFee: asset.platformFee,
-          currentCollected: asset.currentCollected,
+          targetPrice: prismaDecimalToNumber(asset.targetPrice),
+          platformFee: prismaDecimalToNumber(asset.platformFee),
+          currentCollected: prismaDecimalToNumber(asset.currentCollected),
           status: asset.status,
           totalPurchases: asset.totalPurchases,
-          totalRevenue: asset.totalRevenue,
+          totalRevenue: prismaDecimalToNumber(asset.totalRevenue),
           thumbnail: asset.thumbnail,
           featured: asset.featured,
           createdAt: asset.createdAt.toISOString(),
           relationship: 'owned',
-          purchaseAmount: purchase.purchaseAmount,
+          purchaseAmount: prismaDecimalToNumber(purchase.purchaseAmount),
           deliveryAccessKey: purchase.deliveryAccessKey,
           deliveryExpiry: purchase.deliveryExpiry ? purchase.deliveryExpiry.toISOString() : null,
           accessCount: purchase.accessCount,
           lastAccessedAt: purchase.lastAccessedAt ? purchase.lastAccessedAt.toISOString() : null,
           purchasedAt: purchase.createdAt.toISOString(),
           progressPercent,
-          targetWithFee,
+          targetWithFee: prismaDecimalToNumber(targetWithFee),
           purchaseId: purchase.id,
         });
       } else {
         // Asset already added from contributions, mark as owned too
         existingAsset.relationship = 'both';
-        existingAsset.purchaseAmount = purchase.purchaseAmount;
+        existingAsset.purchaseAmount = prismaDecimalToNumber(purchase.purchaseAmount);
         existingAsset.deliveryAccessKey = purchase.deliveryAccessKey;
         existingAsset.deliveryExpiry = purchase.deliveryExpiry
           ? purchase.deliveryExpiry.toISOString()

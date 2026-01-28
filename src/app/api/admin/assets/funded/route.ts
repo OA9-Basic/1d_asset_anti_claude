@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import {
+  prismaDecimalToNumber,
+  isPrismaDecimalGreaterThan,
+  isPrismaDecimalGreaterThanOrEqual,
+  addPrismaDecimals,
+  multiplyPrismaDecimals,
+} from '@/lib/prisma-decimal';
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,20 +47,22 @@ export async function GET(req: NextRequest) {
 
     // Calculate funding status for each asset
     const assetsWithFundingStatus = assets.map((asset) => {
-      const platformFee = asset.platformFee || 0.15;
-      const targetAmount = asset.targetPrice * (1 + platformFee);
-      const isFullyFunded = asset.currentCollected >= targetAmount;
-      const progress = targetAmount > 0 ? (asset.currentCollected / targetAmount) * 100 : 0;
+      const platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
+      const targetAmount = multiplyPrismaDecimals(asset.targetPrice, 1 + platformFee);
+      const isFullyFunded = isPrismaDecimalGreaterThanOrEqual(asset.currentCollected, prismaDecimalToNumber(targetAmount));
+      const progress = isPrismaDecimalGreaterThan(targetAmount, 0)
+        ? prismaDecimalToNumber(multiplyPrismaDecimals(asset.currentCollected, 100)) / prismaDecimalToNumber(targetAmount)
+        : 0;
 
       return {
         id: asset.id,
         title: asset.title,
         type: asset.type,
         thumbnail: asset.thumbnail,
-        targetPrice: asset.targetPrice,
+        targetPrice: prismaDecimalToNumber(asset.targetPrice),
         platformFee,
-        targetAmount,
-        currentCollected: asset.currentCollected,
+        targetAmount: prismaDecimalToNumber(targetAmount),
+        currentCollected: prismaDecimalToNumber(asset.currentCollected),
         status: asset.status,
         isFullyFunded,
         progress,

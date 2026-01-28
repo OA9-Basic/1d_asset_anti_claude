@@ -1,6 +1,7 @@
 import { db } from './db';
 import { subtract, add, parseMoney } from './decimal';
 import { createLogger } from './logger';
+import { prismaDecimalToNumber } from './prisma-decimal';
 
 const logger = createLogger('distribution');
 
@@ -62,12 +63,12 @@ export async function distributeRevenue(assetId: string, amount: number | string
     }
 
     // Calculate loan repayment using safe decimal operations
-    const remainingLoan = parseMoney(subtract(activeGapLoan.loanAmount, activeGapLoan.repaidAmount));
+    const remainingLoan = parseMoney(subtract(prismaDecimalToNumber(activeGapLoan.loanAmount), prismaDecimalToNumber(activeGapLoan.repaidAmount)));
     const repaymentAmount = Math.min(revenueAmount, remainingLoan);
     const platformProfit = parseMoney(subtract(revenueAmount, repaymentAmount));
 
     const balanceBefore = activeGapLoan.user.wallet.balance;
-    const balanceAfter = parseMoney(add(balanceBefore, repaymentAmount));
+    const balanceAfter = parseMoney(add(prismaDecimalToNumber(balanceBefore), repaymentAmount));
 
     await tx.transaction.create({
       data: {
@@ -88,8 +89,8 @@ export async function distributeRevenue(assetId: string, amount: number | string
       data: { balance: balanceAfter },
     });
 
-    const newRepaidAmount = parseMoney(add(activeGapLoan.repaidAmount, repaymentAmount));
-    const newRemainingAmount = parseMoney(subtract(activeGapLoan.loanAmount, newRepaidAmount));
+    const newRepaidAmount = parseMoney(add(prismaDecimalToNumber(activeGapLoan.repaidAmount), repaymentAmount));
+    const newRemainingAmount = parseMoney(subtract(prismaDecimalToNumber(activeGapLoan.loanAmount), newRepaidAmount));
 
     const loanUpdateData: Record<string, unknown> = {
       repaidAmount: newRepaidAmount,

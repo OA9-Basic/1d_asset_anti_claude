@@ -1,4 +1,13 @@
 import { db } from './db';
+import {
+  prismaDecimalToNumber,
+  isPrismaDecimalLessThan,
+  isPrismaDecimalGreaterThanOrEqual,
+  subtractPrismaDecimals,
+  addPrismaDecimals,
+  isPrismaDecimalGreaterThan,
+  multiplyPrismaDecimals,
+} from './prisma-decimal';
 
 export interface ContributionResult {
   success: boolean;
@@ -69,7 +78,7 @@ export async function contributeToAsset(
     }
 
     // Check balance
-    if (wallet.balance < amount) {
+    if (isPrismaDecimalLessThan(wallet.balance, amount)) {
       return {
         success: false,
         assetId,
@@ -91,10 +100,10 @@ export async function contributeToAsset(
     });
 
     // Calculate target amount with platform fee
-    const platformFee = asset.platformFee || 0.15;
-    const targetAmount = asset.targetPrice * (1 + platformFee);
+    const platformFee = prismaDecimalToNumber(asset.platformFee) || 0.15;
+    const targetAmount = multiplyPrismaDecimals(asset.targetPrice, 1 + platformFee);
     const currentCollected = asset.currentCollected;
-    const remainingNeeded = Math.max(0, targetAmount - currentCollected);
+    const remainingNeeded = Math.max(0, prismaDecimalToNumber(subtractPrismaDecimals(targetAmount, currentCollected)));
 
     // Cap contribution at remaining needed amount
     // If remaining needed is small (e.g. $0.50), we accept it to close the pool
@@ -125,7 +134,7 @@ export async function contributeToAsset(
 
     // Deduct from wallet
     const balanceBefore = wallet.balance;
-    const balanceAfter = balanceBefore - contributionAmount;
+    const balanceAfter = subtractPrismaDecimals(balanceBefore, contributionAmount);
 
     await tx.transaction.create({
       data: {
@@ -164,10 +173,10 @@ export async function contributeToAsset(
       _contribution = await tx.contribution.update({
         where: { id: existingContribution.id },
         data: {
-          amount: existingContribution.amount + contributionAmount,
-          excessAmount: existingContribution.excessAmount + excessAmount,
+          amount: addPrismaDecimals(existingContribution.amount, contributionAmount),
+          excessAmount: addPrismaDecimals(existingContribution.excessAmount, excessAmount),
           isInvestment:
-            existingContribution.excessAmount + excessAmount > 0 ||
+            isPrismaDecimalGreaterThan(addPrismaDecimals(existingContribution.excessAmount, excessAmount), 0) ||
             existingContribution.isInvestment,
         },
       });
@@ -184,8 +193,8 @@ export async function contributeToAsset(
     }
 
     // Update asset
-    const newCollected = currentCollected + contributionAmount;
-    const isFullyFunded = newCollected >= targetAmount;
+    const newCollected = addPrismaDecimals(currentCollected, contributionAmount);
+    const isFullyFunded = isPrismaDecimalGreaterThanOrEqual(newCollected, prismaDecimalToNumber(targetAmount));
 
     await tx.asset.update({
       where: { id: assetId },
@@ -208,13 +217,13 @@ export async function contributeToAsset(
         where: { assetId },
       });
 
-      const totalExcess = allContributions.reduce((sum, c) => sum + c.excessAmount, 0);
+      const totalExcess = allContributions.reduce((sum, c) => sum + prismaDecimalToNumber(c.excessAmount), 0);
 
       for (const c of allContributions) {
-        if (c.excessAmount > 0 && totalExcess > 0) {
+        if (isPrismaDecimalGreaterThan(c.excessAmount, 0) && totalExcess > 0) {
           await tx.contribution.update({
             where: { id: c.id },
-            data: { profitShareRatio: c.excessAmount / totalExcess },
+            data: { profitShareRatio: multiplyPrismaDecimals(c.excessAmount, 1 / totalExcess) },
           });
         }
       }
@@ -238,8 +247,8 @@ export async function contributeToAsset(
       amount,
       excessAmount,
       isFullyFunded: false,
-      remainingNeeded: targetAmount - newCollected,
-      message: `Contribution successful! $${(targetAmount - newCollected).toFixed(2)} still needed`,
+      remainingNeeded: prismaDecimalToNumber(subtractPrismaDecimals(targetAmount, newCollected)),
+      message: `Contribution successful! $${prismaDecimalToNumber(subtractPrismaDecimals(targetAmount, newCollected)).toFixed(2)} still needed`,
     };
   });
 }
@@ -263,8 +272,8 @@ export async function getAssetContributionStats(assetId: string) {
   });
 
   const totalContributors = contributions.length;
-  const totalCollected = contributions.reduce((sum, c) => sum + c.amount, 0);
-  const totalExcess = contributions.reduce((sum, c) => sum + c.excessAmount, 0);
+  const totalCollected = contributions.reduce((sum, c) => sum + prismaDecimalToNumber(c.amount), 0);
+  const totalExcess = contributions.reduce((sum, c) => sum + prismaDecimalToNumber(c.excessAmount), 0);
   const investors = contributions.filter((c) => c.isInvestment);
 
   return {
@@ -276,11 +285,11 @@ export async function getAssetContributionStats(assetId: string) {
       id: c.id,
       userId: c.userId,
       userName: c.user.firstName || c.user.email,
-      amount: c.amount,
-      excessAmount: c.excessAmount,
+      amount: prismaDecimalToNumber(c.amount),
+      excessAmount: prismaDecimalToNumber(c.excessAmount),
       isInvestment: c.isInvestment,
-      profitShareRatio: c.profitShareRatio,
-      totalProfitReceived: c.totalProfitReceived,
+      profitShareRatio: prismaDecimalToNumber(c.profitShareRatio),
+      totalProfitReceived: prismaDecimalToNumber(c.totalProfitReceived),
     })),
   };
 }
@@ -310,12 +319,15 @@ export async function getUserContributions(userId: string) {
 
   return contributions.map((c) => ({
     id: c.id,
-    asset: c.asset,
-    amount: c.amount,
-    excessAmount: c.excessAmount,
+    asset: {
+      ...c.asset,
+      totalRevenue: prismaDecimalToNumber(c.asset.totalRevenue),
+    },
+    amount: prismaDecimalToNumber(c.amount),
+    excessAmount: prismaDecimalToNumber(c.excessAmount),
     isInvestment: c.isInvestment,
-    profitShareRatio: c.profitShareRatio,
-    totalProfitReceived: c.totalProfitReceived,
+    profitShareRatio: prismaDecimalToNumber(c.profitShareRatio),
+    totalProfitReceived: prismaDecimalToNumber(c.totalProfitReceived),
     status: c.status,
     createdAt: c.createdAt,
   }));

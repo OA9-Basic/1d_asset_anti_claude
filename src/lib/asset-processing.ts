@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 
 import { generateSecureAccessKey } from './auth';
 import { db } from './db';
+import { prismaDecimalToNumber } from './prisma-decimal';
 
 export interface ProcessingResult {
   success: boolean;
@@ -127,7 +128,7 @@ export async function processFundedAsset(
       },
     });
 
-    const totalExcessInvestment = asset.contributions.reduce((sum, c) => sum + c.excessAmount, 0);
+    const totalExcessInvestment = asset.contributions.reduce((sum, c) => sum + prismaDecimalToNumber(c.excessAmount), 0);
 
     const message = `Asset processed successfully. ${contributorsProcessed} contributors granted access. Total excess investment: $${totalExcessInvestment.toFixed(2)} (will be refunded through profit distribution)${
       errors.length > 0 ? `. ${errors.length} error(s) occurred.` : ''

@@ -3,6 +3,13 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import {
+  subtractPrismaDecimals,
+  isPrismaDecimalLessThan,
+  isPrismaDecimalLessThanOrEqual,
+  addPrismaDecimals,
+  prismaDecimalToNumber
+} from '@/lib/prisma-decimal';
 
 const gapFundSchema = z.object({
   assetId: z.string().cuid(),
@@ -41,13 +48,13 @@ export async function POST(req: NextRequest) {
         throw new Error('Asset is not accepting gap funding');
       }
 
-      const gap = asset.targetPrice - asset.currentCollected;
+      const gap = subtractPrismaDecimals(asset.targetPrice, asset.currentCollected);
 
-      if (gap <= 0) {
+      if (isPrismaDecimalLessThanOrEqual(gap, 0)) {
         throw new Error('Asset is already fully funded');
       }
 
-      if (user.wallet.balance < gap) {
+      if (isPrismaDecimalLessThan(user.wallet.balance, prismaDecimalToNumber(gap))) {
         throw new Error('Insufficient balance for gap funding');
       }
 
@@ -63,7 +70,7 @@ export async function POST(req: NextRequest) {
       }
 
       const balanceBefore = user.wallet.balance;
-      const balanceAfter = balanceBefore - gap;
+      const balanceAfter = subtractPrismaDecimals(balanceBefore, gap);
 
       const debitTransaction = await tx.transaction.create({
         data: {
@@ -85,7 +92,7 @@ export async function POST(req: NextRequest) {
         data: { balance: balanceAfter },
       });
 
-      const newCollected = asset.currentCollected + gap;
+      const newCollected = addPrismaDecimals(asset.currentCollected, gap);
 
       const gapLoan = await tx.gapLoan.create({
         data: {
