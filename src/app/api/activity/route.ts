@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { db } from '@/lib/db';
+
+// Query parameter validation
+const activityQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const { limit } = activityQuerySchema.parse({
+      limit: searchParams.get('limit') || '10',
+    });
 
     // Get recent contributions across all assets
     const recentContributions = await db.contribution.findMany({

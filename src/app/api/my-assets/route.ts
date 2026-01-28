@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -9,6 +10,11 @@ import {
 } from '@/lib/prisma-decimal';
 import type { AssetListItem } from '@/types/assets';
 
+// Query parameter validation
+const myAssetsQuerySchema = z.object({
+  filter: z.enum(['all', 'contributing', 'owned', 'completed']).default('all'),
+});
+
 export async function GET(req: NextRequest) {
   try {
     const userId = await getUserFromToken(req);
@@ -18,7 +24,10 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const filter = searchParams.get('filter') || 'all';
+    const query = myAssetsQuerySchema.parse({
+      filter: searchParams.get('filter') || 'all',
+    });
+    const { filter } = query;
 
     // Fetch user's contributions with asset details
     const contributions = await db.contribution.findMany({

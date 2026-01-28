@@ -1,22 +1,40 @@
 import type { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { db } from '@/lib/db';
+
+// Query parameter validation schema
+const assetsQuerySchema = z.object({
+  status: z.string().optional(),
+  type: z.string().optional(),
+  search: z.string().optional(),
+  sort: z.enum(['newest', 'oldest', 'mostPurchased', 'mostFunded', 'endingSoon', 'trending', 'priceAsc', 'priceDesc', 'createdAt', 'targetPrice', 'currentCollected', 'totalPurchases']).default('newest'),
+  order: z.enum(['asc', 'desc']).default('desc'),
+  limit: z.coerce.number().int().min(1).max(100).default(12),
+  cursor: z.string().optional(),
+  minPrice: z.coerce.number().min(0).optional(),
+  maxPrice: z.coerce.number().min(0).optional(),
+});
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
 
-    // Parse query parameters
-    const statusParam = searchParams.get('status');
-    const typeParam = searchParams.get('type');
-    const search = searchParams.get('search');
-    const sort = searchParams.get('sort') || 'createdAt';
-    const order = searchParams.get('order') || 'desc';
-    const limit = parseInt(searchParams.get('limit') || '12');
-    const cursor = searchParams.get('cursor');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
+    // Validate query parameters
+    const query = assetsQuerySchema.parse({
+      status: searchParams.get('status') || undefined,
+      type: searchParams.get('type') || undefined,
+      search: searchParams.get('search') || undefined,
+      sort: searchParams.get('sort') || 'newest',
+      order: searchParams.get('order') || 'desc',
+      limit: searchParams.get('limit') || '12',
+      cursor: searchParams.get('cursor') || undefined,
+      minPrice: searchParams.get('minPrice') || undefined,
+      maxPrice: searchParams.get('maxPrice') || undefined,
+    });
+
+    const { status: statusParam, type: typeParam, search, sort, order, limit, cursor, minPrice, maxPrice } = query;
 
     // Build where clause with proper typing
     const where: Prisma.AssetWhereInput = {};
@@ -57,10 +75,10 @@ export async function GET(req: NextRequest) {
     if (minPrice || maxPrice) {
       where.targetPrice = {};
       if (minPrice) {
-        where.targetPrice.gte = parseFloat(minPrice);
+        where.targetPrice.gte = minPrice;
       }
       if (maxPrice) {
-        where.targetPrice.lte = parseFloat(maxPrice);
+        where.targetPrice.lte = maxPrice;
       }
     }
 
