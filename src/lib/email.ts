@@ -5,8 +5,9 @@
  * Production-ready implementation with Resend.com
  */
 
-import { createLogger } from '@/lib/logger';
 import { Resend } from 'resend';
+
+import { createLogger } from '@/lib/logger';
 
 const logger = createLogger('email');
 

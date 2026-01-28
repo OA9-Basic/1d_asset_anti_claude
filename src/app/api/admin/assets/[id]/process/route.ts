@@ -7,7 +7,6 @@ import {
   prismaDecimalToNumber,
   isPrismaDecimalGreaterThan,
   isPrismaDecimalGreaterThanOrEqual,
-  addPrismaDecimals,
 } from '@/lib/prisma-decimal';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {

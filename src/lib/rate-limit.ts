@@ -6,8 +6,8 @@
  * Falls back to in-memory storage if Redis is not available.
  */
 
-import { redisHelper, redis } from '@/lib/redis';
 import { createLogger } from '@/lib/logger';
+import { redisHelper, redis } from '@/lib/redis';
 
 const logger = createLogger('rate-limit');
 

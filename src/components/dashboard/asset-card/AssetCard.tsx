@@ -17,10 +17,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import { cn } from '@/lib/utils';
 
-import { AssetActionButton } from './asset-card/AssetActionButton';
-import { AssetCardImage } from './asset-card/AssetCardImage';
-import { AssetStatusBadge } from './asset-card/AssetStatusBadge';
-import { FundingProgress } from './asset-card/FundingProgress';
+import {
+  AssetStatusBadge,
+  FundingProgress,
+  AssetActionButton,
+  AssetCardImage,
+} from './index';
 
 export interface AssetCardProps {
   asset: Asset & {
@@ -79,17 +81,17 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
               <span
                 className={cn(
                   'px-2.5 py-1 rounded-full text-xs font-medium',
-                  (asset.type as string) === 'VIDEO' &&
+                  String(asset.type) === 'VIDEO' &&
                     'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-                  (asset.type as string) === 'AUDIO' &&
+                  String(asset.type) === 'AUDIO' &&
                     'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                  (asset.type as string) === 'IMAGE' &&
+                  String(asset.type) === 'IMAGE' &&
                     'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                  (asset.type as string) === 'DOCUMENT' &&
+                  String(asset.type) === 'DOCUMENT' &&
                     'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                 )}
               >
-                {(asset.type as string).toLowerCase()}
+                {String(asset.type).toLowerCase()}
               </span>
 
               {asset.featured && (

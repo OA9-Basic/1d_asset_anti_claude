@@ -111,8 +111,9 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
   const StatusIcon = statusInfo.icon;
 
   // Calculate progress including platform fee
-  const platformFee = asset.platformFee || 0.15;
-  const targetWithFee = asset.targetPrice * (1 + platformFee);
+  const platformFee = Number(asset.platformFee) || 0.15;
+  const targetPriceNum = Number(asset.targetPrice);
+  const targetWithFee = targetPriceNum * (1 + platformFee);
   const progressPercent = Math.min((Number(asset.currentCollected) / targetWithFee) * 100, 100);
   const remainingAmount = Math.max(targetWithFee - Number(asset.currentCollected), 0);
 
@@ -315,9 +316,9 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
                 <Users className="w-4 h-4" />
                 {asset.totalPurchases || 0}
               </span>
-              {asset.totalRevenue > 0 && (
+              {Number(asset.totalRevenue) > 0 && (
                 <span className="flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4 text-green-500" />${asset.totalRevenue.toFixed(0)}
+                  <TrendingUp className="w-4 h-4 text-green-500" />${Number(asset.totalRevenue).toFixed(0)}
                 </span>
               )}
             </div>

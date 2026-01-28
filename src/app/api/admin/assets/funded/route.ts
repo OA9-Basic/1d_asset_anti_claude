@@ -6,7 +6,6 @@ import {
   prismaDecimalToNumber,
   isPrismaDecimalGreaterThan,
   isPrismaDecimalGreaterThanOrEqual,
-  addPrismaDecimals,
   multiplyPrismaDecimals,
 } from '@/lib/prisma-decimal';
 

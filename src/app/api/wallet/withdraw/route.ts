@@ -3,13 +3,16 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+import { createLogger } from '@/lib/logger';
 import {
   isPrismaDecimalLessThan,
   subtractPrismaDecimals,
   addPrismaDecimals,
   prismaDecimalToNumber,
 } from '@/lib/prisma-decimal';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+
+const logger = createLogger('api:wallet:withdraw');
 
 const withdrawalRequestSchema = z.object({
   amount: z
@@ -46,9 +49,22 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ withdrawals });
+    // Convert Decimal values to numbers for JSON response
+    const formattedWithdrawals = withdrawals.map((w) => ({
+      ...w,
+      wallet: w.wallet
+        ? {
+            ...w.wallet,
+            balance: prismaDecimalToNumber(w.wallet.balance),
+            withdrawableBalance: prismaDecimalToNumber(w.wallet.withdrawableBalance),
+          }
+        : w.wallet,
+      amount: prismaDecimalToNumber(w.amount),
+    }));
+
+    return NextResponse.json({ withdrawals: formattedWithdrawals });
   } catch (error) {
-    console.error('Withdrawal requests fetch error:', error);
+    logger.error({ error }, 'Withdrawal requests fetch error');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -144,9 +160,9 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         withdrawalId: result.withdrawal.id,
-        amount: result.withdrawal.amount,
+        amount: prismaDecimalToNumber(result.withdrawal.amount),
         cryptoCurrency: result.withdrawal.cryptoCurrency,
-        newWithdrawableBalance: result.newWithdrawableBalance,
+        newWithdrawableBalance: prismaDecimalToNumber(result.newWithdrawableBalance),
         message: 'Withdrawal request submitted. Awaiting admin approval.',
       },
       { status: 201 }
@@ -169,7 +185,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.error('Withdrawal request error:', error);
+    logger.error({ error }, 'Withdrawal request error');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -207,12 +223,23 @@ export async function DELETE(req: NextRequest) {
         throw new Error('Can only cancel pending withdrawals');
       }
 
-      // Restore balance
+      // Restore balance (using Prisma.Decimal operations)
+      const currentWallet = await tx.wallet.findUnique({
+        where: { id: withdrawal.walletId },
+      });
+
+      if (!currentWallet) {
+        throw new Error('Wallet not found');
+      }
+
+      const newWithdrawable = addPrismaDecimals(currentWallet.withdrawableBalance, withdrawal.amount);
+      const newLocked = subtractPrismaDecimals(currentWallet.lockedBalance, withdrawal.amount);
+
       await tx.wallet.update({
         where: { id: withdrawal.walletId },
         data: {
-          withdrawableBalance: { increment: withdrawal.amount },
-          lockedBalance: { decrement: withdrawal.amount },
+          withdrawableBalance: newWithdrawable,
+          lockedBalance: newLocked,
         },
       });
 
@@ -233,7 +260,7 @@ export async function DELETE(req: NextRequest) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    console.error('Withdrawal cancellation error:', error);
+    logger.error({ error }, 'Withdrawal cancellation error');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { prismaDecimalToNumber, addPrismaDecimals } from '@/lib/prisma-decimal';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 // Helper: Verify admin role
 async function verifyAdmin(req: NextRequest) {

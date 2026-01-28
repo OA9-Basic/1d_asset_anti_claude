@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
-import type { AssetListItem } from '@/types/assets';
 import {
   prismaDecimalToNumber,
-  addPrismaDecimals,
   multiplyPrismaDecimals,
   subtractPrismaDecimals,
 } from '@/lib/prisma-decimal';
+import type { AssetListItem } from '@/types/assets';
 
 export async function GET(req: NextRequest) {
   try {

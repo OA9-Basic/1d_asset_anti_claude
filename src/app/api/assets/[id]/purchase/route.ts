@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { checkUserAssetAccess } from '@/lib/asset-processing';
 import { getUserFromToken, generateSecureAccessKey } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { isPrismaDecimalLessThan, subtractPrismaDecimals } from '@/lib/prisma-decimal';
 import { distributeProfit } from '@/lib/profit-distribution';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
-import { isPrismaDecimalLessThan, subtractPrismaDecimals, prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 const purchaseSchema = z.object({
   amount: z
