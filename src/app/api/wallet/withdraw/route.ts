@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
 const withdrawalRequestSchema = z.object({
   amount: z
@@ -53,6 +54,18 @@ export async function POST(req: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting for withdrawals
+    const rateLimit = checkRateLimit(`withdrawal:${userId}`, RateLimitPresets.withdrawal);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many withdrawal requests',
+          resetTime: rateLimit.resetTime,
+        },
+        { status: 429 }
+      );
     }
 
     const body = await req.json();

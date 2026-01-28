@@ -130,4 +130,34 @@ export const RateLimitPresets = {
     limit: 20,
     windowMs: 15 * 60 * 1000, // 15 minutes
   },
+  /** Strict rate limit for wallet operations */
+  wallet: {
+    limit: 10,
+    windowMs: 60 * 1000, // 1 minute
+  },
+  /** Very strict rate limit for financial operations */
+  financial: {
+    limit: 5,
+    windowMs: 60 * 1000, // 1 minute
+  },
+  /** Moderate rate limit for asset purchases */
+  purchase: {
+    limit: 3,
+    windowMs: 60 * 1000, // 1 minute
+  },
+  /** Strict rate limit for contributions */
+  contribution: {
+    limit: 10,
+    windowMs: 60 * 1000, // 1 minute
+  },
+  /** Rate limit for withdrawals */
+  withdrawal: {
+    limit: 3,
+    windowMs: 60 * 60 * 1000, // 1 hour
+  },
+  /** Rate limit for deposits */
+  deposit: {
+    limit: 5,
+    windowMs: 60 * 60 * 1000, // 1 hour
+  },
 } as const;

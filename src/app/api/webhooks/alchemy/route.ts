@@ -3,7 +3,7 @@
  * Receives real-time deposit notifications from Alchemy
  */
 
-import { createHash } from 'crypto';
+import { createHmac } from 'crypto';
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -35,9 +35,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify signature (prevent replay attacks)
-    const expectedSignature = createHash('sha256')
-      .update(WEBHOOK_SECRET + body)
+    // Verify signature using HMAC-SHA256 (more secure than simple SHA256)
+    if (!WEBHOOK_SECRET) {
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 500 }
+      );
+    }
+
+    const expectedSignature = createHmac('sha256', WEBHOOK_SECRET)
+      .update(body)
       .digest('hex');
 
     if (signature !== expectedSignature) {

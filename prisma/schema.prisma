@@ -21,6 +21,8 @@ enum TransactionType {
   PROFIT_DISTRIBUTION
   ASSET_PURCHASE
   STORE_CREDIT_CONVERSION
+  GAP_LOAN_DISBURSEMENT
+  GAP_LOAN_REPAYMENT
 }
 
 enum TransactionStatus {
@@ -146,6 +148,7 @@ model User {
   withdrawals       WithdrawalRequest[]
   profitShares      ProfitShare[]
   depositOrders     DepositOrder[]
+  gapLoans          GapLoan[]
 
   @@index([role])
   @@index([isActive])
@@ -258,6 +261,7 @@ model Asset {
   profitShares          ProfitShare[]
   profitDistributions   ProfitDistribution[]
   request               AssetRequest?
+  gapLoans              GapLoan[]
 
   @@index([status])
   @@index([type])
@@ -335,6 +339,26 @@ model Contribution {
   @@index([userId])
   @@index([status])
   @@index([isInvestment])
+}
+
+model GapLoan {
+  id                String   @id @default(cuid())
+  userId            String
+  assetId           String
+  loanAmount        Float
+  repaidAmount      Float    @default(0)
+  remainingAmount   Float
+  status            String   @default("ACTIVE")
+  fullyRepaidAt     DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asset             Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, assetId])
+  @@index([assetId])
+  @@index([status])
 }
 
 model ProfitShare {

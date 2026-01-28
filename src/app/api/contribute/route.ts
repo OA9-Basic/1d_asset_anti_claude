@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { contributeToAsset } from '@/lib/contribution';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
 const contributeSchema = z.object({
   assetId: z.string().cuid(),
@@ -22,6 +23,18 @@ export async function POST(req: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting for contributions
+    const rateLimit = checkRateLimit(`contribution:${userId}`, RateLimitPresets.contribution);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many contribution attempts',
+          resetTime: rateLimit.resetTime,
+        },
+        { status: 429 }
+      );
     }
 
     const body = await req.json();

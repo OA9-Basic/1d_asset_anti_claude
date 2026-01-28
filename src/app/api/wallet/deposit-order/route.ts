@@ -11,6 +11,7 @@ import { NETWORKS, TOKEN_CONTRACTS, formatCryptoAmount as formatCryptoAmountAlch
 import { usdToCrypto } from '@/lib/blockchain/coingecko';
 import { deriveWalletWithPrivateKey, toChecksumAddress } from '@/lib/blockchain/hd-wallet';
 import { db } from '@/lib/db';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
 // ============================================================================
 // VALIDATION
@@ -41,6 +42,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Rate limiting for deposits
+    const rateLimit = checkRateLimit(`deposit:${session.user.id}`, RateLimitPresets.deposit);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many deposit requests',
+          resetTime: rateLimit.resetTime,
+        },
+        { status: 429 }
       );
     }
 

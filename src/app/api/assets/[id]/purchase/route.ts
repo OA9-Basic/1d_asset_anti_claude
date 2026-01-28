@@ -5,6 +5,7 @@ import { checkUserAssetAccess } from '@/lib/asset-processing';
 import { getUserFromToken, generateSecureAccessKey } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { distributeProfit } from '@/lib/profit-distribution';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
 const purchaseSchema = z.object({
   amount: z
@@ -28,6 +29,18 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting for purchases
+    const rateLimit = checkRateLimit(`purchase:${userId}`, RateLimitPresets.purchase);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many purchase attempts',
+          resetTime: rateLimit.resetTime,
+        },
+        { status: 429 }
+      );
     }
 
     const assetId = params.id;

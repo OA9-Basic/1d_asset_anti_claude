@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { CreateDepositOrder, DepositFlow } from '@/components/wallet';
+import { CreateDepositOrder, DepositFlow, type DepositOrder } from '@/components/wallet';
 
 // ============================================================================
 // DEPOSIT PAGE - Clean, Modern Design
@@ -13,10 +13,10 @@ import { CreateDepositOrder, DepositFlow } from '@/components/wallet';
 export default function DepositPage() {
   const router = useRouter();
   const [step, setStep] = useState<'create' | 'payment'>('create');
-  const [depositOrder, setDepositOrder] = useState<Record<string, unknown> | null>(null);
+  const [depositOrder, setDepositOrder] = useState<DepositOrder | null>(null);
 
   const handleDepositOrderCreated = (order: Record<string, unknown>) => {
-    setDepositOrder(order);
+    setDepositOrder(order as unknown as DepositOrder);
     setStep('payment');
   };
 
