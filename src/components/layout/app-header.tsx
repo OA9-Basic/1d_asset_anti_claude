@@ -17,12 +17,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import { staggerContainer, staggerItem, hoverScale } from '@/lib/animations';
+import { Decimal } from '@prisma/client/runtime/library';
 
 interface WalletBalance {
-  balance: number;
-  withdrawableBalance: number;
-  storeCredit: number;
+  balance: number | Decimal;
+  withdrawableBalance: number | Decimal;
+  storeCredit: number | Decimal;
 }
 
 interface BreadcrumbItem {
@@ -205,7 +207,7 @@ export function AppHeader() {
                     animate={{ scale: 1, opacity: 1 }}
                     className="text-sm font-semibold text-violet-700 dark:text-violet-300"
                   >
-                    ${walletBalance.balance.toFixed(2)}
+                    ${prismaDecimalToNumber(walletBalance.balance).toFixed(2)}
                   </motion.span>
                 </div>
               </motion.div>
