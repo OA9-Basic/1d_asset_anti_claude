@@ -1,3 +1,5 @@
+import { type Metadata } from 'next';
+
 import { ScrollProgressBar } from '@/components/animated/reveal-on-scroll';
 import { BentoGridFeatures } from '@/components/page/bento-features';
 import { CTASection } from '@/components/page/cta-section';
@@ -7,7 +9,11 @@ import { HeroSection } from '@/components/page/hero-section';
 import { HowItWorks } from '@/components/page/how-it-works';
 import { LiveStats } from '@/components/page/live-stats';
 
-export { metadata } from '../metadata';
+export const metadata: Metadata = {
+  title: 'Digital Assets - Community-Powered Asset Marketplace',
+  description:
+    'Pool resources with others to purchase premium courses, software, and digital products. Contribute any amount — when funded, everyone gets permanent access.',
+};
 
 // =============================================================================
 // SERVER-SIDE DATA FETCHING
