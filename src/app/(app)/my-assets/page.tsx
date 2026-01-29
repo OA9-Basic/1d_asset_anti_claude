@@ -29,6 +29,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { buttonTap, hoverLift, staggerContainer, staggerItem } from '@/lib/animations';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -279,7 +280,7 @@ function MyAssetCard({ asset }: { asset: Asset }) {
                   animate={{ scale: 1 }}
                   className="font-bold text-lg text-gradient"
                 >
-                  ${asset.userContribution.toFixed(2)}
+                  ${prismaDecimalToNumber(asset.userContribution).toFixed(2)}
                 </motion.span>
               </div>
               <div className="flex items-center justify-between text-sm">
@@ -315,7 +316,7 @@ function MyAssetCard({ asset }: { asset: Asset }) {
                     Funded & Available!
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    You contributed ${asset.userContribution.toFixed(2)}
+                    You contributed ${prismaDecimalToNumber(asset.userContribution).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -495,7 +496,7 @@ export default function MyAssetsPage() {
                   <StatCard
                     icon={DollarSign}
                     title="Total Invested"
-                    value={`$${assetsData.stats.totalInvested.toFixed(2)}`}
+                    value={`$${prismaDecimalToNumber(assetsData.stats.totalInvested).toFixed(2)}`}
                     description="Lifetime contributions"
                     delay={0}
                   />

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Spinner } from '@/components/ui/spinner';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 type AssetCardAsset = Omit<Asset, 'contributions' | 'assetPurchases' | 'profitShares' | 'request'> | {
   id: string;
@@ -261,7 +262,7 @@ export const AssetCard = memo(function AssetCard({ asset }: AssetCardProps) {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Raised</span>
                 <span className="font-bold text-lg text-gradient">
-                  ${asset.currentCollected.toFixed(0)}
+                  ${prismaDecimalToNumber(asset.currentCollected).toFixed(0)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
