@@ -47,10 +47,12 @@ const createAssetSchema = z.object({
     ['COURSE', 'AI_MODEL', 'SAAS', 'SOFTWARE', 'TEMPLATE', 'CODE', 'MODEL_3D', 'EBOOK', 'OTHER'],
     {
       required_error: 'Please select an asset type',
+      invalid_type_error: 'Please select an asset type',
     }
   ),
   deliveryType: z.enum(['DOWNLOAD', 'STREAM', 'EXTERNAL', 'HYBRID'], {
     required_error: 'Please select a delivery type',
+    invalid_type_error: 'Please select a delivery type',
   }),
   thumbnail: z.string().optional(),
   sourceUrl: z.string().optional(),
@@ -403,7 +405,7 @@ export default function CreateAssetPage() {
                                 <FormLabel className="text-sm font-medium">Asset Type *</FormLabel>
                                 <Select
                                   onValueChange={field.onChange}
-                                  value={field.value}
+                                  value={field.value || ''}
                                   disabled={isSubmitting}
                                 >
                                   <FormControl>
@@ -439,7 +441,7 @@ export default function CreateAssetPage() {
                                 </FormLabel>
                                 <Select
                                   onValueChange={field.onChange}
-                                  value={field.value}
+                                  value={field.value || ''}
                                   disabled={isSubmitting}
                                 >
                                   <FormControl>
