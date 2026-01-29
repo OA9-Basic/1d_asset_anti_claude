@@ -30,6 +30,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import {
   buttonTap,
   hoverLift,
@@ -254,7 +255,7 @@ function StatCard({
                     if (active && payload && payload.length) {
                       return (
                         <div className="bg-background border rounded-lg px-2 py-1 shadow-lg">
-                          <p className="text-sm font-medium">{payload[0].value.toFixed(0)}</p>
+                          <p className="text-sm font-medium">{prismaDecimalToNumber(payload[0].value).toFixed(0)}</p>
                         </div>
                       );
                     }
@@ -303,7 +304,7 @@ function ActivityItem({ item, index }: { item: ActivityItem; index: number }) {
             transition={{ delay: index * 0.05 + 0.2 }}
             className="font-semibold text-primary"
           >
-            ${item.amount.toFixed(0)}
+            ${prismaDecimalToNumber(item.amount).toFixed(0)}
           </motion.span>
           <span className="text-muted-foreground"> to </span>
           <span className="font-medium">{item.asset.title}</span>
@@ -380,7 +381,7 @@ function MiniAssetCard({ asset }: { asset: Asset }) {
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">{progressPercent.toFixed(0)}% funded</span>
-                <span className="font-medium">${asset.currentCollected.toFixed(0)}</span>
+                <span className="font-medium">${prismaDecimalToNumber(asset.currentCollected).toFixed(0)}</span>
               </div>
               <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                 <div
@@ -549,7 +550,7 @@ export default function DashboardPage() {
               <StatCard
                 icon={Wallet}
                 title="Total Contributed"
-                value={`$${dashboardData?.stats.totalContributed.toFixed(0) || 0}`}
+                value={`$${prismaDecimalToNumber(dashboardData?.stats.totalContributed).toFixed(0) || '0'}`}
                 description="Lifetime contributions"
                 trend="up"
                 trendValue="+12%"
@@ -575,7 +576,7 @@ export default function DashboardPage() {
               <StatCard
                 icon={TrendingUp}
                 title="Wallet Balance"
-                value={`$${dashboardData?.stats.walletBalance.toFixed(2) || 0}`}
+                value={`$${prismaDecimalToNumber(dashboardData?.stats.walletBalance).toFixed(2) || '0'}`}
                 description="Available to spend"
                 trend="up"
                 trendValue="+5%"
@@ -785,7 +786,7 @@ export default function DashboardPage() {
                                 {contribution.asset.title}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                ${contribution.amount.toFixed(0)} contributed
+                                ${prismaDecimalToNumber(contribution.amount).toFixed(0)} contributed
                               </p>
                             </div>
                             <Badge variant="outline" className="text-xs shrink-0">
@@ -834,19 +835,19 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Available Balance</span>
                       <span className="font-semibold">
-                        ${dashboardData.stats.walletBalance.toFixed(2)}
+                        ${prismaDecimalToNumber(dashboardData.stats.walletBalance).toFixed(2)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Withdrawable</span>
                       <span className="font-semibold text-green-600">
-                        ${dashboardData.stats.withdrawableBalance.toFixed(2)}
+                        ${prismaDecimalToNumber(dashboardData.stats.withdrawableBalance).toFixed(2)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Store Credit</span>
                       <span className="font-semibold text-purple-600">
-                        ${dashboardData.stats.storeCredit.toFixed(2)}
+                        ${prismaDecimalToNumber(dashboardData.stats.storeCredit).toFixed(2)}
                       </span>
                     </div>
                     <Link href="/wallet/deposit">

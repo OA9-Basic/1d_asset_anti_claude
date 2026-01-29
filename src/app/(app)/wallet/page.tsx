@@ -48,6 +48,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -326,7 +327,7 @@ export default function WalletPage() {
                     <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
                     <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData?.balance.toFixed(2) || '0.00'}
+                      ${balanceData ? prismaDecimalToNumber(balanceData.balance).toFixed(2) : '0.00'}
                     </p>
                   )}
                 </CardContent>
@@ -345,7 +346,7 @@ export default function WalletPage() {
                     <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
                     <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
+                      ${balanceData ? prismaDecimalToNumber(balanceData.withdrawableBalance).toFixed(2) : '0.00'}
                     </p>
                   )}
                 </CardContent>
@@ -364,7 +365,7 @@ export default function WalletPage() {
                     <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
                     <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData?.storeCredit.toFixed(2) || '0.00'}
+                      ${balanceData ? prismaDecimalToNumber(balanceData.storeCredit).toFixed(2) : '0.00'}
                     </p>
                   )}
                 </CardContent>
@@ -383,7 +384,7 @@ export default function WalletPage() {
                     <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
                   ) : (
                     <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData?.totalDeposited.toFixed(2) || '0.00'}
+                      ${balanceData ? prismaDecimalToNumber(balanceData.totalDeposited).toFixed(2) : '0.00'}
                     </p>
                   )}
                 </CardContent>
@@ -524,7 +525,7 @@ export default function WalletPage() {
                                 transaction.type === 'CONTRIBUTION_REFUND'
                                   ? '+'
                                   : ''}
-                                ${transaction.amount.toFixed(2)}
+                                ${prismaDecimalToNumber(transaction.amount).toFixed(2)}
                               </span>
                             </TableCell>
                             <TableCell className="text-center">
@@ -576,7 +577,7 @@ export default function WalletPage() {
                 className="border-neutral-200 dark:border-neutral-800"
               />
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                Available: ${balanceData?.withdrawableBalance.toFixed(2) || '0.00'}
+                Available: ${balanceData ? prismaDecimalToNumber(balanceData.withdrawableBalance).toFixed(2) : '0.00'}
               </p>
             </div>
             <div className="space-y-2">
