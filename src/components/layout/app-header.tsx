@@ -202,7 +202,7 @@ export function AppHeader() {
                 <div className="flex flex-col">
                   <span className="text-xs text-muted-foreground">Balance</span>
                   <motion.span
-                    key={walletBalance.balance}
+                    key={prismaDecimalToNumber(walletBalance.balance).toString()}
                     initial={{ scale: 1.2, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="text-sm font-semibold text-violet-700 dark:text-violet-300"
