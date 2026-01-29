@@ -693,16 +693,15 @@ export default function CreateAssetPage() {
                       Back
                     </Button>
                   ) : (
-                    <Link href="/" className="flex-1">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        disabled={isSubmitting}
-                        className="w-full h-11"
-                      >
-                        Cancel
-                      </Button>
-                    </Link>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={isSubmitting}
+                      className="flex-1 h-11"
+                      onClick={() => router.push('/')}
+                    >
+                      Cancel
+                    </Button>
                   )}
 
                   <Button

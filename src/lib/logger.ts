@@ -14,13 +14,6 @@ const logLevel = process.env.LOG_LEVEL || (isDevelopment ? 'debug' : 'info');
 
 export const logger = pino({
   level: logLevel,
-  // In development, use pretty print for readability
-  // Note: Using prettyPrint directly to avoid worker thread issues
-  prettyPrint: isDevelopment,
-  colorize: isDevelopment,
-  translateTime: 'SYS:standard',
-  ignore: isDevelopment ? 'pid,hostname' : undefined,
-  singleLine: !isDevelopment,
   // Add default context fields
   base: {
     env: process.env.NODE_ENV || 'development',
