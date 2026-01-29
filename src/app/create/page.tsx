@@ -52,8 +52,8 @@ const createAssetSchema = z.object({
   deliveryType: z.enum(['DOWNLOAD', 'STREAM', 'EXTERNAL', 'HYBRID'], {
     required_error: 'Please select a delivery type',
   }),
-  thumbnail: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  sourceUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  thumbnail: z.string().optional(),
+  sourceUrl: z.string().optional(),
   targetPrice: z
     .number()
     .min(1, 'Price must be at least $1')
@@ -150,13 +150,20 @@ export default function CreateAssetPage() {
   const handleNext = async () => {
     const fieldsToValidate =
       currentStep === 1
-        ? ['title', 'description', 'type', 'deliveryType', 'thumbnail', 'sourceUrl']
+        ? ['title', 'description', 'type', 'deliveryType']
         : ['targetPrice'];
 
-    const isValid = await form.trigger(fieldsToValidate as Array<'title' | 'description' | 'type' | 'deliveryType' | 'thumbnail' | 'sourceUrl' | 'targetPrice'>);
+    const isValid = await form.trigger(fieldsToValidate as Array<'title' | 'description' | 'type' | 'deliveryType' | 'targetPrice'>);
     if (isValid) {
       setDirection(1);
       setCurrentStep((prev) => Math.min(prev + 1, 3));
+    } else {
+      // Show errors for current step
+      if (currentStep === 1) {
+        form.trigger(['title', 'description', 'type', 'deliveryType']);
+      } else {
+        form.trigger(['targetPrice']);
+      }
     }
   };
 
