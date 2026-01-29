@@ -41,6 +41,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -679,13 +680,13 @@ export default function AssetDetailPage() {
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Platform Fee</p>
                         <p className="font-semibold text-lg">
-                          {(asset.platformFee * 100).toFixed(0)}%
+                          {(prismaDecimalToNumber(asset.platformFee) * 100).toFixed(0)}%
                         </p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm text-muted-foreground">Total Revenue</p>
                         <p className="font-semibold text-lg text-green-600">
-                          ${asset.totalRevenue.toFixed(2)}
+                          ${prismaDecimalToNumber(asset.totalRevenue).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -828,21 +829,21 @@ export default function AssetDetailPage() {
                                           </div>
                                         </TableCell>
                                         <TableCell className="text-right font-medium">
-                                          ${c.amount.toFixed(2)}
+                                          ${prismaDecimalToNumber(c.amount).toFixed(2)}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                          {c.excessAmount > 0 ? (
+                                          {prismaDecimalToNumber(c.excessAmount) > 0 ? (
                                             <span className="text-blue-600 font-medium">
-                                              ${c.excessAmount.toFixed(2)}
+                                              ${prismaDecimalToNumber(c.excessAmount).toFixed(2)}
                                             </span>
                                           ) : (
                                             <span className="text-muted-foreground">-</span>
                                           )}
                                         </TableCell>
                                         <TableCell className="text-right">
-                                          {c.totalProfitReceived > 0 ? (
+                                          {prismaDecimalToNumber(c.totalProfitReceived) > 0 ? (
                                             <span className="text-green-600 font-medium">
-                                              ${c.totalProfitReceived.toFixed(2)}
+                                              ${prismaDecimalToNumber(c.totalProfitReceived).toFixed(2)}
                                             </span>
                                           ) : (
                                             <span className="text-muted-foreground">-</span>
@@ -895,7 +896,7 @@ export default function AssetDetailPage() {
                                           </div>
                                         </TableCell>
                                         <TableCell className="text-right font-medium">
-                                          ${p.purchaseAmount.toFixed(2)}
+                                          ${prismaDecimalToNumber(p.purchaseAmount).toFixed(2)}
                                         </TableCell>
                                         <TableCell className="text-right text-muted-foreground">
                                           {new Date(p.createdAt).toLocaleDateString()}
@@ -944,7 +945,7 @@ export default function AssetDetailPage() {
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">
-                            ${asset.currentCollected.toFixed(2)} collected
+                            ${prismaDecimalToNumber(asset.currentCollected).toFixed(2)} collected
                           </span>
                           <span className="font-semibold">{progressPercent.toFixed(0)}%</span>
                         </div>
@@ -1070,13 +1071,13 @@ export default function AssetDetailPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">Invested Amount</p>
                         <p className="text-2xl font-bold text-blue-600">
-                          ${userContribution.excessAmount.toFixed(2)}
+                          ${prismaDecimalToNumber(userContribution.excessAmount).toFixed(2)}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Profit Received</p>
                         <p className="text-xl font-semibold text-green-600">
-                          ${userContribution.totalProfitReceived.toFixed(2)}
+                          ${prismaDecimalToNumber(userContribution.totalProfitReceived).toFixed(2)}
                         </p>
                       </div>
                       <div>
@@ -1084,7 +1085,7 @@ export default function AssetDetailPage() {
                         <p className="text-lg font-medium">
                           $
                           {(
-                            userContribution.excessAmount - userContribution.totalProfitReceived
+                            prismaDecimalToNumber(userContribution.excessAmount) - prismaDecimalToNumber(userContribution.totalProfitReceived)
                           ).toFixed(2)}
                         </p>
                       </div>
@@ -1127,7 +1128,7 @@ export default function AssetDetailPage() {
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-green-600" />
                         <span className="font-semibold text-green-600">
-                          ${asset.totalRevenue.toFixed(2)}
+                          ${prismaDecimalToNumber(asset.totalRevenue).toFixed(2)}
                         </span>
                       </div>
                     </div>

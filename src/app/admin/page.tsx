@@ -48,6 +48,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { buttonTap, hoverLift, staggerContainer, staggerItem } from '@/lib/animations';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import type { IconType } from '@/types/ui';
 
 interface DashboardStats {
@@ -495,7 +496,7 @@ export default function AdminDashboardPage() {
             <StatCard
               icon={DollarSign}
               title="Total Revenue"
-              value={`$${stats.totalRevenue.toFixed(2)}`}
+              value={`$${prismaDecimalToNumber(stats.totalRevenue).toFixed(2)}`}
               description="Lifetime revenue"
               delay={0.2}
             />
@@ -555,7 +556,7 @@ export default function AdminDashboardPage() {
                             <p className="text-xs text-muted-foreground">{request.user.email}</p>
                           </TableCell>
                           <TableCell>{request.type}</TableCell>
-                          <TableCell>${request.estimatedPrice.toFixed(2)}</TableCell>
+                          <TableCell>${prismaDecimalToNumber(request.estimatedPrice).toFixed(2)}</TableCell>
                           <TableCell>
                             <span
                               className={request.score >= 0 ? 'text-green-600' : 'text-red-600'}
@@ -664,7 +665,7 @@ export default function AdminDashboardPage() {
                             <p className="text-xs text-muted-foreground">{withdrawal.user.email}</p>
                           </TableCell>
                           <TableCell className="font-medium">
-                            ${withdrawal.amount.toFixed(2)}
+                            ${prismaDecimalToNumber(withdrawal.amount).toFixed(2)}
                           </TableCell>
                           <TableCell>{withdrawal.cryptoCurrency}</TableCell>
                           <TableCell className="text-sm font-mono">
@@ -775,16 +776,16 @@ export default function AdminDashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell>{asset.type}</TableCell>
-                            <TableCell>${asset.targetPrice.toFixed(2)}</TableCell>
+                            <TableCell>${prismaDecimalToNumber(asset.targetPrice).toFixed(2)}</TableCell>
                             <TableCell>
                               <span
                                 className={
-                                  asset.currentCollected >= asset.targetPrice
+                                  prismaDecimalToNumber(asset.currentCollected) >= prismaDecimalToNumber(asset.targetPrice)
                                     ? 'text-green-600 font-medium'
                                     : ''
                                 }
                               >
-                                ${asset.currentCollected.toFixed(2)}
+                                ${prismaDecimalToNumber(asset.currentCollected).toFixed(2)}
                               </span>
                             </TableCell>
                             <TableCell>{asset.contributorCount}</TableCell>
@@ -975,10 +976,10 @@ export default function AdminDashboardPage() {
                 <strong>Asset:</strong> {selectedAsset?.title}
               </p>
               <p>
-                <strong>Target Price:</strong> ${selectedAsset?.targetPrice.toFixed(2)}
+                <strong>Target Price:</strong> ${selectedAsset ? prismaDecimalToNumber(selectedAsset.targetPrice).toFixed(2) : '0.00'}
               </p>
               <p>
-                <strong>Collected:</strong> ${selectedAsset?.currentCollected.toFixed(2)}
+                <strong>Collected:</strong> ${selectedAsset ? prismaDecimalToNumber(selectedAsset.currentCollected).toFixed(2) : '0.00'}
               </p>
               <p className="text-muted-foreground">
                 Contributors will receive access to the asset. Any excess contributions will be
