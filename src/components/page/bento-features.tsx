@@ -11,11 +11,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { Card } from '@/components/ui/card';
-
 /**
  * Premium Bento Grid Features Component
- * Tier-1 Fintech aesthetic: minimal, data-driven, professional
+ * Glass design with minimal borders for visual depth
  */
 
 interface BentoGridFeaturesProps {
@@ -134,18 +132,19 @@ const itemVariants = {
 };
 
 export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
-  // Use real stats if available, otherwise show "Growing" placeholder
   const _userCount = stats && stats.users > 0 ? formatNumber(stats.users) : 'Growing';
   const _assetCount = stats && stats.fundedAssets > 0 ? formatNumber(stats.fundedAssets) : 'Growing';
   const _volumeCount = stats && stats.totalCollected > 0 ? `$${formatNumber(stats.totalCollected)}` : 'Growing';
 
   return (
     <section className="relative py-24 overflow-hidden">
-      {/* Clean background - no gradient orbs */}
+      {/* Subtle background */}
       <div className="absolute inset-0 bg-white dark:bg-black" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-100/50 via-white to-white opacity-100 dark:opacity-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-950/20 via-black to-black opacity-0 dark:opacity-100" />
 
       <div className="container mx-auto px-6 relative z-10">
-        {/* Section Header - Clean, minimal */}
+        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -153,7 +152,7 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6 text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tighter mb-6 text-zinc-900 dark:text-zinc-100">
             Why Crowd-Fund Digital Assets?
           </h2>
 
@@ -162,11 +161,11 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
             giving everyone the power to unlock extraordinary value together.
           </p>
 
-          {/* Simple divider instead of bouncing animation */}
-          <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800" />
+          {/* Simple divider */}
+          <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800/50" />
         </motion.div>
 
-        {/* Premium Bento Grid */}
+        {/* Premium Bento Grid with Glass Design */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -186,32 +185,33 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
                 whileHover={{ y: -4 }}
                 transition={{ type: 'spring' as const, stiffness: 300, damping: 25 }}
               >
-                <Card
-                  className={`group relative h-full overflow-hidden border-zinc-200 dark:border-zinc-800
-                    bg-zinc-50/50 dark:bg-zinc-900/40
-                    hover:border-zinc-300 dark:hover:border-zinc-700
+                <div
+                  className={`group relative h-full overflow-hidden rounded-2xl
+                    bg-zinc-100/50 dark:bg-zinc-900/30 backdrop-blur-sm
+                    hover:bg-zinc-200/60 dark:hover:bg-zinc-800/40
+                    hover:ring-1 hover:ring-violet-500/20
                     transition-all duration-300
-                    ${isLarge ? 'p-6 rounded-lg' : 'p-5 rounded-lg'}`}
+                    ${isLarge ? 'p-6' : 'p-5'}`}
                 >
                   {/* Content */}
                   <div className="relative z-10 h-full flex flex-col">
-                    {/* Floating Icon - No background box */}
+                    {/* Floating Icon */}
                     <div className={`mb-4 ${isLarge ? 'h-12' : 'h-10'}`}>
                       <Icon
-                        className="text-zinc-400 dark:text-zinc-600"
+                        className="text-zinc-500 dark:text-zinc-600"
                         strokeWidth={1.5}
                         style={{ width: isLarge ? '36px' : '28px', height: isLarge ? '36px' : '28px' }}
                       />
                     </div>
 
-                    {/* Badge/Highlight - Neutral styling */}
+                    {/* Badge/Highlight */}
                     {'badge' in feature && feature.badge && (
                       <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.3 }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium mb-3 w-fit"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-200/80 dark:bg-zinc-800/50 backdrop-blur-sm text-zinc-700 dark:text-zinc-300 text-xs font-medium mb-3 w-fit"
                       >
                         {feature.badge}
                       </motion.div>
@@ -223,7 +223,7 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.3 }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium mb-3 w-fit"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-200/80 dark:bg-zinc-800/50 backdrop-blur-sm text-zinc-700 dark:text-zinc-300 text-xs font-medium mb-3 w-fit"
                       >
                         {feature.highlight}
                       </motion.div>
@@ -243,7 +243,7 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
 
                     {/* Title */}
                     <h3
-                      className={`font-semibold mb-2 text-zinc-900 dark:text-zinc-100
+                      className={`font-bold mb-2 text-zinc-900 dark:text-zinc-100
                         ${isLarge ? 'text-xl' : 'text-lg'}`}
                     >
                       {feature.title}
@@ -256,17 +256,17 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.4 }}
-                        className="mb-3 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700"
+                        className="mb-3 p-3 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/40 backdrop-blur-sm"
                       >
                         <div className="flex items-baseline gap-2 mb-0.5">
-                          <span className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{feature.stats.value}</span>
+                          <span className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{feature.stats.value}</span>
                           <span className="text-sm text-zinc-600 dark:text-zinc-400">{feature.stats.label}</span>
                         </div>
                         <p className="text-xs text-zinc-500 dark:text-zinc-500">{feature.stats.insight}</p>
                       </motion.div>
                     )}
 
-                    {/* Milestones for vertical cards - Neutral styling */}
+                    {/* Milestones for vertical cards */}
                     {'milestones' in feature && feature.milestones && (
                       <div className="mb-3 space-y-2">
                         {feature.milestones.map((milestone, i) => (
@@ -276,14 +276,14 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.4 + i * 0.1 }}
-                            className="flex items-center gap-3 p-2.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50"
+                            className="flex items-center gap-3 p-2.5 rounded-xl bg-zinc-200/60 dark:bg-zinc-800/40 backdrop-blur-sm"
                           >
-                            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-zinc-600 dark:text-zinc-400 text-xs font-semibold">
+                            <div className="w-8 h-8 rounded-full bg-zinc-300/80 dark:bg-zinc-700/50 flex items-center justify-center text-zinc-700 dark:text-zinc-400 text-xs font-bold">
                               {i + 1}
                             </div>
                             <div className="flex-1">
-                              <p className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{milestone.number}</p>
-                              <p className="text-xs text-zinc-500">{milestone.label}</p>
+                              <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">{milestone.number}</p>
+                              <p className="text-xs text-zinc-500 dark:text-zinc-400">{milestone.label}</p>
                             </div>
                           </motion.div>
                         ))}
@@ -295,23 +295,23 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
                       {feature.description}
                     </p>
 
-                    {/* CTA for rewards card - Neutral styling */}
+                    {/* CTA for rewards card */}
                     {'cta' in feature && feature.cta && (
                       <Link href={feature.cta.href}>
-                        <button className="group/btn w-full justify-between px-4 py-3 h-auto rounded-lg border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all flex items-center text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        <button className="group/btn w-full justify-between px-4 py-3 h-auto rounded-xl bg-zinc-200/60 dark:bg-zinc-800/40 hover:bg-zinc-300/60 dark:hover:bg-zinc-700/50 backdrop-blur-sm transition-all flex items-center text-sm font-medium text-zinc-900 dark:text-zinc-100">
                           <span>{feature.cta.text}</span>
                           <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" strokeWidth={1.5} />
                         </button>
                       </Link>
                     )}
                   </div>
-                </Card>
+                </div>
               </motion.div>
             );
           })}
         </motion.div>
 
-        {/* Bottom CTA - Refined neutral styling */}
+        {/* Bottom CTA - High contrast button */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -320,7 +320,7 @@ export function BentoGridFeatures({ stats }: BentoGridFeaturesProps = {}) {
           className="mt-16 text-center"
         >
           <Link href="/marketplace">
-            <button className="h-12 px-8 text-base font-semibold bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center gap-2 mx-auto">
+            <button className="h-12 px-8 text-base font-semibold bg-black text-white dark:bg-white dark:text-black rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all flex items-center gap-2 mx-auto shadow-[0_0_20px_-5px_rgba(0,0,0,0.2)] dark:shadow-[0_0_20px_-5px_rgba(255,255,255,0.2)]">
               Explore All Assets
               <ArrowRight className="w-5 h-5" strokeWidth={1.5} />
             </button>
