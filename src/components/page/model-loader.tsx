@@ -75,11 +75,8 @@ export function ModelLoader({
     const loader = new GLTFLoader();
     let model: THREE.Group | null = null;
 
-    // Construct full URL for the model
-    const fullUrl = window.location.origin + modelPath;
-
     loader.load(
-      fullUrl,
+      modelPath,
       (gltf) => {
         model = gltf.scene;
         model.scale.setScalar(scale);
