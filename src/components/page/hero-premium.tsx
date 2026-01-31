@@ -201,7 +201,7 @@ function CampaignCardMini({ campaign, delay }: { campaign: CampaignCard; delay: 
   const progress = (campaign.raisedAmount / campaign.goalAmount) * 100;
 
   return (
-    <TiltCard delay={delay} tiltAmount={8}>
+    <TiltCard tiltAmount={8}>
       <Link href={`/assets/${campaign.id}`}>
         <Card className="p-6 border-neutral-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-300 cursor-pointer group h-full">
           <div className="flex items-center justify-between mb-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useHover } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 
@@ -36,7 +36,7 @@ const mockContributions: Contribution[] = [
 export function InfiniteMarquee() {
   const [contributions, setContributions] = useState<Contribution[]>([...mockContributions]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const isHovered = useHover(containerRef);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Simulate live updates
   useEffect(() => {
@@ -85,6 +85,8 @@ export function InfiniteMarquee() {
         <motion.div
           ref={containerRef}
           className="relative"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           {/* Fade effect on left */}
           <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />

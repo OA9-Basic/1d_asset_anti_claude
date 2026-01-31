@@ -42,7 +42,7 @@ const mobileMenuVariants = {
     y: '-100%',
     opacity: 0,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 30,
     },
@@ -51,7 +51,7 @@ const mobileMenuVariants = {
     y: 0,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 30,
       staggerChildren: 0.05,
@@ -65,7 +65,7 @@ const mobileItemVariants = {
     x: -20,
     opacity: 0,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 30,
     },
@@ -74,7 +74,7 @@ const mobileItemVariants = {
     x: 0,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 30,
     },
