@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -76,8 +75,11 @@ export function ModelLoader({
     const loader = new GLTFLoader();
     let model: THREE.Group | null = null;
 
+    // Construct full URL for the model
+    const fullUrl = window.location.origin + modelPath;
+
     loader.load(
-      modelPath,
+      fullUrl,
       (gltf) => {
         model = gltf.scene;
         model.scale.setScalar(scale);
@@ -87,6 +89,7 @@ export function ModelLoader({
       },
       undefined,
       (err) => {
+        // eslint-disable-next-line no-console
         console.error('Error loading 3D model:', err);
         setError('Failed to load 3D model');
         setLoading(false);

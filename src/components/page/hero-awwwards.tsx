@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { ArrowRight, Box, Users, Zap, Sparkles } from 'lucide-react';
+import { ArrowRight, Box, Sparkles, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { ModelLoader } from '@/components/page/model-loader';
 import { Parallax, ScrollReveal, TextReveal } from '@/components/animated/gsap-scroll-reveal';
+import { ModelLoader } from '@/components/page/model-loader';
+import { Button } from '@/components/ui/button';
 
 /**
  * Awwwards-style Hero Section with 3D Model

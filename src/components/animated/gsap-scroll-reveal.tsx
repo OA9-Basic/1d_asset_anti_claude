@@ -1,5 +1,6 @@
 'use client';
 
+// eslint-disable-next-line import/no-named-as-default
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useRef } from 'react';
