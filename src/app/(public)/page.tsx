@@ -6,7 +6,7 @@ import { BentoGridFeatures } from '@/components/page/bento-features';
 import { CTASection } from '@/components/page/cta-section';
 import { Footer } from '@/components/page/footer';
 import { Header } from '@/components/page/header';
-import { HeroSection } from '@/components/page/hero-section';
+import { HeroAwwwards } from '@/components/page/hero-awwwards';
 import { HowItWorks } from '@/components/page/how-it-works';
 import { LiveStats } from '@/components/page/live-stats';
 
@@ -129,7 +129,7 @@ export default async function HomePage() {
       <ScrollProgressBar />
 
       <main className="min-h-screen">
-        <HeroSection featuredCampaign={featuredCampaign} />
+        <HeroAwwwards featuredCampaign={featuredCampaign} />
         <LiveStats stats={stats} />
         <BentoGridFeatures />
         <HowItWorks />
