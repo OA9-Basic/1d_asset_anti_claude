@@ -2,12 +2,13 @@
 import { type Metadata } from 'next';
 
 import { ScrollProgressBar } from '@/components/animated/reveal-on-scroll';
-import { BentoGridFeatures } from '@/components/page/bento-features';
 import { CTASection } from '@/components/page/cta-section';
+import { FeaturesModern } from '@/components/page/features-modern';
 import { Footer } from '@/components/page/footer';
 import { Header } from '@/components/page/header';
-import { HeroAwwwards } from '@/components/page/hero-awwwards';
+import { HeroPremium } from '@/components/page/hero-premium';
 import { HowItWorks } from '@/components/page/how-it-works';
+import { InfiniteMarquee } from '@/components/page/infinite-marquee';
 import { LiveStats } from '@/components/page/live-stats';
 
 export const metadata: Metadata = {
@@ -129,9 +130,10 @@ export default async function HomePage() {
       <ScrollProgressBar />
 
       <main className="min-h-screen">
-        <HeroAwwwards featuredCampaign={featuredCampaign} />
+        <HeroPremium featuredCampaign={featuredCampaign} />
+        <InfiniteMarquee />
         <LiveStats stats={stats} />
-        <BentoGridFeatures />
+        <FeaturesModern />
         <HowItWorks />
         <CTASection />
       </main>
