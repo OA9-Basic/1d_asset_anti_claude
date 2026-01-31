@@ -5,20 +5,31 @@ import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Unified Card Variants
+ * Unified Card Variants - Premium Dark Theme
  * Consistent card styling based on Wallet page design
  */
 const cardVariants = cva(
-  'rounded-xl bg-card text-card-foreground transition-all duration-300',
+  'rounded-xl transition-all duration-300',
   {
     variants: {
       variant: {
-        default: 'border border-neutral-200 dark:border-neutral-800',
-        elevated: 'border-2 border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md',
-        outlined: 'border-2 border-neutral-200 dark:border-neutral-800',
+        // Default: Subtle border, no shadow
+        default:
+          'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 hover:border-zinc-300 dark:hover:border-zinc-700',
+        // Elevated: Subtle shadow
+        elevated:
+          'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700',
+        // Outlined: More prominent border
+        outlined:
+          'border-2 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50',
+        // Ghost: No border or background
         ghost: 'border-0 bg-transparent',
-        elevatedHover:
-          'border-2 border-neutral-200 dark:border-neutral-800 hover:border-neutral-900 dark:hover:border-white shadow-sm hover:shadow-md',
+        // Glass: Glassmorphism effect
+        glass:
+          'border border-zinc-200/50 dark:border-zinc-800/50 bg-white/80 dark:bg-zinc-900/50 backdrop-blur-md',
+        // Premium: Special variant with glow
+        premium:
+          'border border-violet-200 dark:border-violet-900/50 bg-white dark:bg-zinc-950/50 shadow-lg shadow-violet-500/10 hover:shadow-xl hover:shadow-violet-500/20',
       },
       padding: {
         none: 'p-0',
@@ -28,8 +39,9 @@ const cardVariants = cva(
       },
       animate: {
         none: '',
-        fadeIn: 'animate-in fade-in slide-in-from-bottom-4 duration-500',
-        scale: 'hover:scale-[1.02]',
+        fadeIn: 'fade-enter',
+        scale: 'hover:scale-[1.01] active:scale-[0.99]',
+        lift: 'hover-lift-premium',
       },
     },
     defaultVariants: {
@@ -52,9 +64,10 @@ export interface UnifiedCardProps
  * Premium card component with consistent styling inspired by Wallet pages.
  * Features:
  * - Multiple variants for different use cases
- * - Consistent border colors and shadows
- * - Smooth hover animations
+ * - Consistent border colors (zinc-200/zinc-800)
+ * - Smooth hover animations with border transitions
  * - Optional padding presets
+ * - Glassmorphism variant
  */
 export const UnifiedCard = forwardRef<HTMLDivElement, UnifiedCardProps>(
   ({ className, variant, padding, animate, asChild = false, ...props }, ref) => {
@@ -85,7 +98,7 @@ export const CardHeader = forwardRef<
       ref={ref}
       className={cn(
         'flex flex-col space-y-1.5',
-        bordered && 'pb-4 border-b border-neutral-200 dark:border-neutral-800/50',
+        bordered && 'pb-4 mb-4 border-b border-zinc-200 dark:border-zinc-800',
         className
       )}
       {...props}
@@ -98,7 +111,7 @@ CardHeader.displayName = 'CardHeader';
 /**
  * CardTitle Component
  *
- * Consistent card title styling
+ * Consistent card title styling with tight tracking
  */
 export const CardTitle = forwardRef<
   HTMLHeadingElement,
@@ -108,7 +121,7 @@ export const CardTitle = forwardRef<
     <h3
       ref={ref}
       className={cn(
-        'text-lg font-semibold text-neutral-900 dark:text-white leading-none tracking-tight',
+        'text-lg font-semibold text-zinc-900 dark:text-zinc-50 leading-none tracking-tight-premium',
         className
       )}
       {...props}
@@ -132,7 +145,7 @@ export const CardDescription = forwardRef<
   return (
     <p
       ref={ref}
-      className={cn('text-sm text-neutral-500 dark:text-neutral-400', className)}
+      className={cn('text-sm text-zinc-500 dark:text-zinc-400', className)}
       {...props}
     />
   );
@@ -157,7 +170,7 @@ CardContent.displayName = 'CardContent';
 /**
  * CardFooter Component
  *
- * Consistent card footer area
+ * Consistent card footer area with top border
  */
 export const CardFooter = forwardRef<
   HTMLDivElement,
@@ -166,7 +179,10 @@ export const CardFooter = forwardRef<
   return (
     <div
       ref={ref}
-      className={cn('flex items-center pt-4 mt-4 border-t border-neutral-200 dark:border-neutral-800/50', className)}
+      className={cn(
+        'flex items-center pt-4 mt-4 border-t border-zinc-200 dark:border-zinc-800',
+        className
+      )}
       {...props}
     />
   );

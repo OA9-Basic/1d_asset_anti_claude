@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, RefreshCw, Users, Package, ArrowUpRight } from 'lucide-react';
+import { Loader2, RefreshCw, Users, Package, ArrowUpRight, TrendingUp, TrendingDown } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -60,10 +60,12 @@ export default function DashboardPage() {
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-neutral-900 dark:text-white" />
+        <Loader2 className="w-8 h-8 animate-spin text-zinc-900 dark:text-white" />
       </div>
     );
   }
+
+  const displayName = user.firstName || user.name || user.email?.split('@')[0] || 'User';
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -75,24 +77,27 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Header */}
+      {/* Premium Header */}
       <PageHeader>
         <PageHeaderContent>
           <div className="flex items-center justify-between">
-            <div>
-              <PageTitle>
-                Welcome back, {user.firstName || user.name || user.email?.split('@')[0]}!
-              </PageTitle>
-              <PageDescription>
-                Here&apos;s what&apos;s happening with your account
-              </PageDescription>
+            <div className="flex items-center gap-4">
+              <div className="h-8 w-1 bg-gradient-to-b from-violet-500 to-indigo-600 rounded-full" />
+              <div>
+                <PageTitle className="tracking-tight-premium">
+                  Welcome back, {displayName}
+                </PageTitle>
+                <PageDescription>
+                  Here&apos;s what&apos;s happening with your account
+                </PageDescription>
+              </div>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => mutateDashboard()}
               disabled={dashboardLoading}
-              className="border-neutral-200 dark:border-neutral-800"
+              className="border-zinc-200 dark:border-zinc-700"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${dashboardLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -101,8 +106,8 @@ export default function DashboardPage() {
         </PageHeaderContent>
       </PageHeader>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* Stats Grid */}
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 stagger-reveal">
+        {/* Stats Grid - with premium animations */}
         <DashboardStats
           stats={dashboardData?.stats}
           loading={dashboardLoading}
@@ -110,24 +115,26 @@ export default function DashboardPage() {
           onRefresh={() => mutateDashboard()}
         />
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Activity Feed */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Recent Activity */}
+        {/* Main Content Grid - 2:1 ratio */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Activity Feed (2/3) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Recent Activity - Timeline Style */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Recent Activity</h2>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    See what the community is contributing to
+                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight-premium">
+                    Recent Activity
+                  </h2>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    Community contributions in real-time
                   </p>
                 </div>
               </div>
 
-              <UnifiedCard variant="default" padding="none">
+              <UnifiedCard variant="default" padding="none" className="overflow-hidden">
                 <CardHeader bordered>
-                  <CardTitle className="text-lg">Community Contributions</CardTitle>
+                  <CardTitle>Community Contributions</CardTitle>
                   <CardDescription>Real-time updates from across the platform</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -135,25 +142,33 @@ export default function DashboardPage() {
                     <div className="space-y-3">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <div key={i} className="flex items-center gap-3 p-3">
-                          <div className="h-8 w-8 rounded-full bg-neutral-100 dark:bg-neutral-900 animate-pulse" />
+                          <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-900 animate-pulse shimmer-premium" />
                           <div className="flex-1 space-y-2">
-                            <div className="h-4 w-48 bg-neutral-100 dark:bg-neutral-900 animate-pulse rounded" />
-                            <div className="h-3 w-32 bg-neutral-100 dark:bg-neutral-900 animate-pulse rounded" />
+                            <div className="h-4 w-48 bg-zinc-100 dark:bg-zinc-900 animate-pulse shimmer-premium rounded" />
+                            <div className="h-3 w-32 bg-zinc-100 dark:bg-zinc-900 animate-pulse shimmer-premium rounded" />
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : activityData?.activity && activityData.activity.length > 0 ? (
-                    <div className="space-y-1 max-h-[400px] overflow-y-auto">
-                      {activityData.activity.map((item) => (
-                        <ActivityFeedItem key={item.id} item={item} />
+                    <div className="space-y-0 max-h-[400px] overflow-y-auto">
+                      {activityData.activity.map((item, index) => (
+                        <div key={item.id} className="relative">
+                          {/* Timeline connector */}
+                          {index < activityData.activity.length - 1 && (
+                            <div className="absolute left-5 top-12 bottom-0 w-px bg-zinc-200 dark:bg-zinc-800" />
+                          )}
+                          <ActivityFeedItem item={item} />
+                        </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-neutral-500 dark:text-neutral-400">
-                      <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No recent activity yet</p>
-                      <p className="text-sm">Be the first to contribute!</p>
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                        <Users className="w-8 h-8 text-zinc-400" />
+                      </div>
+                      <p className="text-zinc-500 dark:text-zinc-400 font-medium">No recent activity yet</p>
+                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Be the first to contribute!</p>
                     </div>
                   )}
                 </CardContent>
@@ -164,13 +179,15 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Trending Assets</h2>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight-premium">
+                    Trending Assets
+                  </h2>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                     Popular assets getting funded right now
                   </p>
                 </div>
                 <Link href="/marketplace">
-                  <Button variant="outline" size="sm" className="border-neutral-200 dark:border-neutral-800">
+                  <Button variant="outline" size="sm" className="border-zinc-200 dark:border-zinc-700">
                     View All
                     <ArrowUpRight className="w-4 h-4 ml-1" />
                   </Button>
@@ -180,15 +197,18 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {featuredLoading ? (
                   Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="border border-neutral-200 dark:border-neutral-800 rounded-xl bg-white dark:bg-black p-4 animate-pulse" />
+                    <div key={i} className="aspect-video rounded-xl bg-zinc-100 dark:bg-zinc-900 animate-pulse shimmer-premium" />
                   ))
                 ) : featuredData?.assets && featuredData.assets.length > 0 ? (
                   featuredData.assets.map((asset) => <MiniAssetCard key={asset.id} asset={asset} />)
                 ) : (
                   <UnifiedCard className="col-span-full" padding="lg">
-                    <CardContent className="text-center text-neutral-500 dark:text-neutral-400">
-                      <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No trending assets available</p>
+                    <CardContent className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                        <Package className="w-8 h-8 text-zinc-400" />
+                      </div>
+                      <p className="text-zinc-500 dark:text-zinc-400 font-medium">No trending assets available</p>
+                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Check back later for new opportunities</p>
                     </CardContent>
                   </UnifiedCard>
                 )}
@@ -196,7 +216,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Column - Quick Actions & My Contributions */}
+          {/* Right Column - Quick Actions & My Contributions (1/3) */}
           <div className="space-y-6">
             <QuickActions userId={user.id} />
             <MyContributions contributions={dashboardData?.contributions} loading={dashboardLoading} />
