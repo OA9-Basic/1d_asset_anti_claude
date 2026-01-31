@@ -7,7 +7,6 @@ import { Footer } from '@/components/page/footer';
 import { Header } from '@/components/page/header';
 import { HeroPremium } from '@/components/page/hero-premium';
 import { HowItWorks } from '@/components/page/how-it-works';
-import { InfiniteMarquee } from '@/components/page/infinite-marquee';
 import { LiveStats } from '@/components/page/live-stats';
 
 export const metadata: Metadata = {
