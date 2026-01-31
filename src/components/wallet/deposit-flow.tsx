@@ -1,6 +1,7 @@
 'use client';
 
-// eslint-disable-next-line import/no-named-as-default
+import Image from 'next/image';
+/* eslint-disable import/no-named-as-default */
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 
@@ -43,6 +44,7 @@ export function DepositFlow({ depositOrder, onStatusChange, onComplete }: Deposi
   useEffect(() => {
     const generateQR = async () => {
       try {
+        // eslint-disable-next-line import/no-named-as-default-member
         const url = await QRCode.toDataURL(
           `ethereum:${depositOrder.depositAddress}`,
           {
@@ -201,7 +203,7 @@ export function DepositFlow({ depositOrder, onStatusChange, onComplete }: Deposi
         <div className="mb-6 flex flex-col items-center">
           <div className="p-4 bg-white rounded-lg shadow-inner border-2 border-gray-200">
             {qrCodeUrl ? (
-              <img src={qrCodeUrl} alt="Deposit QR Code" className="w-64 h-64" />
+              <Image src={qrCodeUrl} alt="Deposit QR Code" width={256} height={256} className="w-64 h-64" unoptimized />
             ) : (
               <div className="w-64 h-64 flex items-center justify-center bg-gray-100">
                 <span className="text-gray-500">Loading QR Code...</span>

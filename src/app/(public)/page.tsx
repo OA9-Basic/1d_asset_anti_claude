@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { type Metadata } from 'next';
 
 import { ScrollProgressBar } from '@/components/animated/reveal-on-scroll';

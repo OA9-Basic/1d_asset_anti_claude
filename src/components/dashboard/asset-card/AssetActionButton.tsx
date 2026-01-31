@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
-import { getStatusConfig } from './AssetStatusBadge';
+import { getStatusConfig } from './asset-status-utils';
 
 interface AssetActionButtonProps {
   assetId: string;

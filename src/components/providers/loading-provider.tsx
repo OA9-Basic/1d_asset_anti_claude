@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useState, ReactNode } from 'react';
 
 import { FullPageLoader } from '@/components/ui/loading-overlay';
@@ -52,33 +53,4 @@ export function LoadingProvider({ children }: LoadingProviderProps) {
       {isLoading && <FullPageLoader message={message} />}
     </LoadingContext.Provider>
   );
-}
-
-// Hook for async operations with automatic loading state
-export function useAsyncOperation<T = void>() {
-  const { startLoading, stopLoading } = useLoading();
-  const [error, setError] = useState<Error | null>(null);
-  const [data, setData] = useState<T | null>(null);
-
-  const execute = useCallback(
-    async (operation: () => Promise<T>, loadingMessage = 'Processing...'): Promise<T | null> => {
-      startLoading(loadingMessage);
-      setError(null);
-
-      try {
-        const result = await operation();
-        setData(result);
-        return result;
-      } catch (err) {
-        const error = err as Error;
-        setError(error);
-        return null;
-      } finally {
-        stopLoading();
-      }
-    },
-    [startLoading, stopLoading]
-  );
-
-  return { execute, error, data };
 }
