@@ -15,7 +15,8 @@ import { Input } from '@/components/ui/input';
 
 
 interface PricingStepProps {
-  control: Control<Record<string, unknown>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: Control<any>;
   isSubmitting: boolean;
 }
 

@@ -24,7 +24,8 @@ import { deliveryTypes } from '../constants';
 
 
 interface DetailsStepProps {
-  control: Control<Record<string, unknown>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: Control<any>;
   isSubmitting: boolean;
 }
 
