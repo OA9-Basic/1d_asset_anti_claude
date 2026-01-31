@@ -1,23 +1,8 @@
 'use client';
 
-import {
-  AlertCircle,
-  ArrowDownCircle,
-  ArrowUpCircle,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  DollarSign,
-  Filter,
-  Loader2,
-  RefreshCw,
-  TrendingDown,
-  TrendingUp,
-  Wallet as WalletIcon,
-  XCircle,
-} from 'lucide-react';
+import { RefreshCw, Loader2, Filter, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 
 import { Badge } from '@/components/ui/badge';
@@ -39,131 +24,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
+import { BalanceCards } from './components/BalanceCards';
+import { TransactionTable } from './components/TransactionTable';
+import { WalletActions } from './components/WalletActions';
+import type { BalanceData, TransactionsData } from './types';
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-interface BalanceData {
-  balance: number;
-  withdrawableBalance: number;
-  storeCredit: number;
-  totalDeposited: number;
-  totalWithdrawn: number;
-  totalContributed: number;
-  totalProfitReceived: number;
-}
-
-interface Transaction {
-  id: string;
-  type: string;
-  status: string;
-  amount: number;
-  balanceBefore: number;
-  balanceAfter: number;
-  description: string;
-  createdAt: string;
-}
-
-interface TransactionsData {
-  transactions: Transaction[];
-}
-
-// Transaction Status Badge
-function TransactionStatus({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
-    COMPLETED: {
-      label: 'Success',
-      className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
-      icon: CheckCircle2,
-    },
-    PENDING: {
-      label: 'Pending',
-      className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border-amber-200 dark:border-amber-900/50',
-      icon: Clock,
-    },
-    FAILED: {
-      label: 'Failed',
-      className: 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400 border-red-200 dark:border-red-900/50',
-      icon: XCircle,
-    },
-  };
-
-  const config = statusConfig[status] || statusConfig.PENDING;
-  const StatusIcon = config.icon;
-
-  return (
-    <Badge variant="outline" className={config.className}>
-      <StatusIcon className="w-3 h-3 mr-1" />
-      {config.label}
-    </Badge>
-  );
-}
-
-// Transaction Type Badge
-function TransactionType({ type }: { type: string }) {
-  const typeConfig: Record<string, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
-    DEPOSIT: {
-      label: 'Deposit',
-      className: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
-      icon: ArrowDownCircle,
-    },
-    WITHDRAWAL: {
-      label: 'Withdrawal',
-      className: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30',
-      icon: ArrowUpCircle,
-    },
-    WITHDRAWAL_REQUEST: {
-      label: 'Withdrawal Request',
-      className: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30',
-      icon: Clock,
-    },
-    CONTRIBUTION: {
-      label: 'Contribution',
-      className: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
-      icon: TrendingUp,
-    },
-    CONTRIBUTION_REFUND: {
-      label: 'Refund',
-      className: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30',
-      icon: TrendingDown,
-    },
-    PROFIT_SHARE: {
-      label: 'Profit',
-      className: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/30',
-      icon: DollarSign,
-    },
-    PURCHASE: {
-      label: 'Purchase',
-      className: 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30',
-      icon: CheckCircle2,
-    },
-  };
-
-  const config = typeConfig[type] || {
-    label: type,
-    className: 'text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-950/30',
-    icon: DollarSign,
-  };
-  const TypeIcon = config.icon;
-
-  return (
-    <div className="flex items-center gap-2">
-      <div className={`p-1.5 rounded-lg ${config.className}`}>
-        <TypeIcon className="w-3.5 h-3.5" />
-      </div>
-      <span className="text-sm font-medium">{config.label}</span>
-    </div>
-  );
-}
 
 export default function WalletPage() {
   const router = useRouter();
@@ -252,7 +121,6 @@ export default function WalletPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      {/* Header */}
       <div className="border-b border-neutral-200 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
@@ -309,131 +177,10 @@ export default function WalletPage() {
           </Card>
         ) : (
           <>
-            {/* Balance Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              {/* Total Balance */}
-              <Card className="border-2 border-neutral-200 dark:border-neutral-800 hover:border-neutral-900 dark:hover:border-white transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-900">
-                      <WalletIcon className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
-                    </div>
-                    <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-900 px-2.5 py-1 rounded-full">
-                      Primary
-                    </span>
-                  </div>
-                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Total Balance</p>
-                  {balanceLoading ? (
-                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
-                  ) : (
-                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData ? prismaDecimalToNumber(balanceData.balance).toFixed(2) : '0.00'}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+            <BalanceCards balanceData={balanceData} balanceLoading={balanceLoading} />
+            <WalletActions onWithdrawClick={() => setWithdrawOpen(true)} />
 
-              {/* Withdrawable */}
-              <Card className="border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30">
-                      <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Withdrawable</p>
-                  {balanceLoading ? (
-                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
-                  ) : (
-                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData ? prismaDecimalToNumber(balanceData.withdrawableBalance).toFixed(2) : '0.00'}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Store Credit */}
-              <Card className="border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-violet-50 dark:bg-violet-950/30">
-                      <WalletIcon className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Store Credit</p>
-                  {balanceLoading ? (
-                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
-                  ) : (
-                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData ? prismaDecimalToNumber(balanceData.storeCredit).toFixed(2) : '0.00'}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Total Deposited */}
-              <Card className="border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30">
-                      <TrendingUp className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">Total Deposited</p>
-                  {balanceLoading ? (
-                    <div className="h-8 bg-neutral-200 dark:bg-neutral-800 rounded animate-pulse" />
-                  ) : (
-                    <p className="text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                      ${balanceData ? prismaDecimalToNumber(balanceData.totalDeposited).toFixed(2) : '0.00'}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <button
-                onClick={() => router.push('/wallet/deposit')}
-                className="group relative overflow-hidden rounded-xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-6 text-left hover:border-neutral-900 dark:hover:border-white transition-all duration-300 shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500"
-              >
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 group-hover:scale-110 transition-transform duration-300">
-                      <ArrowDownCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
-                    Deposit Funds
-                  </h3>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    Add funds using cryptocurrency
-                  </p>
-                </div>
-              </button>
-
-              <button
-                onClick={() => setWithdrawOpen(true)}
-                className="group relative overflow-hidden rounded-xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black p-6 text-left hover:border-neutral-900 dark:hover:border-white transition-all duration-300 shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100"
-              >
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-orange-50 dark:bg-orange-950/30 group-hover:scale-110 transition-transform duration-300">
-                      <ArrowUpCircle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
-                    Withdraw Funds
-                  </h3>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    Request withdrawal to crypto
-                  </p>
-                </div>
-              </button>
-            </div>
-
-            {/* Transaction History */}
-            <Card className="border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+            <Card className="border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
               <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
@@ -473,87 +220,12 @@ export default function WalletPage() {
                   </div>
                 </div>
               </div>
-              <CardContent className="p-0">
-                {transactionsLoading ? (
-                  <div className="p-8 space-y-4">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="h-16 bg-neutral-100 dark:bg-neutral-900 rounded-lg animate-pulse" />
-                    ))}
-                  </div>
-                ) : filteredTransactions.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50">
-                          <TableHead className="font-semibold">Date</TableHead>
-                          <TableHead className="font-semibold">Type</TableHead>
-                          <TableHead className="font-semibold">Description</TableHead>
-                          <TableHead className="text-right font-semibold">Amount</TableHead>
-                          <TableHead className="text-center font-semibold">Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredTransactions.map((transaction) => (
-                          <TableRow
-                            key={transaction.id}
-                            className="border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50 transition-colors"
-                          >
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-neutral-400" />
-                                {new Date(transaction.createdAt).toLocaleDateString()}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <TransactionType type={transaction.type} />
-                            </TableCell>
-                            <TableCell className="max-w-xs truncate text-neutral-600 dark:text-neutral-400">
-                              {transaction.description}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <span
-                                className={`font-semibold ${
-                                  transaction.type === 'DEPOSIT' ||
-                                  transaction.type === 'PROFIT_SHARE' ||
-                                  transaction.type === 'CONTRIBUTION_REFUND'
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : 'text-neutral-900 dark:text-white'
-                                }`}
-                              >
-                                {transaction.type === 'DEPOSIT' ||
-                                transaction.type === 'PROFIT_SHARE' ||
-                                transaction.type === 'CONTRIBUTION_REFUND'
-                                  ? '+'
-                                  : ''}
-                                ${prismaDecimalToNumber(transaction.amount).toFixed(2)}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <TransactionStatus status={transaction.status} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center py-16">
-                    <div className="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-900 flex items-center justify-center mx-auto mb-4">
-                      <WalletIcon className="w-8 h-8 text-neutral-400 dark:text-neutral-600" />
-                    </div>
-                    <p className="text-neutral-600 dark:text-neutral-400 font-medium">No transactions found</p>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-500 mt-1">
-                      Your transaction history will appear here
-                    </p>
-                  </div>
-                )}
-              </CardContent>
+              <TransactionTable transactions={filteredTransactions} transactionsLoading={transactionsLoading} />
             </Card>
           </>
         )}
       </div>
 
-      {/* Withdraw Dialog */}
       <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
         <DialogContent className="sm:max-w-md border-neutral-200 dark:border-neutral-800 rounded-xl">
           <DialogHeader>
