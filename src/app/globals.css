@@ -522,4 +522,35 @@
       scroll-behavior: auto !important;
     }
   }
+
+  /* Radial gradient utility for vignette effects */
+  .bg-radial-gradient {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+  }
+
+  .dark .bg-radial-gradient {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.2) 50%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+  }
+
+  /* 3D Model container styles */
+  .model-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .model-container canvas {
+    outline: none;
+  }
 }

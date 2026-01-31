@@ -10,7 +10,7 @@ import {
   ShoppingCart,
   TrendingUp,
   Users,
-  Vote,
+  Vote as VoteIcon,
   Wallet,
   Package,
 } from 'lucide-react';
@@ -339,7 +339,7 @@ export default function DashboardPage() {
               variant="default"
             />
             <StatCard
-              icon={Vote}
+              icon={VoteIcon}
               title="Active Votes"
               value={dashboardData?.stats.activeVotes || 0}
               description="Asset requests you've voted on"

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
 import { Parallax, ScrollReveal, TextReveal } from '@/components/animated/gsap-scroll-reveal';
-import { ModelLoader } from '@/components/page/model-loader';
+import { ModelLoaderPro } from '@/components/page/model-loader-pro';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -106,13 +106,16 @@ export function HeroAwwwards({ featuredCampaign }: HeroAwwwardsProps) {
       {/* Particles Container */}
       <div ref={particlesRef} />
 
-      {/* 3D Model */}
-      <div className="absolute inset-0 opacity-60">
-        <ModelLoader
+      {/* 3D Model - Professional Version */}
+      <div className="absolute inset-0">
+        <ModelLoaderPro
           modelPath="/models/DamagedHelmet.glb"
-          scale={3}
-          position={[0, -0.5, 0]}
+          scale={2.5}
+          position={[0, -0.3, 0]}
           autoRotate={true}
+          rotateSpeed={0.2}
+          enableControls={true}
+          loadingColor="#8b5cf6"
         />
       </div>
 
