@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
@@ -60,6 +60,12 @@ export default function CreateAssetPage() {
 
   const watchedValues = form.watch();
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth/sign-in');
+    }
+  }, [user, authLoading, router]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -69,7 +75,6 @@ export default function CreateAssetPage() {
   }
 
   if (!user) {
-    router.push('/auth/sign-in');
     return null;
   }
 

@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
 
 import { Form } from '@/components/ui/form';
@@ -61,6 +61,12 @@ export default function RequestAssetPage() {
 
   const watchedValues = form.watch();
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth/sign-in');
+    }
+  }, [user, authLoading, router]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -70,7 +76,6 @@ export default function RequestAssetPage() {
   }
 
   if (!user) {
-    router.push('/auth/sign-in');
     return null;
   }
 
