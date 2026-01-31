@@ -103,12 +103,12 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       stats: {
-        totalContributed: user.wallet?.totalContributed ?? 0,
+        totalContributed: Number(user.wallet?.totalContributed ?? 0),
         activeVotes,
         assetsOwned,
-        walletBalance: user.wallet?.balance ?? 0,
-        withdrawableBalance: user.wallet?.withdrawableBalance ?? 0,
-        storeCredit: user.wallet?.storeCredit ?? 0,
+        walletBalance: Number(user.wallet?.balance ?? 0),
+        withdrawableBalance: Number(user.wallet?.withdrawableBalance ?? 0),
+        storeCredit: Number(user.wallet?.storeCredit ?? 0),
       },
       contributions: user.contributions,
       purchases: user.assetPurchases,

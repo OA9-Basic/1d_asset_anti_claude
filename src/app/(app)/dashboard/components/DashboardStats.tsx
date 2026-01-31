@@ -49,7 +49,7 @@ export function DashboardStats({ stats, loading, error, onRefresh }: DashboardSt
       <StatCard
         icon={Wallet}
         title="Total Contributed"
-        value={`$${stats?.totalContributed.toFixed(0) || '0'}`}
+        value={`$${Number(stats?.totalContributed ?? 0).toFixed(0)}`}
         description="Lifetime contributions"
         variant="default"
       />
@@ -70,7 +70,7 @@ export function DashboardStats({ stats, loading, error, onRefresh }: DashboardSt
       <StatCard
         icon={TrendingUp}
         title="Wallet Balance"
-        value={`$${stats?.walletBalance.toFixed(2) || '0'}`}
+        value={`$${Number(stats?.walletBalance ?? 0).toFixed(2)}`}
         description="Available to spend"
         variant="success"
       />
