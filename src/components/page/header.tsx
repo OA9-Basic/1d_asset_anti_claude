@@ -105,31 +105,11 @@ export function Header() {
       )}
     >
       <nav className="container mx-auto px-6 h-20 flex items-center justify-between">
-        {/* Logo - Premium hover animation */}
+        {/* Logo - Clean, minimal styling */}
         <Link href="/" className="flex items-center gap-3 group">
-          <motion.div
-            whileHover={{ scale: 1.05, y: -2 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="relative"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:shadow-violet-500/40 transition-all duration-300">
-              <span className="text-white font-bold text-lg">DA</span>
-            </div>
-            {/* Shimmer effect on hover */}
-            <motion.div
-              className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/30 to-transparent"
-              initial={{ x: '-100%' }}
-              whileHover={{ x: '100%' }}
-              transition={{ duration: 0.6 }}
-            />
-          </motion.div>
-          <motion.span
-            className="font-semibold text-lg tracking-tight text-zinc-900 dark:text-zinc-100 bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 bg-clip-text text-transparent"
-            whileHover={{ backgroundPosition: '100% 0%' }}
-            transition={{ duration: 0.3 }}
-          >
+          <span className="font-semibold text-lg tracking-tight text-zinc-900 dark:text-zinc-100">
             Digital Assets
-          </motion.span>
+          </span>
         </Link>
 
         {/* Desktop Navigation - Enhanced with subtle hover shift */}
@@ -151,7 +131,7 @@ export function Header() {
           ))}
         </div>
 
-        {/* Desktop CTA - Premium styling */}
+        {/* Desktop CTA - Refined white/black theme */}
         <div className="hidden md:flex items-center gap-3">
           {/* Theme Toggle */}
           <ThemeToggle />
@@ -162,61 +142,40 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-10 px-5 text-sm font-medium rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200"
+                  className="h-10 px-5 text-sm font-medium rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200"
                 >
-                  <WalletIcon className="w-4 h-4 mr-2" strokeWidth={2} />
+                  <WalletIcon className="w-4 h-4 mr-2" strokeWidth={1.5} />
                   Wallet
                 </Button>
               </Link>
               <Link href="/profile">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                <Button
+                  size="sm"
+                  className="h-10 px-5 text-sm font-medium rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 transition-all duration-200"
                 >
-                  <Button
-                    size="sm"
-                    className="h-10 px-5 text-sm font-medium rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/20 hover:shadow-violet-500/30 transition-all duration-300"
-                  >
-                    {user.firstName || user.name || user.email?.split('@')[0] || 'Account'}
-                  </Button>
-                </motion.div>
+                  {user.firstName || user.name || user.email?.split('@')[0] || 'Account'}
+                </Button>
               </Link>
             </>
           ) : (
             <>
               <Link href="/auth/sign-in">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  className="h-10 px-5 text-sm font-medium rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200"
+                  className="h-10 px-5 text-sm font-medium rounded-lg border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200"
                 >
                   Sign In
                 </Button>
               </Link>
               <Link href="/auth/sign-up">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                <Button
+                  size="sm"
+                  className="h-10 px-5 text-sm font-medium rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-all duration-200 flex items-center gap-2"
                 >
-                  <Button
-                    size="sm"
-                    className="h-10 px-5 text-sm font-medium rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-md shadow-violet-500/20 hover:shadow-violet-500/30 transition-all duration-300 relative overflow-hidden group"
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      Get Started
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" strokeWidth={2} />
-                    </span>
-                    {/* Shimmer effect */}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      initial={{ x: '-100%' }}
-                      whileHover={{ x: '100%' }}
-                      transition={{ duration: 0.6 }}
-                    />
-                  </Button>
-                </motion.div>
+                  Get Started
+                  <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
+                </Button>
               </Link>
             </>
           )}
@@ -284,15 +243,15 @@ export function Header() {
                 {!isLoading && user ? (
                   <>
                     <Link href="/wallet" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" size="sm" className="w-full h-12 rounded-xl justify-start">
-                        <WalletIcon className="w-5 h-5 mr-3" strokeWidth={2} />
+                      <Button variant="outline" size="sm" className="w-full h-12 rounded-lg justify-start border-zinc-300 dark:border-zinc-700">
+                        <WalletIcon className="w-5 h-5 mr-3" strokeWidth={1.5} />
                         Wallet
                       </Button>
                     </Link>
                     <Link href="/profile" onClick={() => setIsOpen(false)}>
                       <Button
                         size="sm"
-                        className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+                        className="w-full h-12 rounded-lg bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
                       >
                         {user.firstName || user.name || user.email?.split('@')[0] || 'Account'}
                       </Button>
@@ -301,14 +260,14 @@ export function Header() {
                 ) : (
                   <>
                     <Link href="/auth/sign-in" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" size="sm" className="w-full h-12 rounded-xl">
+                      <Button variant="outline" size="sm" className="w-full h-12 rounded-lg border-zinc-300 dark:border-zinc-700">
                         Sign In
                       </Button>
                     </Link>
                     <Link href="/auth/sign-up" onClick={() => setIsOpen(false)}>
                       <Button
                         size="sm"
-                        className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+                        className="w-full h-12 rounded-lg bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                       >
                         Get Started
                       </Button>

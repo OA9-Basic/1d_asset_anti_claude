@@ -128,7 +128,7 @@ export default async function HomePage() {
       <main className="min-h-screen">
         <HeroPremium featuredCampaign={featuredCampaign} />
         <LiveStats stats={stats} />
-        <BentoGridFeatures />
+        <BentoGridFeatures stats={stats} />
         <HowItWorks />
         <InfiniteMarquee />
         <CTASection />
