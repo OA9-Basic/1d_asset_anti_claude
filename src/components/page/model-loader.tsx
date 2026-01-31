@@ -72,18 +72,15 @@ export function ModelLoader({
     scene.add(backLight);
 
     // ═══════════════════════════════════════════════════════════════
-    // LOAD 3D MODEL - Manual fetch workaround for Next.js compatibility
+    // LOAD 3D MODEL - Manual fetch with custom resource loading
     // ═══════════════════════════════════════════════════════════════
-    // NOTE: GLTFLoader's internal XHR fails with Next.js in some cases.
-    // We manually fetch the file and use loader.parse() instead.
+    // GLTFLoader.parse() still tries to fetch resources via XHR.
+    // We need to provide a custom resource loader callback.
 
     const loader = new GLTFLoader();
     let model: THREE.Group | null = null;
 
-    // Set resource path for associated files (textures, etc.)
-    loader.setResourcePath(modelPath.substring(0, modelPath.lastIndexOf('/') + 1));
-
-    // Manual fetch + parse approach
+    // Override the resource loading to use fetch instead of XHR
     const loadModel = async () => {
       try {
         console.log('🎮 Loading 3D model:', modelPath);
@@ -96,12 +93,53 @@ export function ModelLoader({
         const arrayBuffer = await response.arrayBuffer();
         console.log('✅ Model fetched, size:', arrayBuffer.byteLength, 'bytes');
 
-        // Parse the GLB data
-        loader.parse(
+        // Verify it's a valid GLB file (starts with 'glTF' magic bytes)
+        const header = new Uint8Array(arrayBuffer, 0, 4);
+        const magic = String.fromCharCode(header[0], header[1], header[2], header[3]);
+        console.log('🔍 File magic bytes:', magic, '(should be "glTF")');
+
+        if (magic !== 'glTF') {
+          console.error('❌ Not a valid GLB file! Magic bytes:', magic);
+          // Check if we got HTML instead
+          const textDecoder = new TextDecoder();
+          const beginning = textDecoder.decode(arrayBuffer.slice(0, 100));
+          console.error('📄 File begins with:', beginning);
+          throw new Error('Invalid GLB file format');
+        }
+
+        // Set up a resource loading manager that uses fetch instead of XHR
+        const manager = new THREE.LoadingManager();
+        const resourceLoader = new THREE.FileLoader(manager);
+
+        // Override the load method to use fetch
+        resourceLoader.load = function(url: string, onLoad?: (data: string | ArrayBuffer) => void, onProgress?: () => void, onError?: (err: unknown) => void) {
+          fetch(url)
+            .then(res => {
+              if (!res.ok) throw new Error(`Failed to load ${url}`);
+              return res.arrayBuffer();
+            })
+            .then(buffer => {
+              if (onLoad) onLoad(buffer);
+            })
+            .catch(err => {
+              if (onError) onError(err);
+            });
+        };
+
+        // Create new loader with custom manager
+        const customLoader = new GLTFLoader(manager);
+
+        // Parse with the full URL as base path
+        const fullPath = new URL(modelPath, window.location.origin).href;
+        console.log('📂 Full path for parsing:', fullPath);
+
+        customLoader.parse(
           arrayBuffer,
-          '', // No URL needed since we have the data directly
+          fullPath, // Use full URL as base path
           (gltf) => {
             console.log('✅ Model parsed successfully!');
+            console.log('📦 Scene:', gltf.scene);
+            console.log('🎨 Children:', gltf.scene.children);
             model = gltf.scene;
             model.scale.setScalar(scale);
             model.position.set(...position);
@@ -110,6 +148,7 @@ export function ModelLoader({
           },
           (err) => {
             console.error('❌ Error parsing GLB:', err);
+            console.error('🔴 Error details:', err);
             setError('Failed to parse 3D model');
             setLoading(false);
           }
