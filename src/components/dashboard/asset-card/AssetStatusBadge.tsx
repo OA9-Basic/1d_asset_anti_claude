@@ -4,6 +4,7 @@
  * Displays the current status of an asset with appropriate styling
  */
 
+import type { LucideIcon } from 'lucide-react';
 import { CheckCircle2, Clock, ShoppingCart } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 export interface AssetStatus {
   label: string;
   variant: 'default' | 'outline' | 'destructive' | 'secondary';
-  icon: any;
+  icon: LucideIcon;
   className: string;
   gradient: string;
 }

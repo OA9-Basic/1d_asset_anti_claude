@@ -1,5 +1,6 @@
 'use client';
 
+import { Decimal } from '@prisma/client/runtime/library';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, User, Settings, LogOut, Wallet, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
@@ -17,9 +18,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import { staggerContainer, staggerItem, hoverScale } from '@/lib/animations';
-import { Decimal } from '@prisma/client/runtime/library';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 interface WalletBalance {
   balance: number | Decimal;

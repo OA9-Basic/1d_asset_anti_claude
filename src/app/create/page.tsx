@@ -174,9 +174,12 @@ export default function CreateAssetPage() {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const handleNextClick = async () => {
+    await handleNext();
+  };
+
   const handleSubmit = async (values: CreateAssetFormValues) => {
     if (currentStep !== 3) {
-      handleNext();
       return;
     }
 
@@ -191,11 +194,9 @@ export default function CreateAssetPage() {
           targetPrice: values.targetPrice,
           thumbnail: values.thumbnail || undefined,
           type: values.type,
+          deliveryType: values.deliveryType,
+          sourceUrl: values.sourceUrl || undefined,
           featured: false,
-          metadata: {
-            deliveryType: values.deliveryType,
-            sourceUrl: values.sourceUrl,
-          },
         }),
       });
 
@@ -221,8 +222,8 @@ export default function CreateAssetPage() {
       }
 
       toast({
-        title: 'Asset Created!',
-        description: 'Your asset has been successfully created and is now live.',
+        title: 'Request Submitted!',
+        description: 'Your asset request has been sent to the admin for review. You will be notified once it\'s approved.',
       });
 
       router.push('/');
@@ -238,12 +239,12 @@ export default function CreateAssetPage() {
   };
 
   const calculatePlatformFee = () => {
-    const price = watchedValues.targetPrice || 0;
+    const price = Number(watchedValues.targetPrice) || 0;
     return price * 0.15;
   };
 
   const calculateTotal = () => {
-    const price = watchedValues.targetPrice || 0;
+    const price = Number(watchedValues.targetPrice) || 0;
     return price + calculatePlatformFee();
   };
 
@@ -260,9 +261,9 @@ export default function CreateAssetPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold">Create Asset</h1>
+              <h1 className="text-2xl font-bold">Request Asset</h1>
               <p className="text-sm text-muted-foreground">
-                List a new digital asset on the marketplace
+                Submit a request to add a new digital asset to the marketplace
               </p>
             </div>
           </div>
@@ -541,6 +542,11 @@ export default function CreateAssetPage() {
                                     max="10000"
                                     step="0.01"
                                     {...field}
+                                    value={field.value || ''}
+                                    onChange={(e) => {
+                                      const value = e.target.value ? Number(e.target.value) : 0;
+                                      field.onChange(value);
+                                    }}
                                     disabled={isSubmitting}
                                     className="h-11 pl-7 bg-zinc-50 dark:bg-zinc-900"
                                   />
@@ -562,7 +568,7 @@ export default function CreateAssetPage() {
                             <div className="flex justify-between text-sm">
                               <span className="text-muted-foreground">Target Price</span>
                               <span className="font-medium">
-                                ${watchedValues.targetPrice || '0.00'}
+                                ${Number(watchedValues.targetPrice || 0).toFixed(2)}
                               </span>
                             </div>
                             <div className="flex justify-between text-sm">
@@ -606,9 +612,9 @@ export default function CreateAssetPage() {
                       <div className="space-y-6">
                         <Card className="bg-muted/30">
                           <CardHeader>
-                            <CardTitle className="text-lg">Review Your Asset</CardTitle>
+                            <CardTitle className="text-lg">Review Your Request</CardTitle>
                             <CardDescription>
-                              Please review all information before submitting
+                              Please review all information before submitting to admin
                             </CardDescription>
                           </CardHeader>
                           <CardContent className="space-y-4">
@@ -635,7 +641,7 @@ export default function CreateAssetPage() {
                               </div>
                               <div>
                                 <span className="text-muted-foreground">Target Price</span>
-                                <p className="font-medium mt-1">${watchedValues.targetPrice}</p>
+                                <p className="font-medium mt-1">${Number(watchedValues.targetPrice || 0).toFixed(2)}</p>
                               </div>
                             </div>
 
@@ -714,21 +720,22 @@ export default function CreateAssetPage() {
                   )}
 
                   <Button
-                    type="submit"
+                    type={currentStep === 3 ? 'submit' : 'button'}
+                    onClick={currentStep === 3 ? undefined : handleNextClick}
                     disabled={isSubmitting}
                     className="flex-1 h-11 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-md"
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {currentStep === 3 ? 'Creating...' : 'Processing...'}
+                        {currentStep === 3 ? 'Submitting...' : 'Processing...'}
                       </>
                     ) : (
                       <>
                         {currentStep === 3 ? (
                           <>
                             <Sparkles className="w-4 h-4 mr-2" />
-                            Create Asset
+                            Submit Request
                           </>
                         ) : (
                           <>
@@ -745,16 +752,17 @@ export default function CreateAssetPage() {
           </CardContent>
         </Card>
 
-        {/* Tips Card */}
+        {/* Info Card */}
         <Card className="mt-6 border bg-muted/30">
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Tips for a great asset listing</CardTitle>
+            <CardTitle className="text-sm font-medium">How it works</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>• Use a clear, descriptive title that includes the asset name and version/year</p>
-            <p>• Provide a detailed description explaining what users will get</p>
-            <p>• Set a realistic target price based on current market value</p>
-            <p>• Use a high-quality thumbnail image to attract more contributors</p>
+            <p>• Submit your asset request with all relevant details</p>
+            <p>• Admin will review your request and may adjust pricing or fees</p>
+            <p>• Once approved, the asset will be listed for community funding</p>
+            <p>• Contributors can pledge $1 until the target amount is reached</p>
+            <p>• When fully funded, the platform purchases the asset for everyone</p>
           </CardContent>
         </Card>
       </div>

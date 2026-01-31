@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-const createAssetSchema = z.object({
+const createAssetRequestSchema = z.object({
   title: z.string().min(1).max(255),
   description: z.string().min(1),
   targetPrice: z
@@ -15,10 +15,11 @@ const createAssetSchema = z.object({
       if (isNaN(num) || num <= 0) throw new Error('Invalid target price');
       return num;
     }),
-  type: z.enum(['COURSE', 'AI_MODEL', 'SAAS', 'SOFTWARE', 'TEMPLATE', 'OTHER']).optional(),
+  type: z.enum(['COURSE', 'AI_MODEL', 'SAAS', 'SOFTWARE', 'TEMPLATE', 'CODE', 'MODEL_3D', 'EBOOK', 'OTHER']).optional(),
+  deliveryType: z.enum(['DOWNLOAD', 'STREAM', 'EXTERNAL', 'HYBRID']).optional(),
   thumbnail: z.string().url().optional(),
+  sourceUrl: z.string().url().optional(),
   metadata: z.record(z.any()).optional().default({}),
-  featured: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -30,40 +31,53 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const validatedData = createAssetSchema.parse(body);
+    const validatedData = createAssetRequestSchema.parse(body);
 
-    const slug = validatedData.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .substring(0, 100);
-
-    const existingAsset = await db.asset.findUnique({
-      where: { slug },
+    // Check if user already has a pending request with the same title
+    const existingRequest = await db.assetRequest.findFirst({
+      where: {
+        userId,
+        title: {
+          equals: validatedData.title,
+        },
+        status: {
+          in: ['PENDING', 'UNDER_REVIEW', 'VOTING'],
+        },
+      },
     });
 
-    const finalSlug = existingAsset ? `${slug}-${Date.now().toString(36)}` : slug;
+    if (existingRequest) {
+      return NextResponse.json(
+        {
+          error: 'You already have a pending request for this asset',
+          existingRequestId: existingRequest.id,
+        },
+        { status: 400 }
+      );
+    }
 
-    const asset = await db.asset.create({
+    // Create asset request instead of asset
+    const assetRequest = await db.assetRequest.create({
       data: {
+        userId,
         title: validatedData.title,
         description: validatedData.description,
-        slug: finalSlug,
         type: validatedData.type || 'OTHER',
-        targetPrice: validatedData.targetPrice,
-        status: 'COLLECTING',
-        thumbnail: validatedData.thumbnail,
+        deliveryType: validatedData.deliveryType || 'DOWNLOAD',
+        estimatedPrice: validatedData.targetPrice,
+        sourceUrl: validatedData.sourceUrl || '',
+        thumbnail: validatedData.thumbnail || null,
         metadata: validatedData.metadata,
-        featured: validatedData.featured,
+        status: 'PENDING',
       },
     });
 
     return NextResponse.json(
       {
-        id: asset.id,
-        slug: asset.slug,
-        status: asset.status,
-        targetPrice: asset.targetPrice,
+        id: assetRequest.id,
+        title: assetRequest.title,
+        status: assetRequest.status,
+        message: 'Your asset request has been submitted for admin review',
       },
       { status: 201 }
     );
@@ -78,7 +92,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error('Asset creation error:', error);
+    console.error('Asset request creation error:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',

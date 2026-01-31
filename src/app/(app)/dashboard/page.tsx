@@ -30,7 +30,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
-import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import {
   buttonTap,
   hoverLift,
@@ -39,6 +38,7 @@ import {
   staggerContainer,
   staggerItem,
 } from '@/lib/animations';
+import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 import type { IconType } from '@/types/ui';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

@@ -5,31 +5,83 @@
  * Handles Decimal to number conversion automatically
  */
 
+import type { Decimal } from '@prisma/client/runtime/library';
+
 import { prismaDecimalToNumber } from './prisma-decimal';
+
+interface WalletRecord {
+  balance: Decimal | number | string | null;
+  withdrawableBalance: Decimal | number | string | null;
+  storeCredit: Decimal | number | string | null;
+  totalDeposited?: Decimal | number | string | null;
+  totalWithdrawn?: Decimal | number | string | null;
+  totalConvertedToCredit?: Decimal | number | string | null;
+  totalContributed?: Decimal | number | string | null;
+  totalProfitReceived?: Decimal | number | string | null;
+  lockedBalance?: Decimal | number | string | null;
+  [key: string]: unknown;
+}
+
+interface TransactionRecord {
+  amount: Decimal | number | string | null;
+  balanceBefore: Decimal | number | string | null;
+  balanceAfter: Decimal | number | string | null;
+  [key: string]: unknown;
+}
+
+interface AssetRecord {
+  targetPrice: Decimal | number | string | null;
+  platformFee: Decimal | number | string | null;
+  platformFeeAfterExcess?: Decimal | number | string | null;
+  currentCollected: Decimal | number | string | null;
+  totalRevenue: Decimal | number | string | null;
+  totalProfitDistributed?: Decimal | number | string | null;
+  [key: string]: unknown;
+}
+
+interface ContributionRecord {
+  amount: Decimal | number | string | null;
+  excessAmount?: Decimal | number | string | null;
+  profitShareRatio?: Decimal | number | string | null;
+  totalProfitReceived?: Decimal | number | string | null;
+  [key: string]: unknown;
+}
+
+interface WithdrawalRecord {
+  amount: Decimal | number | string | null;
+  [key: string]: unknown;
+}
+
+interface GapLoanRecord {
+  loanAmount: Decimal | number | string | null;
+  repaidAmount: Decimal | number | string | null;
+  remainingAmount: Decimal | number | string | null;
+  [key: string]: unknown;
+}
 
 /**
  * Format wallet for API response (converts Decimal to number)
  */
-export function formatWalletForResponse(wallet: any) {
+export function formatWalletForResponse<T extends WalletRecord>(wallet: T | null | undefined): T | null | undefined {
   if (!wallet) return wallet;
   return {
     ...wallet,
     balance: prismaDecimalToNumber(wallet.balance),
     withdrawableBalance: prismaDecimalToNumber(wallet.withdrawableBalance),
     storeCredit: prismaDecimalToNumber(wallet.storeCredit),
-    totalDeposited: prismaDecimalToNumber(wallet.totalDeposited),
-    totalWithdrawn: prismaDecimalToNumber(wallet.totalWithdrawn),
-    totalConvertedToCredit: prismaDecimalToNumber(wallet.totalConvertedToCredit),
-    totalContributed: prismaDecimalToNumber(wallet.totalContributed),
-    totalProfitReceived: prismaDecimalToNumber(wallet.totalProfitReceived),
-    lockedBalance: prismaDecimalToNumber(wallet.lockedBalance),
+    totalDeposited: wallet.totalDeposited !== undefined ? prismaDecimalToNumber(wallet.totalDeposited) : undefined,
+    totalWithdrawn: wallet.totalWithdrawn !== undefined ? prismaDecimalToNumber(wallet.totalWithdrawn) : undefined,
+    totalConvertedToCredit: wallet.totalConvertedToCredit !== undefined ? prismaDecimalToNumber(wallet.totalConvertedToCredit) : undefined,
+    totalContributed: wallet.totalContributed !== undefined ? prismaDecimalToNumber(wallet.totalContributed) : undefined,
+    totalProfitReceived: wallet.totalProfitReceived !== undefined ? prismaDecimalToNumber(wallet.totalProfitReceived) : undefined,
+    lockedBalance: wallet.lockedBalance !== undefined ? prismaDecimalToNumber(wallet.lockedBalance) : undefined,
   };
 }
 
 /**
  * Format transaction for API response
  */
-export function formatTransactionForResponse(transaction: any) {
+export function formatTransactionForResponse<T extends TransactionRecord>(transaction: T | null | undefined): T | null | undefined {
   if (!transaction) return transaction;
   return {
     ...transaction,
@@ -42,37 +94,37 @@ export function formatTransactionForResponse(transaction: any) {
 /**
  * Format asset for API response
  */
-export function formatAssetForResponse(asset: any) {
+export function formatAssetForResponse<T extends AssetRecord>(asset: T | null | undefined): T | null | undefined {
   if (!asset) return asset;
   return {
     ...asset,
     targetPrice: prismaDecimalToNumber(asset.targetPrice),
     platformFee: prismaDecimalToNumber(asset.platformFee),
-    platformFeeAfterExcess: prismaDecimalToNumber(asset.platformFeeAfterExcess),
+    platformFeeAfterExcess: asset.platformFeeAfterExcess !== undefined ? prismaDecimalToNumber(asset.platformFeeAfterExcess) : undefined,
     currentCollected: prismaDecimalToNumber(asset.currentCollected),
     totalRevenue: prismaDecimalToNumber(asset.totalRevenue),
-    totalProfitDistributed: prismaDecimalToNumber(asset.totalProfitDistributed),
+    totalProfitDistributed: asset.totalProfitDistributed !== undefined ? prismaDecimalToNumber(asset.totalProfitDistributed) : undefined,
   };
 }
 
 /**
  * Format contribution for API response
  */
-export function formatContributionForResponse(contribution: any) {
+export function formatContributionForResponse<T extends ContributionRecord>(contribution: T | null | undefined): T | null | undefined {
   if (!contribution) return contribution;
   return {
     ...contribution,
     amount: prismaDecimalToNumber(contribution.amount),
-    excessAmount: prismaDecimalToNumber(contribution.excessAmount),
-    profitShareRatio: prismaDecimalToNumber(contribution.profitShareRatio),
-    totalProfitReceived: prismaDecimalToNumber(contribution.totalProfitReceived),
+    excessAmount: contribution.excessAmount !== undefined ? prismaDecimalToNumber(contribution.excessAmount) : undefined,
+    profitShareRatio: contribution.profitShareRatio !== undefined ? prismaDecimalToNumber(contribution.profitShareRatio) : undefined,
+    totalProfitReceived: contribution.totalProfitReceived !== undefined ? prismaDecimalToNumber(contribution.totalProfitReceived) : undefined,
   };
 }
 
 /**
  * Format withdrawal request for API response
  */
-export function formatWithdrawalForResponse(withdrawal: any) {
+export function formatWithdrawalForResponse<T extends WithdrawalRecord>(withdrawal: T | null | undefined): T | null | undefined {
   if (!withdrawal) return withdrawal;
   return {
     ...withdrawal,
@@ -83,7 +135,7 @@ export function formatWithdrawalForResponse(withdrawal: any) {
 /**
  * Format gap loan for API response
  */
-export function formatGapLoanForResponse(gapLoan: any) {
+export function formatGapLoanForResponse<T extends GapLoanRecord>(gapLoan: T | null | undefined): T | null | undefined {
   if (!gapLoan) return gapLoan;
   return {
     ...gapLoan,

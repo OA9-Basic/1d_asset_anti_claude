@@ -101,9 +101,22 @@ export async function isAssetDeleted(assetId: string): Promise<boolean> {
  * const dbWithSoftDelete = prisma.$extends(withSoftDelete);
  * const users = await dbWithSoftDelete.user.findMany(); // Excludes deleted users
  */
+
+interface PrismaOperationArgs {
+  where?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+interface PrismaOperationContext {
+  model: string;
+  operation: string;
+  args: PrismaOperationArgs;
+  query: (args: PrismaOperationArgs) => unknown;
+}
+
 export const withSoftDelete = {
   query: {
-    $allOperations({ model, operation, args, query }: any) {
+    $allOperations({ model, operation, args, query }: PrismaOperationContext) {
       // Only apply to findMany and findFirst operations on models with deletedAt
       if (
         (operation === 'findMany' || operation === 'findFirst') &&

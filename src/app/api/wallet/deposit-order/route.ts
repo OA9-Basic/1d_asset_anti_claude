@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
     // 5. Generate HD wallet address
     // Get next unused index from database
     const lastOrder = await db.depositOrder.findFirst({
-      where: { network: network as any, userId: session.user.id },
+      where: { network: network as 'ETHEREUM_MAINNET' | 'POLYGON_MAINNET' | 'BSC_MAINNET', userId: session.user.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
         usdAmount,
         cryptoAmount: priceQuote.cryptoAmount,
         cryptoCurrency,
-        network: network as any,
+        network: network as 'ETHEREUM_MAINNET' | 'POLYGON_MAINNET' | 'BSC_MAINNET',
         priceAtCreation: priceQuote.usdPrice,
         priceExpiresAt: priceQuote.expiresAt,
         depositAddress: toChecksumAddress(wallet.address),

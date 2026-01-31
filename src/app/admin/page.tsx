@@ -874,7 +874,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="space-y-2">
               <Label>Profit Distribution Timing</Label>
-              <Select value={profitDistributionTiming} onValueChange={(v: any) => setProfitDistributionTiming(v)}>
+              <Select value={profitDistributionTiming} onValueChange={(v: 'IMMEDIATE' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'CUSTOM') => setProfitDistributionTiming(v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select timing" />
                 </SelectTrigger>
