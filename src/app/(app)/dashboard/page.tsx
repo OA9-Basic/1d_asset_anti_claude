@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, RefreshCw, Users, Package, ArrowUpRight, TrendingUp, TrendingDown } from 'lucide-react';
+import { Loader2, RefreshCw, Users, Package, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -69,28 +69,27 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      {/* Email Verification Banner */}
+      {/* Email Verification Banner - Slim top bar */}
       {user && !user.emailVerified && !dismissBanner && (
-        <EmailVerificationBanner
-          email={user.email}
-          onDismiss={() => setDismissBanner(true)}
-        />
+        <div className="h-10 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-center px-4">
+          <EmailVerificationBanner
+            email={user.email}
+            onDismiss={() => setDismissBanner(true)}
+          />
+        </div>
       )}
 
-      {/* Premium Header */}
-      <PageHeader>
+      {/* Premium Header - No purple bar, larger welcome text */}
+      <PageHeader className="pb-4">
         <PageHeaderContent>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-8 w-1 bg-gradient-to-b from-violet-500 to-indigo-600 rounded-full" />
-              <div>
-                <PageTitle className="tracking-tight-premium">
-                  Welcome back, {displayName}
-                </PageTitle>
-                <PageDescription>
-                  Here&apos;s what&apos;s happening with your account
-                </PageDescription>
-              </div>
+            <div>
+              <PageTitle className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100">
+                Welcome back, {displayName}
+              </PageTitle>
+              <PageDescription className="mt-1">
+                Here&apos;s what&apos;s happening with your account
+              </PageDescription>
             </div>
             <Button
               variant="outline"
@@ -106,7 +105,7 @@ export default function DashboardPage() {
         </PageHeaderContent>
       </PageHeader>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 stagger-reveal">
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
         {/* Stats Grid - with premium animations */}
         <DashboardStats
           stats={dashboardData?.stats}
@@ -115,15 +114,15 @@ export default function DashboardPage() {
           onRefresh={() => mutateDashboard()}
         />
 
-        {/* Main Content Grid - 2:1 ratio */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Activity Feed (2/3) */}
-          <div className="lg:col-span-2 space-y-6">
+        {/* Main Content Grid - 12-column: 8:4 ratio */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column - Activity Feed (8 cols) */}
+          <div className="lg:col-span-8 space-y-6">
             {/* Recent Activity - Timeline Style */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight-premium">
+                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight-premium">
                     Recent Activity
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -132,7 +131,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <UnifiedCard variant="default" padding="none" className="overflow-hidden">
+              <UnifiedCard variant="default" padding="none" className="border-zinc-800 dark:border-zinc-800 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
                 <CardHeader bordered>
                   <CardTitle>Community Contributions</CardTitle>
                   <CardDescription>Real-time updates from across the platform</CardDescription>
@@ -163,12 +162,9 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
-                        <Users className="w-8 h-8 text-zinc-400" />
-                      </div>
-                      <p className="text-zinc-500 dark:text-zinc-400 font-medium">No recent activity yet</p>
-                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Be the first to contribute!</p>
+                    <div className="text-center py-10 border border-dashed border-zinc-700 rounded-lg">
+                      <Users className="w-8 h-8 mx-auto mb-3 text-zinc-600" />
+                      <p className="text-sm text-zinc-500">No activity yet</p>
                     </div>
                   )}
                 </CardContent>
@@ -179,7 +175,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight-premium">
+                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight-premium">
                     Trending Assets
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -203,12 +199,9 @@ export default function DashboardPage() {
                   featuredData.assets.map((asset) => <MiniAssetCard key={asset.id} asset={asset} />)
                 ) : (
                   <UnifiedCard className="col-span-full" padding="lg">
-                    <CardContent className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
-                        <Package className="w-8 h-8 text-zinc-400" />
-                      </div>
-                      <p className="text-zinc-500 dark:text-zinc-400 font-medium">No trending assets available</p>
-                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Check back later for new opportunities</p>
+                    <CardContent className="text-center py-10">
+                      <Package className="w-8 h-8 mx-auto mb-3 text-zinc-600" />
+                      <p className="text-sm text-zinc-500">No trending assets available</p>
                     </CardContent>
                   </UnifiedCard>
                 )}
@@ -216,8 +209,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Column - Quick Actions & My Contributions (1/3) */}
-          <div className="space-y-6">
+          {/* Right Column - Sidebar (4 cols) */}
+          <div className="lg:col-span-4 space-y-6">
             <QuickActions userId={user.id} />
             <MyContributions contributions={dashboardData?.contributions} loading={dashboardLoading} />
             <BalanceBreakdown stats={dashboardData?.stats} />

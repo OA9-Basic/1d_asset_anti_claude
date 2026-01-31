@@ -13,9 +13,9 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        // Default: Subtle border, no shadow
+        // Default: Subtle border, inner glow, no shadow
         default:
-          'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 hover:border-zinc-300 dark:hover:border-zinc-700',
+          'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]',
         // Elevated: Subtle shadow
         elevated:
           'border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-700',
