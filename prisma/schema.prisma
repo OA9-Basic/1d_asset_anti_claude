@@ -174,6 +174,11 @@ model Wallet {
   user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions          Transaction[]
   withdrawalRequests    WithdrawalRequest[]
+
+  @@index([userId])
+  @@index([balance])
+  @@index([withdrawableBalance])
+  @@index([createdAt])
 }
 
 model Transaction {
@@ -278,6 +283,10 @@ model Asset {
   @@index([profitDistributionTiming])
   @@index([status, featured])
   @@index([status, type])
+  @@index([status, currentCollected])  // For funding progress queries
+  @@index([totalPurchases])  // For sorting by popularity
+  @@index([totalRevenue])  // For sorting by revenue
+  @@index([createdAt, status])  // For sorting newest by status
 }
 
 model AssetRequest {
@@ -349,6 +358,9 @@ model Contribution {
   @@index([isInvestment])
   @@index([assetId, status])
   @@index([userId, status])
+  @@index([createdAt])  // For sorting by contribution date
+  @@index([assetId, createdAt])  // For getting recent contributions
+  @@index([amount])  // For sorting by contribution amount
 }
 
 model GapLoan {

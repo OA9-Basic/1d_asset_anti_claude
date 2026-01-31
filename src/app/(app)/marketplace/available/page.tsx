@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import { AssetCard } from '@/components/features/asset-card';
@@ -65,6 +65,23 @@ const sortOptions: { value: SortOption; label: string; icon: string }[] = [
   { value: 'priceDesc', label: 'Price: High to Low', icon: '💎' },
 ];
 
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 // Loading Skeleton Component
 function AssetCardSkeleton() {
   return (
@@ -86,9 +103,11 @@ export default function AvailableAssetsPage() {
   const _router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [cursor, setCursor] = useState<string | undefined>();
   const [allAssets, setAllAssets] = useState<Asset[]>([]);
+
+  // Use debounce hook with 500ms delay
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   // Build query params
   const queryParams = new URLSearchParams({
@@ -279,7 +298,6 @@ export default function AvailableAssetsPage() {
                     variant="outline"
                     onClick={() => {
                       setSearchQuery('');
-                      setDebouncedSearch('');
                     }}
                   >
                     Clear Search
