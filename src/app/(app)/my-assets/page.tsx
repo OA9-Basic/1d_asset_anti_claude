@@ -1,17 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AlertCircle, ArrowUpRight, RefreshCw, ShoppingCart, Package } from 'lucide-react';
+import { RefreshCw, ArrowUpRight, ShoppingCart, Package } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { UnifiedCard, CardContent } from '@/components/ui/unified/unified-card';
 import { useAuth } from '@/hooks/use-auth';
-import { staggerContainer } from '@/lib/animations';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
 import { MyAssetCard } from './components/MyAssetCard';
@@ -44,12 +43,12 @@ export default function MyAssetsPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         >
-          <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+          <RefreshCw className="w-8 h-8 animate-spin text-zinc-900 dark:text-white" />
         </motion.div>
       </div>
     );
@@ -62,23 +61,29 @@ export default function MyAssetsPage() {
       exit={{ opacity: 0 }}
       className="min-h-screen bg-white dark:bg-black"
     >
+      {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="border-b bg-background/95 backdrop-blur sticky top-0 z-10"
+        className="border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-black/95 backdrop-blur sticky top-0 z-10"
       >
-        <div className="container-custom py-6">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">My Assets</h1>
-              <p className="text-muted-foreground">Manage your contributions and owned assets</p>
+              <h1 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100">
+                My Assets
+              </h1>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                Manage your contributions and owned assets
+              </p>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => mutateAssets()}
               disabled={assetsLoading}
+              className="border-zinc-200 dark:border-zinc-800"
             >
               <motion.div
                 animate={assetsLoading ? { rotate: 360 } : {}}
@@ -92,26 +97,26 @@ export default function MyAssetsPage() {
         </div>
       </motion.header>
 
-      <div className="container-custom py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {assetsError ? (
-          <Card className="border-destructive">
+          <UnifiedCard variant="default" padding="lg" className="border-red-900/50 bg-red-950/30">
             <CardContent className="p-6">
-              <div className="flex items-center gap-3 text-destructive">
-                <AlertCircle className="w-5 h-5" />
+              <div className="flex items-center gap-3 text-red-400">
+                <RefreshCw className="w-5 h-5" />
                 <div>
-                  <p className="font-medium">Failed to load assets</p>
+                  <p className="font-medium text-zinc-100">Failed to load assets</p>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => mutateAssets()}
-                    className="mt-2"
+                    className="mt-2 border-zinc-800"
                   >
                     Retry
                   </Button>
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </UnifiedCard>
         ) : (
           <>
             {assetsData?.stats && (
@@ -120,37 +125,36 @@ export default function MyAssetsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="show"
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard
-                    icon={ ShoppingCart}
+                    icon={ShoppingCart}
                     title="Total Invested"
                     value={`$${prismaDecimalToNumber(assetsData.stats.totalInvested).toFixed(2)}`}
                     description="Lifetime contributions"
+                    variant="default"
                   />
                   <StatCard
                     icon={Package}
                     title="Contributing"
                     value={assetsData.stats.contributingCount}
                     description="Assets funding now"
+                    variant="info"
                   />
                   <StatCard
                     icon={ShoppingCart}
                     title="Owned"
                     value={assetsData.stats.ownedCount}
                     description="Assets you own"
+                    variant="success"
                   />
                   <StatCard
                     icon={Package}
                     title="Completed"
                     value={assetsData.stats.completedCount}
                     description="Successfully funded"
+                    variant="primary"
                   />
-                </motion.div>
+                </div>
               </motion.section>
             )}
 
@@ -172,7 +176,7 @@ export default function MyAssetsPage() {
                 </Tabs>
 
                 <Link href="/marketplace">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-zinc-200 dark:border-zinc-800">
                     Browse More Assets
                     <ArrowUpRight className="w-4 h-4 ml-1" />
                   </Button>
@@ -187,9 +191,9 @@ export default function MyAssetsPage() {
                 </div>
               ) : assetsData?.assets && assetsData.assets.length > 0 ? (
                 <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="show"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                   {assetsData.assets.map((asset) => (

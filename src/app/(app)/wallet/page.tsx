@@ -1,12 +1,11 @@
 'use client';
 
-import { RefreshCw, Loader2, Filter, AlertCircle } from 'lucide-react';
+import { Loader2, Filter, AlertCircle, RefreshCw, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UnifiedCard, CardContent } from '@/components/ui/unified/unified-card';
 import { useAuth } from '@/hooks/use-auth';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
@@ -113,23 +113,26 @@ export default function WalletPage() {
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-neutral-900 dark:text-white" />
+        <Loader2 className="w-8 h-8 animate-spin text-zinc-900 dark:text-white" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      <div className="border-b border-neutral-200 dark:border-neutral-800">
+      {/* Header */}
+      <div className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-8 w-1 bg-neutral-900 dark:bg-white" />
+              <div className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-900">
+                <Wallet className="w-5 h-5 text-zinc-700 dark:text-zinc-300" />
+              </div>
               <div>
-                <h1 className="text-xl font-semibold text-neutral-900 dark:text-white tracking-tight">
+                <h1 className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100">
                   Wallet
                 </h1>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                   Manage your funds
                 </p>
               </div>
@@ -142,7 +145,7 @@ export default function WalletPage() {
                 mutateTransactions();
               }}
               disabled={balanceLoading || transactionsLoading}
-              className="border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              className="border-zinc-200 dark:border-zinc-800"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${balanceLoading || transactionsLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -151,14 +154,14 @@ export default function WalletPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-6 py-10 space-y-6">
         {balanceError || transactionsError ? (
-          <Card className="border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30">
+          <UnifiedCard variant="default" padding="lg" className="border-red-900/50 bg-red-950/30">
             <CardContent className="p-6">
-              <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+              <div className="flex items-center gap-3 text-red-400">
                 <AlertCircle className="w-5 h-5" />
                 <div>
-                  <p className="font-medium">Failed to load wallet data</p>
+                  <p className="font-medium text-zinc-100">Failed to load wallet data</p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -166,33 +169,33 @@ export default function WalletPage() {
                       mutateBalance();
                       mutateTransactions();
                     }}
-                    className="mt-2"
+                    className="mt-2 border-zinc-800"
                   >
                     Retry
                   </Button>
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </UnifiedCard>
         ) : (
           <>
             <BalanceCards balanceData={balanceData} balanceLoading={balanceLoading} />
             <WalletActions onWithdrawClick={() => setWithdrawOpen(true)} />
 
-            <Card className="border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+            <UnifiedCard variant="default" padding="none" className="border-zinc-800/60 overflow-hidden">
+              <div className="p-6 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
-                    <h2 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
+                    <h2 className="text-xl font-semibold text-zinc-100 mb-1">
                       Transaction History
                     </h2>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                    <p className="text-sm text-zinc-500">
                       Your recent wallet activity
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Select value={typeFilter} onValueChange={setTypeFilter}>
-                      <SelectTrigger className="w-[140px] border-neutral-200 dark:border-neutral-800">
+                      <SelectTrigger className="w-[140px] bg-zinc-900/50 border-zinc-800">
                         <Filter className="w-4 h-4 mr-2" />
                         <SelectValue placeholder="Type" />
                       </SelectTrigger>
@@ -206,7 +209,7 @@ export default function WalletPage() {
                       </SelectContent>
                     </Select>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-[140px] border-neutral-200 dark:border-neutral-800">
+                      <SelectTrigger className="w-[140px] bg-zinc-900/50 border-zinc-800">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -220,22 +223,22 @@ export default function WalletPage() {
                 </div>
               </div>
               <TransactionTable transactions={filteredTransactions} transactionsLoading={transactionsLoading} />
-            </Card>
+            </UnifiedCard>
           </>
         )}
       </div>
 
       <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
-        <DialogContent className="sm:max-w-md border-neutral-200 dark:border-neutral-800 rounded-xl">
+        <DialogContent className="sm:max-w-md border-zinc-800 rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl">Withdraw Funds</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl text-zinc-100">Withdraw Funds</DialogTitle>
+            <DialogDescription className="text-zinc-400">
               Withdraw funds from your wallet to cryptocurrency
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <span className="block text-sm font-medium text-zinc-300">
                 Amount (USD)
               </span>
               <Input
@@ -245,18 +248,18 @@ export default function WalletPage() {
                 onChange={(e) => setWithdrawAmount(e.target.value)}
                 min="1"
                 step="0.01"
-                className="border-neutral-200 dark:border-neutral-800"
+                className="bg-zinc-900/50 border-zinc-800"
               />
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="text-xs text-zinc-500">
                 Available: ${balanceData ? prismaDecimalToNumber(balanceData.withdrawableBalance).toFixed(2) : '0.00'}
               </p>
             </div>
             <div className="space-y-2">
-              <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <span className="block text-sm font-medium text-zinc-300">
                 Cryptocurrency
               </span>
               <Select value={cryptoCurrency} onValueChange={setCryptoCurrency}>
-                <SelectTrigger className="border-neutral-200 dark:border-neutral-800">
+                <SelectTrigger className="bg-zinc-900/50 border-zinc-800">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -268,25 +271,25 @@ export default function WalletPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <span className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <span className="block text-sm font-medium text-zinc-300">
                 Wallet Address
               </span>
               <Input
                 placeholder="Enter your wallet address"
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
-                className="border-neutral-200 dark:border-neutral-800"
+                className="bg-zinc-900/50 border-zinc-800"
               />
             </div>
-            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50">
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">Withdrawal Request</p>
-              <p className="text-xs text-amber-700 dark:text-amber-300">
+            <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-900/50">
+              <p className="text-sm font-medium text-amber-200 mb-1">Withdrawal Request</p>
+              <p className="text-xs text-amber-300">
                 Your withdrawal will be processed by an admin. Funds will be locked until approval.
               </p>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setWithdrawOpen(false)} className="border-neutral-200 dark:border-neutral-800">
+            <Button variant="outline" onClick={() => setWithdrawOpen(false)} className="border-zinc-800">
               Cancel
             </Button>
             <Button
@@ -297,7 +300,7 @@ export default function WalletPage() {
                 parseFloat(withdrawAmount) <= 0 ||
                 !walletAddress
               }
-              className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90"
+              className="bg-zinc-100 text-black hover:bg-zinc-200"
             >
               {isProcessing ? (
                 <>

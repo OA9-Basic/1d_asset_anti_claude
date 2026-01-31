@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form } from '@/components/ui/form';
+import { UnifiedCard, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/unified/unified-card';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -63,8 +63,8 @@ export default function RequestAssetPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <Loader2 className="w-8 h-8 animate-spin text-zinc-900 dark:text-white" />
       </div>
     );
   }
@@ -160,24 +160,24 @@ export default function RequestAssetPage() {
     <div className="min-h-screen bg-white dark:bg-black">
       <RequestHeader />
 
-      <div className="container-custom py-8 max-w-3xl">
+      <div className="max-w-3xl mx-auto px-6 py-8">
         <ProgressBar currentStep={currentStep} />
 
         {/* Form Card */}
-        <Card className="border-2 shadow-xl overflow-hidden">
-          <CardHeader>
+        <UnifiedCard variant="default" padding="none" className="overflow-hidden border-zinc-800/60">
+          <CardHeader className="border-zinc-200 dark:border-zinc-800">
             <div className="flex items-center gap-3 mb-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white">
-                <PlusCircle className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-900">
+                <PlusCircle className="h-5 w-5 text-zinc-700 dark:text-zinc-300" />
               </div>
               <div>
-                <CardTitle>{steps[currentStep - 1].title}</CardTitle>
+                <CardTitle className="text-zinc-100">{steps[currentStep - 1].title}</CardTitle>
                 <CardDescription>{steps[currentStep - 1].description}</CardDescription>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="px-6 pb-6">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
@@ -207,7 +207,7 @@ export default function RequestAssetPage() {
               </form>
             </Form>
           </CardContent>
-        </Card>
+        </UnifiedCard>
 
         <InfoCards />
       </div>
