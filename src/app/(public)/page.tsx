@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { type Metadata } from 'next';
 
-import { ScrollProgressBar } from '@/components/animated/reveal-on-scroll';
 import { CTASection } from '@/components/page/cta-section';
 import { FeaturesModern } from '@/components/page/features-modern';
 import { Footer } from '@/components/page/footer';
@@ -126,12 +125,8 @@ export default async function HomePage() {
       {/* Single Global Header */}
       <Header />
 
-      {/* Awwwards-style Scroll Progress Bar */}
-      <ScrollProgressBar />
-
       <main className="min-h-screen">
         <HeroPremium featuredCampaign={featuredCampaign} />
-        <InfiniteMarquee />
         <LiveStats stats={stats} />
         <FeaturesModern />
         <HowItWorks />

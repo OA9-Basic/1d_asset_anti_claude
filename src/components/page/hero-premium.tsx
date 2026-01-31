@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ChevronRight, Sparkles, TrendingUp, Zap, ShieldCheck, Star } from 'lucide-react';
+import { ArrowRight, ChevronRight, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
@@ -138,48 +138,6 @@ function StatCard({
   );
 }
 
-// Testimonial card
-function TestimonialCard({
-  name,
-  jobTitle,
-  content,
-  avatar,
-  delay,
-}: {
-  name: string;
-  jobTitle: string;
-  content: string;
-  avatar: string;
-  delay: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.8 + delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative"
-    >
-      <Card className="p-6 border-neutral-200/50 dark:border-neutral-800/50 bg-white/60 dark:bg-black/60 backdrop-blur-xl hover:bg-white/80 dark:hover:bg-black/80 transition-all duration-300">
-        <div className="flex items-start gap-4 mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-bold shrink-0">
-            {avatar}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-neutral-900 dark:text-white">{name}</p>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">{jobTitle}</p>
-          </div>
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-            ))}
-          </div>
-        </div>
-        <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">&ldquo;{content}&rdquo;</p>
-      </Card>
-    </motion.div>
-  );
-}
-
 // Campaign card mini
 function CampaignCardMini({ campaign, delay }: { campaign: CampaignCard; delay: number }) {
   const progress = (campaign.raisedAmount / campaign.goalAmount) * 100;
@@ -299,7 +257,7 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
 
       {/* Main content */}
       <motion.div style={{ opacity, scale }} className="relative">
-        <div className="container mx-auto px-6 pt-24 pb-32">
+        <div className="container mx-auto px-6 pt-32 pb-32">
           <div className="grid lg:grid-cols-12 gap-8 items-start">
             {/* Left column - Hero content */}
             <motion.div
@@ -375,55 +333,6 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
                   </Button>
                 </Link>
               </motion.div>
-
-              {/* Social proof */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-3">
-                    {[...Array(5)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{
-                          duration: 0.4,
-                          delay: 0.6 + i * 0.08,
-                          type: 'spring',
-                          stiffness: 200,
-                        }}
-                        className="w-12 h-12 rounded-full bg-gradient-to-br from-neutral-200 to-neutral-300 dark:from-neutral-700 dark:to-neutral-800 border-3 border-white dark:border-black flex items-center justify-center text-sm font-bold shadow-lg"
-                      >
-                        {String.fromCharCode(65 + i)}
-                      </motion.div>
-                    ))}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                      Trusted by 10,000+ creators
-                    </p>
-                    <p className="text-sm text-neutral-500">Join our growing community</p>
-                  </div>
-                </div>
-
-                <div className="hidden sm:block h-12 w-px bg-neutral-200 dark:bg-neutral-800" />
-
-                <div className="flex items-center gap-6">
-                  {[
-                    { icon: ShieldCheck, label: 'Secure payments' },
-                    { icon: Zap, label: 'Instant access' },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center gap-2">
-                      <item.icon className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-                      <span className="text-sm text-neutral-600 dark:text-neutral-400">{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
             </motion.div>
 
             {/* Right column - Cards */}
@@ -448,36 +357,11 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
                   delay={1.5}
                 />
               </div>
-
-              {/* Testimonial */}
-              <TestimonialCard
-                name="Sarah Chen"
-                jobTitle="UX Designer"
-                content="This platform completely changed how I access premium design tools. I've saved over $2,000 this year alone."
-                avatar="SC"
-                delay={2}
-              />
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-      >
-        <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-6 h-10 rounded-full border-2 border-neutral-300 dark:border-neutral-700 flex justify-center items-start pt-2"
-        >
-          <div className="w-1 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }
