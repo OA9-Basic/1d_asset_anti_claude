@@ -20,7 +20,7 @@ export function DashboardStats({ stats, loading, error, onRefresh }: DashboardSt
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border border-neutral-200 dark:border-neutral-800 rounded-xl bg-white dark:bg-black p-6 animate-pulse" />
+          <div key={i} className="border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950/50 p-6 animate-pulse" />
         ))}
       </div>
     );

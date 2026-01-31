@@ -13,12 +13,8 @@ interface QuickActionsProps {
 /**
  * Quick Actions Component - Premium Dark Theme
  *
- * Compact 2x2 grid of uniform action buttons.
- * Features:
- * - Consistent zinc-900/50 background
- * - Hover: violet-500/10 bg with violet-500/50 border
- * - Sophisticated "Control Keys" aesthetic
- * - No rainbow colors
+ * Compact card with 2x2 grid of uniform action buttons.
+ * Height is auto-fit to content - NO stretching.
  */
 export function QuickActions({ userId }: QuickActionsProps) {
   const handleShare = () => {
@@ -53,9 +49,9 @@ export function QuickActions({ userId }: QuickActionsProps) {
   ];
 
   return (
-    <UnifiedCard variant="default" padding="md" className="h-full">
+    <UnifiedCard variant="default" padding="md" className="h-auto">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base">Quick Actions</CardTitle>
+        <CardTitle className="text-base text-zinc-100">Quick Actions</CardTitle>
         <CardDescription className="text-xs">Get started</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -69,10 +65,9 @@ export function QuickActions({ userId }: QuickActionsProps) {
                   'group relative flex flex-col items-center justify-center',
                   'p-3 rounded-lg border',
                   'transition-all duration-200',
-                  'bg-zinc-900/50 dark:bg-zinc-900/50',
-                  'border-zinc-800 dark:border-zinc-800',
+                  'bg-zinc-900/50',
+                  'border-zinc-800',
                   'hover:border-violet-500/50 hover:bg-violet-500/10',
-                  'hover:text-violet-200',
                   'active:scale-[0.98]'
                 )}
               >

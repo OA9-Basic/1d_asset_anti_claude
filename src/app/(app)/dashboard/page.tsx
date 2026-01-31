@@ -79,11 +79,11 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Premium Header - No purple bar, larger welcome text */}
+      {/* Premium Header - Proper flex alignment */}
       <PageHeader className="pb-4">
         <PageHeaderContent>
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-center justify-between w-full">
+            <div className="flex-1">
               <PageTitle className="text-3xl font-light tracking-tight text-zinc-900 dark:text-zinc-100">
                 Welcome back, {displayName}
               </PageTitle>
@@ -96,7 +96,7 @@ export default function DashboardPage() {
               size="sm"
               onClick={() => mutateDashboard()}
               disabled={dashboardLoading}
-              className="border-zinc-200 dark:border-zinc-700"
+              className="border-zinc-200 dark:border-zinc-700 flex-shrink-0 ml-4"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${dashboardLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -106,7 +106,7 @@ export default function DashboardPage() {
       </PageHeader>
 
       <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
-        {/* Stats Grid - with premium animations */}
+        {/* Stats Grid */}
         <DashboardStats
           stats={dashboardData?.stats}
           loading={dashboardLoading}
@@ -122,7 +122,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight-premium">
+                  <h2 className="text-xl font-semibold text-zinc-100 tracking-tight-premium">
                     Recent Activity
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -131,9 +131,9 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <UnifiedCard variant="default" padding="none" className="border-zinc-800 dark:border-zinc-800 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+              <UnifiedCard variant="default" padding="none" className="border-zinc-800 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
                 <CardHeader bordered>
-                  <CardTitle>Community Contributions</CardTitle>
+                  <CardTitle className="text-zinc-100">Community Contributions</CardTitle>
                   <CardDescription>Real-time updates from across the platform</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -175,7 +175,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight-premium">
+                  <h2 className="text-xl font-semibold text-zinc-100 tracking-tight-premium">
                     Trending Assets
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
@@ -209,8 +209,8 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Column - Sidebar (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Right Column - Sidebar (4 cols) - h-fit to prevent stretching */}
+          <div className="lg:col-span-4 flex flex-col gap-6 h-fit">
             <QuickActions userId={user.id} />
             <MyContributions contributions={dashboardData?.contributions} loading={dashboardLoading} />
             <BalanceBreakdown stats={dashboardData?.stats} />
