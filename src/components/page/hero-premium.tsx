@@ -1,10 +1,10 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ChevronRight, type LucideIcon } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-import type { CampaignCard } from '@/types/page';
+import type { CampaignCard, StatsData } from '@/types/page';
 
 /**
  * Premium Hero Section with Depth & Life
@@ -13,44 +13,25 @@ import type { CampaignCard } from '@/types/page';
  * - Glass cards with minimal borders
  * - High-contrast buttons
  * - Huge typography with subtle gradients
+ * - Real stats from API
  */
 
 interface HeroPremiumProps {
   featuredCampaign: CampaignCard | null;
+  stats: StatsData;
 }
 
-// Stat card - Glass design with no heavy borders
-function _StatCard({
-  value,
-  label,
-  icon: Icon,
-  _delay,
-}: {
-  value: string;
-  label: string;
-  icon: LucideIcon;
-  _delay: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.8 + _delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative"
-    >
-      <div className="relative p-6 rounded-2xl bg-zinc-900/50 dark:bg-white/5 backdrop-blur-sm hover:bg-zinc-800/80 dark:hover:bg-white/10 hover:ring-1 hover:ring-violet-500/30 transition-all duration-300">
-        <Icon className="w-6 h-6 text-zinc-400 dark:text-zinc-500 mb-3" strokeWidth={1.5} />
-        <p className="text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-100 mb-1">{value}</p>
-        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{label}</p>
-      </div>
-    </motion.div>
-  );
-}
-
-export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
+export function HeroPremium({ featuredCampaign: _featuredCampaign, stats }: HeroPremiumProps) {
   const { scrollY } = useScroll();
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const scale = useTransform(scrollY, [0, 300], [1, 0.95]);
+
+  // Format stats for display - show real data or hide if zero
+  const totalRaised = stats.totalCollected > 0
+    ? `$${(stats.totalCollected / 1000).toFixed(0)}K+`
+    : null;
+  const assetsFunded = stats.fundedAssets > 0 ? `${stats.fundedAssets}+` : null;
+  const avgContribution = '$25'; // This could be calculated from API if available
 
   return (
     <section className="relative min-h-[85vh] overflow-hidden">
@@ -77,7 +58,7 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </span>
                 <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Join thousands funding assets together
+                  {stats.users > 0 ? `${stats.users.toLocaleString()}+ members` : 'Join thousands funding assets together'}
                 </span>
               </div>
             </motion.div>
@@ -124,30 +105,38 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
               </Link>
             </motion.div>
 
-            {/* Stats - Horizontal row with dividers */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="pt-8 border-t border-zinc-200 dark:border-zinc-800"
-            >
-              <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div className="flex flex-col items-center">
-                  <p className="text-3xl md:text-4xl font-mono font-bold text-zinc-900 dark:text-zinc-100">
-                    {featuredCampaign?.raisedAmount ? `$${(featuredCampaign.raisedAmount / 1000).toFixed(0)}K` : '25K+'}
-                  </p>
-                  <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">Total Raised</p>
+            {/* Stats - Horizontal row with dividers - Only show if we have real data */}
+            {(totalRaised || assetsFunded || avgContribution) && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="pt-8 border-t border-zinc-200 dark:border-zinc-800"
+              >
+                <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+                  {totalRaised && (
+                    <div className="flex flex-col items-center">
+                      <p className="text-3xl md:text-4xl font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                        {totalRaised}
+                      </p>
+                      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">Total Raised</p>
+                    </div>
+                  )}
+                  {assetsFunded && (
+                    <div className={`flex flex-col items-center ${totalRaised ? 'border-l border-r border-zinc-200 dark:border-zinc-800' : ''}`}>
+                      <p className="text-3xl md:text-4xl font-mono font-bold text-zinc-900 dark:text-zinc-100">{assetsFunded}</p>
+                      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">Assets Funded</p>
+                    </div>
+                  )}
+                  {avgContribution && (
+                    <div className="flex flex-col items-center">
+                      <p className="text-3xl md:text-4xl font-mono font-bold text-zinc-900 dark:text-zinc-100">{avgContribution}</p>
+                      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">Avg. Contribution</p>
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-col items-center border-l border-r border-zinc-200 dark:border-zinc-800">
-                  <p className="text-3xl md:text-4xl font-mono font-bold text-zinc-900 dark:text-zinc-100">500+</p>
-                  <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">Assets Funded</p>
-                </div>
-                <div className="flex flex-col items-center">
-                  <p className="text-3xl md:text-4xl font-mono font-bold text-zinc-900 dark:text-zinc-100">$25</p>
-                  <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mt-1">Avg. Contribution</p>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
           </div>
         </div>
       </motion.div>

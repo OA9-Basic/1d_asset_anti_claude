@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
  * - Animated underline on link hover
  * - Newsletter with success feedback
  * - Clean, professional design
+ * - High-contrast subscribe button
  */
 
 const footerSections = {
@@ -154,7 +155,8 @@ export function Footer() {
                 placeholder="Enter your email"
                 disabled={newsletterState !== 'idle'}
                 className={cn(
-                  'w-full md:w-64 h-10 bg-background border-zinc-200 dark:border-zinc-800',
+                  'w-full md:w-64 h-10 bg-white dark:bg-zinc-900',
+                  'border-zinc-200 dark:border-zinc-800',
                   'focus-visible:ring-violet-500 disabled:opacity-50'
                 )}
                 required
@@ -164,14 +166,17 @@ export function Footer() {
                 size="sm"
                 disabled={newsletterState !== 'idle'}
                 className={cn(
-                  'h-10 px-4 bg-gradient-to-r from-violet-600 to-indigo-600',
-                  'hover:from-violet-700 hover:to-indigo-700 shrink-0'
+                  'h-10 px-4',
+                  'bg-black text-white dark:bg-white dark:text-black',
+                  'hover:bg-zinc-800 dark:hover:bg-zinc-200',
+                  'shadow-[0_0_20px_-5px_rgba(0,0,0,0.2)] dark:shadow-[0_0_20px_-5px_rgba(255,255,255,0.2)]',
+                  'shrink-0 font-semibold rounded-lg'
                 )}
               >
                 {newsletterState === 'idle' && (
                   <span className="flex items-center gap-2">
                     Subscribe
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                   </span>
                 )}
                 {newsletterState === 'loading' && (
@@ -188,7 +193,7 @@ export function Footer() {
                     animate={{ scale: 1 }}
                     className="flex items-center gap-1"
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="w-4 h-4" strokeWidth={1.5} />
                   </motion.span>
                 )}
               </Button>
@@ -198,7 +203,7 @@ export function Footer() {
             <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-green-600 dark:text-green-400 mt-2 text-center md:text-right"
+              className="text-sm text-emerald-600 dark:text-emerald-400 mt-2 text-center md:text-right"
             >
               Thanks for subscribing to updates!
             </motion.p>

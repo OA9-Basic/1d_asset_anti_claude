@@ -126,7 +126,7 @@ export default async function HomePage() {
       <Header />
 
       <main className="min-h-screen">
-        <HeroPremium featuredCampaign={featuredCampaign} />
+        <HeroPremium featuredCampaign={featuredCampaign} stats={stats} />
         <LiveStats stats={stats} />
         <BentoGridFeatures stats={stats} />
         <HowItWorks />

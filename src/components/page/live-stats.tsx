@@ -10,6 +10,7 @@ import type { StatsData } from '@/types/page';
  * Live Stats Ticker Component
  * Full-width section with evenly spaced items
  * Data passed via props from server-side fetch
+ * Shows real data or hides stat if zero
  */
 
 interface LiveStatsProps {
@@ -55,11 +56,22 @@ const colorClasses = {
 };
 
 export function LiveStats({ stats }: LiveStatsProps) {
+  // Filter out stats with zero values
+  const visibleStats = statItems.filter((item) => {
+    const value = stats[item.key as keyof StatsData] || 0;
+    return value > 0;
+  });
+
+  // Don't render section if no data
+  if (visibleStats.length === 0) {
+    return null;
+  }
+
   return (
     <section className="border-y border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 backdrop-blur-sm">
       <div className="container mx-auto px-6 py-8">
         <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
-          {statItems.map((item, index) => {
+          {visibleStats.map((item, index) => {
             const value = stats[item.key as keyof StatsData] || 0;
             const Icon = item.icon;
 
