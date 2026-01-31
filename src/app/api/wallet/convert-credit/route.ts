@@ -9,6 +9,7 @@ import {
   addPrismaDecimals,
   prismaDecimalToNumber,
 } from '@/lib/prisma-decimal';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
 const convertSchema = z.object({
   amount: z
@@ -27,6 +28,18 @@ export async function POST(req: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting for store credit conversion
+    const rateLimit = checkRateLimit(`convert-credit:${userId}`, RateLimitPresets.financial);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Too many conversion attempts',
+          resetTime: rateLimit.resetTime,
+        },
+        { status: 429 }
+      );
     }
 
     const body = await req.json();

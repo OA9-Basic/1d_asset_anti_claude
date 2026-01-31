@@ -68,6 +68,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Timestamp validation to prevent replay attacks (5 minute window)
+    const timestamp = req.headers.get('x-alchemy-timestamp');
+    if (timestamp) {
+      const timestampNum = parseInt(timestamp, 10);
+      const now = Date.now();
+      const age = now - timestampNum;
+
+      // Reject requests older than 5 minutes or from the future
+      if (age > 300000 || age < -30000) {
+        await db.webhookLog.create({
+          data: {
+            type: 'ALCHEMY_NOTIFY',
+            source: 'alchemy',
+            payload: body,
+            signature,
+            processed: false,
+            processingError: `Invalid timestamp - request age: ${age}ms`,
+            receivedAt: new Date(),
+          },
+        });
+
+        return NextResponse.json(
+          { error: 'Request timestamp too old or from future' },
+          { status: 401 }
+        );
+      }
+    }
+
     // 2. Parse webhook payload
     const payload = JSON.parse(body);
 

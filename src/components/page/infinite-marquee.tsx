@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
+import useSWR from 'swr';
 
 /**
  * Premium Infinite Marquee Component
@@ -11,6 +12,7 @@ import { useEffect, useState, useRef } from 'react';
  * - Refined styling with inner shadow
  * - More padding for less cluttered feel
  * - Smooth, seamless loop
+ * - REAL data from /api/activity endpoint
  */
 
 interface Contribution {
@@ -21,40 +23,97 @@ interface Contribution {
   timeAgo: string;
 }
 
-// Mock data - replace with real API
-const mockContributions: Contribution[] = [
-  { id: '1', userName: 'Alex M.', amount: 25, assetTitle: 'Figma Masterclass', timeAgo: '2m ago' },
-  { id: '2', userName: 'Sarah K.', amount: 50, assetTitle: 'React Course Pro', timeAgo: '5m ago' },
-  { id: '3', userName: 'Mike R.', amount: 15, assetTitle: 'UI Kit Bundle', timeAgo: '8m ago' },
-  { id: '4', userName: 'Emma L.', amount: 100, assetTitle: '3D Assets Pack', timeAgo: '12m ago' },
-  { id: '5', userName: 'John D.', amount: 30, assetTitle: 'Adobe Fonts Collection', timeAgo: '15m ago' },
-  { id: '6', userName: 'Lisa P.', amount: 45, assetTitle: 'Video Editing Course', timeAgo: '18m ago' },
-  { id: '7', userName: 'David W.', amount: 20, assetTitle: 'Icon Library', timeAgo: '22m ago' },
-  { id: '8', userName: 'Anna S.', amount: 75, assetTitle: 'Photography Presets', timeAgo: '25m ago' },
-];
+interface ActivityResponse {
+  activity: Array<{
+    id: string;
+    type: string;
+    amount: number;
+    user: {
+      id: string;
+      name: string;
+    };
+    asset: {
+      id: string;
+      title: string;
+      type: string;
+    };
+    createdAt: string;
+  }>;
+}
+
+// Helper function to format time ago
+function timeAgo(dateString: string): string {
+  const now = Date.now();
+  const past = new Date(dateString).getTime();
+  const diffInSeconds = Math.floor((now - past) / 1000);
+
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  return `${Math.floor(diffInSeconds / 86400)}d ago`;
+}
+
+// Fetch activity data
+async function fetchActivity(): Promise<Contribution[]> {
+  try {
+    const res = await fetch('/api/activity?limit=8', {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      console.error('Failed to fetch activity:', res.status);
+      return [];
+    }
+
+    const data: ActivityResponse = await res.json();
+
+    return data.activity.map((item) => ({
+      id: item.id,
+      userName: item.user.name || 'Anonymous',
+      amount: Number(item.amount),
+      assetTitle: item.asset.title,
+      timeAgo: timeAgo(item.createdAt),
+    }));
+  } catch (error) {
+    console.error('Error fetching activity:', error);
+    return [];
+  }
+}
 
 export function InfiniteMarquee() {
-  const [contributions, setContributions] = useState<Contribution[]>([...mockContributions]);
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Simulate live updates
+  // Fetch real activity data
   useEffect(() => {
-    const interval = setInterval(() => {
-      setContributions((prev) => {
-        const newContribution: Contribution = {
-          id: Date.now().toString(),
-          userName: ['Chris B.', 'Nina T.', 'Tom H.', 'Lucy G.', 'Jack M.'][Math.floor(Math.random() * 5)],
-          amount: [15, 25, 50, 75, 100][Math.floor(Math.random() * 5)],
-          assetTitle: mockContributions[Math.floor(Math.random() * mockContributions.length)].assetTitle,
-          timeAgo: 'Just now',
-        };
-        return [newContribution, ...prev.slice(0, -1)];
-      });
-    }, 5000);
+    let mounted = true;
 
-    return () => clearInterval(interval);
+    async function loadData() {
+      setIsLoading(true);
+      const data = await fetchActivity();
+      if (mounted) {
+        setContributions(data.length > 0 ? data : []);
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+
+    // Refresh every 30 seconds to show new contributions
+    const interval = setInterval(loadData, 30000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, []);
+
+  // If loading or no data, don't render the marquee
+  if (isLoading || contributions.length === 0) {
+    return null;
+  }
 
   // Duplicate items for seamless loop
   const displayItems = [...contributions, ...contributions];
