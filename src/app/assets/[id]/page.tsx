@@ -5,25 +5,26 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import useSWR from 'swr';
 
-import { AssetHeader } from './components/AssetHeader';
-import { AssetDetails } from './components/AssetDetails';
-import { WhyThisAsset } from './components/WhyThisAsset';
+
 import { ActionCard } from './components/ActionCard';
-import { QuickStats } from './components/QuickStats';
-import { InvestmentInfo } from './components/InvestmentInfo';
+import { AssetDetails } from './components/AssetDetails';
+import { AssetHeader } from './components/AssetHeader';
 import { AssetTabs } from './components/AssetTabs';
-import { RelatedAssets } from './components/RelatedAssets';
-import { LoadingSkeleton } from './components/LoadingSkeleton';
-import { ErrorState } from './components/ErrorState';
 import { Breadcrumb } from './components/Breadcrumb';
+import { ErrorState } from './components/ErrorState';
+import { InvestmentInfo } from './components/InvestmentInfo';
+import { LoadingSkeleton } from './components/LoadingSkeleton';
+import { QuickStats } from './components/QuickStats';
+import { RelatedAssets } from './components/RelatedAssets';
 import { ShareButton } from './components/ShareButton';
+import { WhyThisAsset } from './components/WhyThisAsset';
 import type { AssetData, RelatedAsset } from './types';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function AssetDetailPage() {
   const params = useParams();
-  const [retryCount, setRetryCount] = useState(0);
+  const [_retryCount, setRetryCount] = useState(0);
 
   const assetId = params.id as string;
 

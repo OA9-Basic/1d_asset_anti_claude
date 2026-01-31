@@ -8,8 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface RejectRequestDialogProps {
   open: boolean;
@@ -33,7 +33,7 @@ export function RejectRequestDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Reject Asset Request</DialogTitle>
-          <DialogDescription>Reject "{requestTitle}"</DialogDescription>
+          <DialogDescription>Reject &quot;{requestTitle}&quot;</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">

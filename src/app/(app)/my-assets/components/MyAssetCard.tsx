@@ -1,14 +1,15 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Package, PlusCircle, Eye, ArrowUpRight, CheckCircle2, DollarSign, Star, ShoppingCart, Clock, Calendar } from 'lucide-react';
+import Link from 'next/link';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
 import { statusConfig } from '../types';
 import type { Asset } from '../types';
 

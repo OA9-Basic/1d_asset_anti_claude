@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { FundedAsset } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { FundedAsset } from '../types';
 
 interface FundedAssetsTabProps {
   assets: FundedAsset[];

@@ -15,8 +15,8 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
-import { CreateHeader } from './components/CreateHeader';
 import { BasicInfoStep } from './components/BasicInfoStep';
+import { CreateHeader } from './components/CreateHeader';
 import { PricingStep } from './components/PricingStep';
 import { ReviewStep } from './components/ReviewStep';
 import { createAssetSchema, type CreateAssetFormValues, steps } from './constants';

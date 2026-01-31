@@ -1,8 +1,8 @@
-import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export function Breadcrumb({ assetId }: { assetId: string }) {
+export function Breadcrumb({ assetId: _assetId }: { assetId: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}

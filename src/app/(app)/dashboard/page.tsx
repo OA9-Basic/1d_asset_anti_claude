@@ -1,24 +1,24 @@
 'use client';
 
-import { Loader2, RefreshCw, Users, Package, ArrowUpRight, X } from 'lucide-react';
-import { useState } from 'react';
+import { Loader2, RefreshCw, Users, Package, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
+
+import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
+import { Button } from '@/components/ui/button';
 import { PageHeader, PageHeaderContent, PageTitle, PageDescription } from '@/components/ui/unified';
 import { UnifiedCard, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/unified/unified-card';
 import { useAuth } from '@/hooks/use-auth';
-import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
-import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 
-import { DashboardStats } from './components/DashboardStats';
-import { QuickActions } from './components/QuickActions';
-import { MyContributions } from './components/MyContributions';
-import { BalanceBreakdown } from './components/BalanceBreakdown';
 import { ActivityFeedItem } from './components/ActivityFeedItem';
+import { BalanceBreakdown } from './components/BalanceBreakdown';
+import { DashboardStats } from './components/DashboardStats';
 import { MiniAssetCard } from './components/MiniAssetCard';
+import { MyContributions } from './components/MyContributions';
+import { QuickActions } from './components/QuickActions';
 import type { DashboardData, FeaturedAssetsData, ActivityItem } from './types';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

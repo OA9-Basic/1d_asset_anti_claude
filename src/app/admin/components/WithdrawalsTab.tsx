@@ -10,8 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { Withdrawal } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Withdrawal } from '../types';
 
 interface WithdrawalsTabProps {
   withdrawals: Withdrawal[];

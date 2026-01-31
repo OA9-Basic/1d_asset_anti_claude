@@ -1,12 +1,14 @@
 'use client';
 
+import { Package, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Package, Users } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { CardContent } from '@/components/ui/unified/unified-card';
-import type { Asset } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Asset } from '../types';
 
 export function MiniAssetCard({ asset }: { asset: Asset }) {
   const progressPercent = Math.min(

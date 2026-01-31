@@ -1,6 +1,7 @@
 'use client';
 
-import { Package, ShoppingCart, Loader2 } from 'lucide-react';
+import { Package } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 
 export function AssetCardSkeleton() {

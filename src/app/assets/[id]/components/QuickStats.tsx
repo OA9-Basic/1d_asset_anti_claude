@@ -1,11 +1,13 @@
 'use client';
 
 import { CheckCircle2, Clock, DollarSign, ShoppingCart, Users } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import type { Asset, Contribution } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Asset } from '../types';
+
 
 interface QuickStatsProps {
   asset: Asset;

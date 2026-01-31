@@ -1,11 +1,13 @@
 'use client';
 
-import Link from 'next/link';
 import { Wallet } from 'lucide-react';
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 import { UnifiedCard, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/unified/unified-card';
-import type { DashboardStats } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { DashboardStats } from '../types';
 
 interface BalanceBreakdownProps {
   stats?: DashboardStats;

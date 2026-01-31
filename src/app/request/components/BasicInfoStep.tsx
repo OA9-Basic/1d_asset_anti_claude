@@ -1,5 +1,7 @@
 'use client';
 
+import type { Control } from 'react-hook-form';
+
 import {
   FormField,
   FormItem,
@@ -9,7 +11,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -17,11 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+
 import { assetTypes } from '../constants';
-import type { RequestAssetFormValues } from '../constants';
+
 
 interface BasicInfoStepProps {
-  control: any;
+  control: Control<Record<string, unknown>>;
   isSubmitting: boolean;
 }
 

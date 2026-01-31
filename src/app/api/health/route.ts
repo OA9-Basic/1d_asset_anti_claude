@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { db } from '@/lib/db';
 import { apiLogger } from '@/lib/loggers';
 
@@ -53,7 +54,7 @@ export async function GET(req: Request) {
       try {
         const { checkRateLimit } = await import('@/lib/rate-limit');
         // Use rate limit check as proxy for Redis health
-        const result = checkRateLimit('health-check', { maxRequests: 100, windowMs: 60000 });
+        const result = checkRateLimit('health-check', { limit: 100, windowMs: 60000 });
         healthStatus.checks.redis = {
           status: result.success ? 'healthy' : 'degraded',
           responseTime: Date.now() - redisCheckStart,

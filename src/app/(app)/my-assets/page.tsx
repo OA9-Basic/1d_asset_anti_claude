@@ -1,13 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {
-  AlertCircle,
-  ArrowUpRight,
-  RefreshCw,
-  ShoppingCart,
-  Package,
-} from 'lucide-react';
+import { AlertCircle, ArrowUpRight, RefreshCw, ShoppingCart, Package } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,9 +14,9 @@ import { useAuth } from '@/hooks/use-auth';
 import { staggerContainer } from '@/lib/animations';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
-import { StatCard } from './components/StatCard';
 import { MyAssetCard } from './components/MyAssetCard';
 import { AssetCardSkeleton, EmptyState } from './components/SkeletonStates';
+import { StatCard } from './components/StatCard';
 import type { MyAssetsData } from './types';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

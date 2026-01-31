@@ -1,6 +1,7 @@
-import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 
 export function ErrorState({ onRetry }: { onRetry: () => void }) {

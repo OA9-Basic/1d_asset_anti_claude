@@ -1,6 +1,8 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import type { Control } from 'react-hook-form';
+
 import {
   FormField,
   FormItem,
@@ -11,8 +13,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
+
 interface PricingStepProps {
-  control: any;
+  control: Control<Record<string, unknown>>;
   isSubmitting: boolean;
 }
 

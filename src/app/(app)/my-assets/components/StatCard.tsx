@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { DollarSign, Target, Package, CheckCircle2 } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { staggerItem } from '@/lib/animations';
 import type { IconType } from '@/types/ui';

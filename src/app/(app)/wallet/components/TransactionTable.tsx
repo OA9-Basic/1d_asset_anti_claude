@@ -1,12 +1,15 @@
 'use client';
 
 import { Calendar, Wallet as WalletIcon } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TransactionType } from './TransactionType';
-import { TransactionStatus } from './TransactionStatus';
-import type { Transaction } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Transaction } from '../types';
+
+import { TransactionStatus } from './TransactionStatus';
+import { TransactionType } from './TransactionType';
 
 interface TransactionTableProps {
   transactions: Transaction[];

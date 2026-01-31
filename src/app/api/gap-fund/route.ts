@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -6,7 +7,6 @@ import { db } from '@/lib/db';
 import { paymentLogger } from '@/lib/loggers';
 import {
   subtractPrismaDecimals,
-  isPrismaDecimalLessThan,
   isPrismaDecimalLessThanOrEqual,
   addPrismaDecimals,
   prismaDecimalToNumber
@@ -17,21 +17,24 @@ const gapFundSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  let userId: string | null = null;
+  let body: { assetId?: string } | undefined;
+
   try {
-    const userId = await getUserFromToken(req);
+    userId = await getUserFromToken(req);
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json();
+    body = await req.json();
     const { assetId } = gapFundSchema.parse(body);
 
     const result = await db.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
-        where: { id: userId },
+        where: { id: userId ?? '' },
         include: { wallet: true },
-      });
+      }) as { id: string; wallet: { id: string; balance: Prisma.Decimal | string | number } } | null;
 
       if (!user?.wallet) {
         throw new Error('Wallet not found');
@@ -55,7 +58,9 @@ export async function POST(req: NextRequest) {
         throw new Error('Asset is already fully funded');
       }
 
-      if (isPrismaDecimalLessThan(user.wallet.balance, prismaDecimalToNumber(gap))) {
+      const userBalance = prismaDecimalToNumber(user.wallet.balance);
+      const gapAmount = prismaDecimalToNumber(gap);
+      if (userBalance < gapAmount) {
         throw new Error('Insufficient balance for gap funding');
       }
 

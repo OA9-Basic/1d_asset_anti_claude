@@ -3,12 +3,12 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 import { AppHeader } from '@/components/layout/app-header';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
-import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();

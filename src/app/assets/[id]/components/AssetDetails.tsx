@@ -1,11 +1,13 @@
 'use client';
 
-import { ExternalLink } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ExternalLink , Download } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
-import type { Asset } from '../types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Asset } from '../types';
+
 
 interface AssetDetailsProps {
   asset: Asset;

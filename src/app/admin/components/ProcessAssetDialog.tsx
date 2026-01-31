@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,8 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { FundedAsset } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { FundedAsset } from '../types';
 
 interface ProcessAssetDialogProps {
   open: boolean;
@@ -39,7 +41,7 @@ export function ProcessAssetDialog({
         <DialogHeader>
           <DialogTitle>Process Funded Asset</DialogTitle>
           <DialogDescription>
-            Process "{asset?.title}" after purchasing the actual product
+            Process &quot;{asset?.title}&quot; after purchasing the actual product
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
@@ -49,7 +51,7 @@ export function ProcessAssetDialog({
               <li>Purchase the actual course/product using the collected funds</li>
               <li>Get the delivery URL/access credentials</li>
               <li>Update the asset with delivery information</li>
-              <li>Click "Process Asset" to give contributors access</li>
+              <li>Click &quot;Process Asset&quot; to give contributors access</li>
             </ol>
           </div>
           <div className="space-y-2 text-sm">

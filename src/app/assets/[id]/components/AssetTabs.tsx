@@ -1,9 +1,9 @@
 'use client';
 
+import { motion , AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Users } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import { CardContent } from '@/components/ui/card';
+
+import { Card , CardContent } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -13,9 +13,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AnimatePresence } from 'framer-motion';
-import type { Asset, Contribution, Purchase } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Asset, Contribution, Purchase } from '../types';
 
 interface AssetTabsProps {
   asset: Asset;

@@ -3,8 +3,10 @@
 import { Package, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+
 import type { RelatedAsset } from '../types';
 
 export function RelatedAssetCard({ asset }: { asset: RelatedAsset }) {

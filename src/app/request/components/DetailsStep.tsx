@@ -1,6 +1,8 @@
 'use client';
 
 import { Info } from 'lucide-react';
+import type { Control } from 'react-hook-form';
+
 import {
   FormField,
   FormItem,
@@ -9,7 +11,6 @@ import {
   FormDescription,
   FormMessage,
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -17,10 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+
 import { deliveryTypes } from '../constants';
 
+
 interface DetailsStepProps {
-  control: any;
+  control: Control<Record<string, unknown>>;
   isSubmitting: boolean;
 }
 

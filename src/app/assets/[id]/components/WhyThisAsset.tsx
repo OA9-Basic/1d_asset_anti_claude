@@ -1,6 +1,7 @@
 'use client';
 
 import { DollarSign, Star, TrendingUp, Users } from 'lucide-react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface WhyThisAssetProps {

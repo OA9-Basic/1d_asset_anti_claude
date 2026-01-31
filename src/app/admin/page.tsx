@@ -6,20 +6,19 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { buttonTap, staggerContainer } from '@/lib/animations';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
 
-import { StatCard } from './components/StatCard';
-import { AssetRequestsTab } from './components/AssetRequestsTab';
-import { WithdrawalsTab } from './components/WithdrawalsTab';
-import { FundedAssetsTab } from './components/FundedAssetsTab';
 import { ApproveRequestDialog } from './components/ApproveRequestDialog';
-import { RejectRequestDialog } from './components/RejectRequestDialog';
+import { AssetRequestsTab } from './components/AssetRequestsTab';
+import { FundedAssetsTab } from './components/FundedAssetsTab';
 import { ProcessAssetDialog } from './components/ProcessAssetDialog';
+import { RejectRequestDialog } from './components/RejectRequestDialog';
+import { StatCard } from './components/StatCard';
+import { WithdrawalsTab } from './components/WithdrawalsTab';
 import type { DashboardStats, AssetRequest, Withdrawal, FundedAsset } from './types';
 
 export default function AdminDashboardPage() {

@@ -1,8 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { buttonTap, hoverLift, staggerItem } from '@/lib/animations';
+
 import { Card, CardContent } from '@/components/ui/card';
+import { hoverLift, staggerItem } from '@/lib/animations';
+
 import type { StatCardProps } from '../types';
 
 export function StatCard({ icon: Icon, title, value, description, delay = 0 }: StatCardProps) {

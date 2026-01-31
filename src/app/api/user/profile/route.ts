@@ -4,17 +4,12 @@ import { z } from 'zod';
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-// Validation schema for profile updates
+// Validation schema for profile updates (only fields that exist in User model)
 const profileUpdateSchema = z.object({
   firstName: z.string().min(1, 'First name must be at least 1 character').max(100, 'First name must be less than 100 characters').optional(),
   lastName: z.string().min(1, 'Last name must be at least 1 character').max(100, 'Last name must be less than 100 characters').optional(),
-  phone: z.string().regex(/^\+?[\d\s-]+$/, 'Invalid phone number format').optional().or(z.literal('')),
-  location: z.string().max(200, 'Location must be less than 200 characters').optional().or(z.literal('')),
-  website: z.string().url('Invalid URL format').optional().or(z.literal('')),
-  bio: z.string().max(500, 'Bio must be less than 500 characters').optional().or(z.literal('')),
+  avatar: z.string().url('Invalid URL format').optional().or(z.literal('')),
 });
-
-type ProfileUpdateData = z.infer<typeof profileUpdateSchema>;
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,6 +26,7 @@ export async function GET(req: NextRequest) {
         email: true,
         firstName: true,
         lastName: true,
+        avatar: true,
         role: true,
         createdAt: true,
       },
@@ -69,16 +65,13 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const { firstName, lastName, phone, location, website, bio } = validatedData.data;
+    const { firstName, lastName, avatar } = validatedData.data;
 
     // Build update data object with only provided fields
-    const updateData: Record<string, string | undefined> = {};
+    const updateData: Record<string, string | null | undefined> = {};
     if (firstName !== undefined) updateData.firstName = firstName;
     if (lastName !== undefined) updateData.lastName = lastName;
-    if (phone !== undefined) updateData.phone = phone || null;
-    if (location !== undefined) updateData.location = location || null;
-    if (website !== undefined) updateData.website = website || null;
-    if (bio !== undefined) updateData.bio = bio || null;
+    if (avatar !== undefined) updateData.avatar = avatar || null;
 
     // Update user profile
     const updatedUser = await db.user.update({
@@ -89,10 +82,7 @@ export async function PUT(req: NextRequest) {
         email: true,
         firstName: true,
         lastName: true,
-        phone: true,
-        location: true,
-        website: true,
-        bio: true,
+        avatar: true,
         role: true,
         createdAt: true,
       },

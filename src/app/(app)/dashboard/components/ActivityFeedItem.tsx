@@ -2,8 +2,9 @@
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import type { ActivityItem } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { ActivityItem } from '../types';
 
 export function ActivityFeedItem({ item }: { item: ActivityItem }) {
   return (

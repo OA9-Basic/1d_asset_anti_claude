@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircle, Loader2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
 import type { AssetRequest } from '../types';
 
 interface ApproveRequestDialogProps {
@@ -56,7 +58,7 @@ export function ApproveRequestDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Approve Asset Request</DialogTitle>
-          <DialogDescription>Add "{request?.title}" to the platform</DialogDescription>
+          <DialogDescription>Add &quot;{request?.title}&quot; to the platform</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">

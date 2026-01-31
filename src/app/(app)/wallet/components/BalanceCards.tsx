@@ -1,9 +1,11 @@
 'use client';
 
 import { Wallet as WalletIcon, DollarSign, TrendingUp } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
-import type { BalanceData } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { BalanceData } from '../types';
 
 interface BalanceCardsProps {
   balanceData: BalanceData | undefined;

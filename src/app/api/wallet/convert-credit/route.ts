@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 import { paymentLogger } from '@/lib/loggers';
 import {
   isPrismaDecimalLessThan,
@@ -25,8 +24,11 @@ const convertSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  let userId: string | null = null;
+  let body: { amount?: unknown } | undefined;
+
   try {
-    const userId = await getUserFromToken(req);
+    userId = await getUserFromToken(req);
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -61,12 +63,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
+    body = await req.json();
     const { amount } = convertSchema.parse(body);
 
     const result = await db.$transaction(async (tx) => {
       const wallet = await tx.wallet.findUnique({
-        where: { userId },
+        where: { userId: userId ?? '' },
       });
 
       if (!wallet) {

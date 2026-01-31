@@ -1,9 +1,9 @@
 'use client';
 
+
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
-import useSWR from 'swr';
 
 /**
  * Premium Infinite Marquee Component

@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircle, XCircle } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,8 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { AssetRequest } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { AssetRequest } from '../types';
 
 interface AssetRequestsTabProps {
   requests: AssetRequest[];

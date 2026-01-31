@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDownCircle, ArrowUpCircle, Clock, TrendingUp, TrendingDown, DollarSign, CheckCircle2 } from 'lucide-react';
-import type { Transaction } from '../types';
+
 
 interface TransactionTypeProps {
   type: string;

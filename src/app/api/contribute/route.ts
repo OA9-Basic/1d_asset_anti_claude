@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { contributeToAsset } from '@/lib/contribution';
-import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 import { db } from '@/lib/db';
 import { paymentLogger } from '@/lib/loggers';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
 const contributeSchema = z.object({
   assetId: z.string().cuid(),
@@ -20,8 +20,11 @@ const contributeSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  let userId: string | null = null;
+  let body: { assetId?: string; amount?: unknown } | undefined;
+
   try {
-    const userId = await getUserFromToken(req);
+    userId = await getUserFromToken(req);
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -56,7 +59,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
+    body = await req.json();
     const { assetId, amount } = contributeSchema.parse(body);
 
     const result = await contributeToAsset(userId, assetId, amount);

@@ -1,9 +1,11 @@
 'use client';
 
-import { AlertCircle, Loader2, RefreshCw, Wallet, Package, TrendingUp, Vote as VoteIcon } from 'lucide-react';
+import { AlertCircle, Wallet, Package, TrendingUp, Vote as VoteIcon } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/ui/unified/stat-card';
 import { UnifiedCard, CardContent } from '@/components/ui/unified/unified-card';
+
 import type { DashboardStats } from '../types';
 
 interface DashboardStatsProps {

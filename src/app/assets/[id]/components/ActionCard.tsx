@@ -1,9 +1,9 @@
 'use client';
 
-import { CheckCircle2, Clock, DollarSign, Loader2, ShoppingCart, Users } from 'lucide-react';
-import { useState } from 'react';
+import { CheckCircle2, Clock, Loader2, ShoppingCart, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,8 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import type { Asset, Contribution } from '../types';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+
+import type { Asset, Contribution } from '../types';
 
 interface ActionCardProps {
   asset: Asset;
@@ -22,7 +23,7 @@ interface ActionCardProps {
   onMutate: () => void;
 }
 
-export function ActionCard({ asset, hasAccess, contributionsCount, userContribution, onMutate }: ActionCardProps) {
+export function ActionCard({ asset, hasAccess, contributionsCount, userContribution: _userContribution, onMutate }: ActionCardProps) {
   const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -55,8 +56,7 @@ export function ActionCard({ asset, hasAccess, contributionsCount, userContribut
     },
   };
 
-  const status = statusConfig[asset.status as keyof typeof statusConfig] || statusConfig.COLLECTING;
-  const StatusIcon = status.icon;
+  const _status = statusConfig[asset.status as keyof typeof statusConfig] || statusConfig.COLLECTING;
 
   const handleContribute = async () => {
     if (!user) {

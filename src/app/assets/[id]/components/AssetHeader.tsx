@@ -1,9 +1,11 @@
 'use client';
 
-import { CheckCircle2, Clock, Eye, ExternalLink, Package, Star } from 'lucide-react';
+import { CheckCircle2, Clock, Eye, Package, Star } from 'lucide-react';
 import Image from 'next/image';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+
 import type { Asset } from '../types';
 
 interface AssetHeaderProps {

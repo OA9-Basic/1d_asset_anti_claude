@@ -12,13 +12,13 @@ import { Form } from '@/components/ui/form';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
-import { RequestHeader } from './components/RequestHeader';
-import { ProgressBar } from './components/ProgressBar';
 import { BasicInfoStep } from './components/BasicInfoStep';
 import { DetailsStep } from './components/DetailsStep';
-import { ReviewStep } from './components/ReviewStep';
 import { FormNavigation } from './components/FormNavigation';
 import { InfoCards } from './components/InfoCards';
+import { ProgressBar } from './components/ProgressBar';
+import { RequestHeader } from './components/RequestHeader';
+import { ReviewStep } from './components/ReviewStep';
 import { requestAssetSchema, type RequestAssetFormValues, steps } from './constants';
 
 const slideVariants = {
