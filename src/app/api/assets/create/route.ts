@@ -30,6 +30,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check email verification
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { emailVerified: true },
+    });
+
+    if (!user || !user.emailVerified) {
+      return NextResponse.json(
+        {
+          error: 'Email verification required',
+          message: 'Please verify your email address before creating asset requests. Check your inbox for the verification link.',
+          requireVerification: true,
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const validatedData = createAssetRequestSchema.parse(body);
 

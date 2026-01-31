@@ -1,18 +1,20 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { AppHeader } from '@/components/layout/app-header';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
+import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const _pathname = usePathname();
+  const [dismissBanner, setDismissBanner] = useState(false);
 
   // Redirect to sign-in if not authenticated
   useEffect(() => {
@@ -40,6 +42,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
+      {/* Email Verification Banner */}
+      {user && !user.emailVerified && !dismissBanner && (
+        <EmailVerificationBanner
+          email={user.email}
+          onDismiss={() => setDismissBanner(true)}
+        />
+      )}
+
       {/* Desktop Sidebar */}
       <AppSidebar />
 

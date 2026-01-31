@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 import {
   isPrismaDecimalLessThan,
   subtractPrismaDecimals,
@@ -28,6 +29,23 @@ export async function POST(req: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check email verification
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { emailVerified: true },
+    });
+
+    if (!user || !user.emailVerified) {
+      return NextResponse.json(
+        {
+          error: 'Email verification required',
+          message: 'Please verify your email address before converting credits. Check your inbox for the verification link.',
+          requireVerification: true,
+        },
+        { status: 403 }
+      );
     }
 
     // Rate limiting for store credit conversion

@@ -1,6 +1,7 @@
 'use client';
 
-import { Loader2, RefreshCw, Users, Package, ArrowUpRight } from 'lucide-react';
+import { Loader2, RefreshCw, Users, Package, ArrowUpRight, X } from 'lucide-react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -10,6 +11,7 @@ import { PageHeader, PageHeaderContent, PageTitle, PageDescription } from '@/com
 import { UnifiedCard, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/unified/unified-card';
 import { useAuth } from '@/hooks/use-auth';
 import { prismaDecimalToNumber } from '@/lib/prisma-decimal';
+import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 
 import { DashboardStats } from './components/DashboardStats';
 import { QuickActions } from './components/QuickActions';
@@ -24,6 +26,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
+  const [dismissBanner, setDismissBanner] = useState(false);
 
   const {
     data: dashboardData,
@@ -64,6 +67,14 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
+      {/* Email Verification Banner */}
+      {user && !user.emailVerified && !dismissBanner && (
+        <EmailVerificationBanner
+          email={user.email}
+          onDismiss={() => setDismissBanner(true)}
+        />
+      )}
+
       {/* Header */}
       <PageHeader>
         <PageHeaderContent>

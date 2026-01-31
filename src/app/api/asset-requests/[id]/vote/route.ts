@@ -16,6 +16,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check email verification
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { emailVerified: true },
+    });
+
+    if (!user || !user.emailVerified) {
+      return NextResponse.json(
+        {
+          error: 'Email verification required',
+          message: 'Please verify your email address before voting. Check your inbox for the verification link.',
+          requireVerification: true,
+        },
+        { status: 403 }
+      );
+    }
+
     const assetRequestId = params.id;
     const body = await req.json();
     const { voteType } = voteSchema.parse(body);

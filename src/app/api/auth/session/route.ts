@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
         name: user.firstName,
         firstName: user.firstName,
         lastName: user.lastName,
+        emailVerified: user.emailVerified,
         role: user.role,
         createdAt: user.createdAt.toISOString(),
       },

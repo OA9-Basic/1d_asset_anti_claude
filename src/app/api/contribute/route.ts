@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getUserFromToken } from '@/lib/auth';
 import { contributeToAsset } from '@/lib/contribution';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+import { db } from '@/lib/db';
 
 const contributeSchema = z.object({
   assetId: z.string().cuid(),
@@ -23,6 +24,23 @@ export async function POST(req: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check email verification
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { emailVerified: true },
+    });
+
+    if (!user || !user.emailVerified) {
+      return NextResponse.json(
+        {
+          error: 'Email verification required',
+          message: 'Please verify your email address before contributing. Check your inbox for the verification link.',
+          requireVerification: true,
+        },
+        { status: 403 }
+      );
     }
 
     // Rate limiting for contributions

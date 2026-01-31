@@ -8,6 +8,7 @@ interface User {
   name?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  emailVerified?: boolean;
   image?: string | null;
   role?: string;
   createdAt?: string;
