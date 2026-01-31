@@ -15,47 +15,42 @@ import {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-[600px] w-[600px] rounded-full bg-gradient-to-br from-violet-500/10 to-purple-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-purple-500/10 to-violet-500/10 blur-3xl" />
-      </div>
-
-      <Card className="w-full max-w-md relative shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black p-4">
+      <Card className="w-full max-w-md shadow-lg border-neutral-200 dark:border-neutral-800">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-500/10 to-purple-600/10">
-            <SearchX className="h-8 w-8 text-muted-foreground" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-900">
+            <SearchX className="h-8 w-8 text-neutral-500 dark:text-neutral-400" />
           </div>
-          <CardTitle className="text-2xl font-bold">Page Not Found</CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle className="text-2xl font-bold text-neutral-900 dark:text-white">Page Not Found</CardTitle>
+          <CardDescription className="text-base text-neutral-500 dark:text-neutral-400">
             Sorry, we couldn&apos;t find the page you&apos;re looking for. It might have been moved,
             deleted, or never existed.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="rounded-lg border bg-muted/30 p-4">
-            <p className="text-sm font-medium mb-2">Here&apos;re some helpful links instead:</p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+          <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 p-4">
+            <p className="text-sm font-medium mb-2 text-neutral-900 dark:text-white">Here&apos;re some helpful links instead:</p>
+            <ul className="space-y-2 text-sm text-neutral-500 dark:text-neutral-400">
               <li>
-                <Link href="/#assets" className="hover:text-primary transition-colors underline">
+                <Link href="/marketplace" className="hover:text-neutral-900 dark:hover:text-white transition-colors underline">
                   Browse Assets
                 </Link>
               </li>
               <li>
-                <Link href="/request" className="hover:text-primary transition-colors underline">
+                <Link href="/request" className="hover:text-neutral-900 dark:hover:text-white transition-colors underline">
                   Request an Asset
                 </Link>
               </li>
               <li>
-                <Link href="/requests" className="hover:text-primary transition-colors underline">
+                <Link href="/requests" className="hover:text-neutral-900 dark:hover:text-white transition-colors underline">
                   Vote on Requests
                 </Link>
               </li>
               <li>
                 <Link
                   href="/auth/sign-up"
-                  className="hover:text-primary transition-colors underline"
+                  className="hover:text-neutral-900 dark:hover:text-white transition-colors underline"
                 >
                   Create an Account
                 </Link>
@@ -63,7 +58,7 @@ export default function NotFound() {
             </ul>
           </div>
 
-          <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="space-y-2 text-sm text-neutral-500 dark:text-neutral-400">
             <p className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
               Double-check the URL for typos
@@ -81,14 +76,14 @@ export default function NotFound() {
 
         <CardFooter className="flex flex-col sm:flex-row gap-3">
           <Link href="/" className="w-full sm:flex-1">
-            <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
+            <Button className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90">
               <Home className="w-4 h-4 mr-2" />
               Go to Home
             </Button>
           </Link>
           <Button
             variant="outline"
-            className="w-full sm:flex-1"
+            className="w-full sm:flex-1 border-neutral-200 dark:border-neutral-800"
             type="button"
             onClick={() => window.history.back()}
             onKeyDown={(e) => {

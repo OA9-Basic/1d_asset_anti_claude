@@ -111,7 +111,7 @@ interface RelatedAsset {
 // Loading Skeleton Component
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="container mx-auto px-4 py-8">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-7xl mx-auto">
           {/* Breadcrumb Skeleton */}
@@ -544,7 +544,7 @@ export default function AssetDetailPage() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20"
+      className="min-h-screen bg-white dark:bg-black"
     >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">

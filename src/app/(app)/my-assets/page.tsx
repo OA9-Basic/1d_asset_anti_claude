@@ -424,7 +424,7 @@ export default function MyAssetsPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-muted/20 to-background"
+      className="min-h-screen bg-white dark:bg-black"
     >
       <motion.header
         initial={{ opacity: 0, y: -20 }}

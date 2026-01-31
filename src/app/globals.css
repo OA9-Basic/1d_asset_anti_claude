@@ -118,22 +118,6 @@
       'calt' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
-    /* Animated grid background */
-    background-image:
-      linear-gradient(to right, hsl(var(--muted) / 0.3) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--muted) / 0.3) 1px, transparent 1px);
-    background-size: 64px 64px;
-    animation: grid-move 20s linear infinite;
-  }
-
-  @keyframes grid-move {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 64px 64px;
-    }
   }
 
   /* Smooth scrolling */

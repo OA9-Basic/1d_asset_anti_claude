@@ -7,15 +7,12 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
   CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UnifiedCard } from '@/components/ui/unified/unified-card';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -80,158 +77,160 @@ export default function SignUpPage() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-background">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-black">
       <div className="w-full max-w-md relative">
         {/* Back button */}
         <Link href="/">
-          <Button variant="ghost" size="sm" className="mb-4 gap-2">
+          <Button variant="ghost" size="sm" className="mb-4 gap-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Button>
         </Link>
 
-        <Card className="border-2 shadow-xl">
-          <CardHeader className="space-y-1 text-center pb-6">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white font-bold text-xl">
-                D
+        <UnifiedCard variant="elevated" padding="lg" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-900">
+                <Sparkles className="h-7 w-7 text-neutral-700 dark:text-neutral-300" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+              Create Account
+            </CardTitle>
+            <CardDescription className="text-neutral-500 dark:text-neutral-400">
               Join our community and start accessing premium digital assets
             </CardDescription>
-          </CardHeader>
+          </div>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-                  {error}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-900/50">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-neutral-700 dark:text-neutral-300">Full Name</Label>
+              <Input
+                id="name"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                disabled={isLoading}
+                required
+                className="h-11 border-neutral-200 dark:border-neutral-800"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-neutral-700 dark:text-neutral-300">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                disabled={isLoading}
+                required
+                className="h-11 border-neutral-200 dark:border-neutral-800"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-neutral-700 dark:text-neutral-300">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                disabled={isLoading}
+                required
+                className="h-11 border-neutral-200 dark:border-neutral-800"
+              />
+              {formData.password && (
+                <div className="space-y-1 mt-2 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800">
+                  {passwordRequirements.map((req, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      <CheckCircle2
+                        className={`h-3.5 w-3.5 ${req.met ? 'text-emerald-600 dark:text-emerald-400' : 'text-neutral-400'}`}
+                      />
+                      <span className={req.met ? 'text-emerald-700 dark:text-emerald-300' : 'text-neutral-500 dark:text-neutral-400'}>
+                        {req.text}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  disabled={isLoading}
-                  required
-                  className="h-11"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-neutral-700 dark:text-neutral-300">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                disabled={isLoading}
+                required
+                className="h-11 border-neutral-200 dark:border-neutral-800"
+              />
+              {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <p className="text-xs text-red-600 dark:text-red-400">Passwords do not match</p>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={isLoading}
-                  required
-                  className="h-11"
-                />
-              </div>
+            <Button
+              type="submit"
+              className="w-full h-11 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90"
+              disabled={
+                isLoading ||
+                formData.password.length < 8 ||
+                formData.password !== formData.confirmPassword
+              }
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Create Account
+                </>
+              )}
+            </Button>
+          </form>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  disabled={isLoading}
-                  required
-                  className="h-11"
-                />
-                {formData.password && (
-                  <div className="space-y-1 mt-2 p-3 rounded-lg bg-muted/50">
-                    {passwordRequirements.map((req, i) => (
-                      <div key={i} className="flex items-center gap-2 text-xs">
-                        <CheckCircle2
-                          className={`h-3.5 w-3.5 ${req.met ? 'text-green-500' : 'text-muted-foreground'}`}
-                        />
-                        <span className={req.met ? 'text-green-600' : 'text-muted-foreground'}>
-                          {req.text}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  disabled={isLoading}
-                  required
-                  className="h-11"
-                />
-                {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                  <p className="text-xs text-destructive">Passwords do not match</p>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow"
-                disabled={
-                  isLoading ||
-                  formData.password.length < 8 ||
-                  formData.password !== formData.confirmPassword
-                }
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Create Account
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-
-          <CardFooter className="flex flex-col space-y-4 pb-6">
+          {/* Footer */}
+          <div className="mt-8">
             <div className="relative w-full">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-neutral-200 dark:border-neutral-800" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Already have an account?</span>
+                <span className="bg-white dark:bg-black px-2 text-neutral-500 dark:text-neutral-400">
+                  Already have an account?
+                </span>
               </div>
             </div>
 
-            <Link href="/auth/sign-in" className="w-full">
-              <Button variant="outline" className="w-full h-11">
+            <Link href="/auth/sign-in" className="block mt-6">
+              <Button
+                variant="outline"
+                className="w-full h-11 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              >
                 Sign In Instead
               </Button>
             </Link>
-          </CardFooter>
-        </Card>
+          </div>
+        </UnifiedCard>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
+        <p className="text-center text-xs text-neutral-500 dark:text-neutral-400 mt-6">
           By creating an account, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>

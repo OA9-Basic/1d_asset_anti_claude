@@ -439,7 +439,7 @@ export default function AdminDashboardPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-muted/20 to-background"
+      className="min-h-screen bg-white dark:bg-black"
     >
       {/* Header */}
       <motion.header

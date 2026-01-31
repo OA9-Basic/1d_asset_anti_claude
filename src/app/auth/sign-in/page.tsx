@@ -7,15 +7,12 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
   CardDescription,
-  CardFooter,
-  CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UnifiedCard } from '@/components/ui/unified/unified-card';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -55,109 +52,113 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-background">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center p-4 bg-white dark:bg-black">
       <div className="w-full max-w-md relative">
         {/* Back button */}
         <Link href="/">
-          <Button variant="ghost" size="sm" className="mb-4 gap-2">
+          <Button variant="ghost" size="sm" className="mb-4 gap-2 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Button>
         </Link>
 
-        <Card className="border-2 shadow-xl">
-          <CardHeader className="space-y-1 text-center pb-6">
-            <div className="flex justify-center mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white font-bold text-xl">
-                D
+        <UnifiedCard variant="elevated" padding="lg" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-900">
+                <Sparkles className="h-7 w-7 text-neutral-700 dark:text-neutral-300" />
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-            <CardDescription>Sign in to your account to continue</CardDescription>
-          </CardHeader>
+            <CardTitle className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+              Welcome Back
+            </CardTitle>
+            <CardDescription className="text-neutral-500 dark:text-neutral-400">
+              Sign in to your account to continue
+            </CardDescription>
+          </div>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-                  {error}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={isLoading}
-                  required
-                  className="h-11"
-                />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm border border-red-200 dark:border-red-900/50">
+                {error}
               </div>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  disabled={isLoading}
-                  required
-                  minLength={8}
-                  className="h-11"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-purple-500/30 button-glow"
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-neutral-700 dark:text-neutral-300">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Sign In
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
+                required
+                className="h-11 border-neutral-200 dark:border-neutral-800"
+              />
+            </div>
 
-          <CardFooter className="flex flex-col space-y-4 pb-6">
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-neutral-700 dark:text-neutral-300">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                disabled={isLoading}
+                required
+                minLength={8}
+                className="h-11 border-neutral-200 dark:border-neutral-800"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Sign In
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Footer */}
+          <div className="mt-8">
             <div className="relative w-full">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-neutral-200 dark:border-neutral-800" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">New to Digital Assets?</span>
+                <span className="bg-white dark:bg-black px-2 text-neutral-500 dark:text-neutral-400">
+                  New to Digital Assets?
+                </span>
               </div>
             </div>
 
-            <Link href="/auth/sign-up" className="w-full">
-              <Button variant="outline" className="w-full h-11">
+            <Link href="/auth/sign-up" className="block mt-6">
+              <Button
+                variant="outline"
+                className="w-full h-11 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              >
                 Create an Account
               </Button>
             </Link>
-          </CardFooter>
-        </Card>
+          </div>
+        </UnifiedCard>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
+        <p className="text-center text-xs text-neutral-500 dark:text-neutral-400 mt-6">
           By signing in, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>

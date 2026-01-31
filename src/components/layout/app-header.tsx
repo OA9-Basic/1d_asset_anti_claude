@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { staggerContainer, staggerItem, hoverScale } from '@/lib/animations';
@@ -217,6 +218,9 @@ export function AppHeader() {
 
         {/* User Actions */}
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {isLoading ? (
             <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
           ) : user ? (

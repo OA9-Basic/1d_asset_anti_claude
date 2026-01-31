@@ -245,7 +245,7 @@ export default function RequestAssetPage() {
   const progressPercentage = (currentStep / 3) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-500/5 via-purple-500/5 to-background">
+    <div className="min-h-screen bg-white dark:bg-black">
       <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-10">
         <div className="container-custom py-4">
           <div className="flex items-center gap-4">

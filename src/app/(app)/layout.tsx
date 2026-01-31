@@ -24,13 +24,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-fuchsia-950/20">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
         <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 animate-pulse" />
-            <div className="absolute inset-0 h-12 w-12 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 animate-ping opacity-20" />
-          </div>
-          <p className="text-sm text-muted-foreground">Loading...</p>
+          <div className="h-10 w-10 rounded-lg bg-neutral-200 dark:bg-neutral-800 animate-pulse" />
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading...</p>
         </div>
       </div>
     );
@@ -42,7 +39,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-fuchsia-950/20">
+    <div className="min-h-screen bg-white dark:bg-black">
       {/* Desktop Sidebar */}
       <AppSidebar />
 
