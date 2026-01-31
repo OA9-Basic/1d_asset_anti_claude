@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { paymentLogger } from '@/lib/loggers';
 import {
   subtractPrismaDecimals,
   isPrismaDecimalLessThan,
@@ -161,7 +162,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.error('Gap fund error:', error);
+    paymentLogger.error('Gap fund failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId,
+      assetId: body?.assetId,
+    });
     return NextResponse.json(
       {
         error: 'Internal server error',

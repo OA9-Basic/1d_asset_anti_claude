@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getUserFromToken } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
+import { paymentLogger } from '@/lib/loggers';
 import {
   isPrismaDecimalLessThan,
   subtractPrismaDecimals,
@@ -144,7 +145,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.error('Store credit conversion error:', error);
+    paymentLogger.error('Store credit conversion failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId,
+      amount: body?.amount,
+    });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

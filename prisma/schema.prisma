@@ -126,6 +126,13 @@ enum ContributionStatus {
   CONVERTED_TO_INVESTMENT
 }
 
+enum GapLoanStatus {
+  ACTIVE
+  REPAID
+  DEFAULTED
+  CANCELLED
+}
+
 model User {
   id                String             @id @default(cuid())
   email             String             @unique
@@ -364,23 +371,26 @@ model Contribution {
 }
 
 model GapLoan {
-  id                String   @id @default(cuid())
+  id                String        @id @default(cuid())
   userId            String
   assetId           String
   loanAmount        Decimal
-  repaidAmount      Decimal  @default(0)
+  repaidAmount      Decimal       @default(0)
   remainingAmount   Decimal
-  status            String   @default("ACTIVE")
+  status            GapLoanStatus @default(ACTIVE)
   fullyRepaidAt     DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  defaultedAt       DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  asset             Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  asset             Asset         @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@unique([userId, assetId])
   @@index([assetId])
   @@index([status])
+  @@index([fullyRepaidAt])
 }
 
 model ProfitShare {

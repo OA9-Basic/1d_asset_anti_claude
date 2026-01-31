@@ -5,6 +5,7 @@ import { getUserFromToken } from '@/lib/auth';
 import { contributeToAsset } from '@/lib/contribution';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 import { db } from '@/lib/db';
+import { paymentLogger } from '@/lib/loggers';
 
 const contributeSchema = z.object({
   assetId: z.string().cuid(),
@@ -84,7 +85,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.error('Contribution error:', error);
+    paymentLogger.error('Contribution failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId,
+      assetId: body?.assetId,
+      amount: body?.amount,
+    });
     return NextResponse.json(
       {
         error: 'Internal server error',
