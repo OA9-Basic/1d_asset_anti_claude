@@ -107,11 +107,12 @@ export function HeroAwwwards({ featuredCampaign }: HeroAwwwardsProps) {
       <div ref={particlesRef} />
 
       {/* 3D Model */}
-      <div className="absolute inset-0 opacity-40">
+      <div className="absolute inset-0 opacity-60">
         <ModelLoader
-          modelPath="/models/Duck.glb"
-          scale={1.5}
+          modelPath="/models/DamagedHelmet.glb"
+          scale={3}
           position={[0, -0.5, 0]}
+          autoRotate={true}
         />
       </div>
 
