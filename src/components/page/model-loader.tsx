@@ -26,9 +26,6 @@ export function ModelLoader({
   scale = 1,
   position = [0, 0, 0],
 }: ModelLoaderProps) {
-  // Log props on mount
-  console.log('🎮 ModelLoader Component Props:', { modelPath, className, autoRotate, scale, position });
-
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState(true);
@@ -75,142 +72,56 @@ export function ModelLoader({
     scene.add(backLight);
 
     // ═══════════════════════════════════════════════════════════════
-    // EXTENSIVE LOGGING - 3D Model Loading Debug
+    // LOAD 3D MODEL - Manual fetch workaround for Next.js compatibility
     // ═══════════════════════════════════════════════════════════════
+    // NOTE: GLTFLoader's internal XHR fails with Next.js in some cases.
+    // We manually fetch the file and use loader.parse() instead.
 
-    console.group('🎮 3D Model Loader - Debug Session');
-    console.log('📁 Model Path prop:', modelPath);
-    console.log('🌐 Window location:', window.location.href);
-    console.log('🔗 Window origin:', window.location.origin);
-    console.log('📍 Current hostname:', window.location.hostname);
-    console.log('⚡ Port:', window.location.port);
-    console.log('🛤️ Full URL would be:', window.location.origin + modelPath);
-
-    // Try multiple URL strategies and log each attempt
-    const urlStrategies = [
-      { name: 'Direct path', url: modelPath },
-      { name: 'Origin + path', url: window.location.origin + modelPath },
-      { name: 'Public path', url: '/public' + modelPath },
-      { name: 'Absolute URL', url: new URL(modelPath, window.location.origin).href },
-    ];
-
-    console.log('🔍 Testing URL strategies:');
-    urlStrategies.forEach((strategy, index) => {
-      console.log(`  ${index + 1}. ${strategy.name}:`, strategy.url);
-    });
-
-    // Manual fetch to see what we actually get
-    const testFetch = async (url: string, name: string) => {
-      try {
-        console.group(`🌐 Testing fetch for: ${name}`);
-        console.log('📡 Fetching URL:', url);
-
-        const response = await fetch(url);
-        console.log('📊 Response status:', response.status, response.statusText);
-        console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
-        console.log('🔐 Content-Type:', response.headers.get('content-type'));
-        console.log('📦 Content-Length:', response.headers.get('content-length'));
-
-        const contentType = response.headers.get('content-type');
-        const isHtml = contentType?.includes('html') || contentType?.includes('text/plain');
-
-        if (isHtml) {
-          const text = await response.text();
-          console.warn('⚠️ Received HTML instead of GLB!');
-          console.warn('📄 First 500 chars of response:', text.substring(0, 500));
-          console.warn('📄 Full response:', text);
-        } else if (contentType?.includes('application/octet-stream') || contentType?.includes('model/gltf-binary')) {
-          console.log('✅ Looks like a valid GLB file!');
-          const blob = await response.blob();
-          console.log('📦 Blob size:', blob.size, 'bytes');
-          console.log('📦 Blob type:', blob.type);
-        } else {
-          console.warn('❓ Unknown content type:', contentType);
-          const text = await response.text();
-          console.warn('📄 First 200 chars:', text.substring(0, 200));
-        }
-
-        console.groupEnd();
-        return { success: response.ok, contentType, url };
-      } catch (err) {
-        console.error(`❌ Fetch failed for ${name}:`, err);
-        console.groupEnd();
-        return { success: false, contentType: null, url };
-      }
-    };
-
-    // Test all strategies
-    Promise.all(urlStrategies.map(s => testFetch(s.url, s.name))).then((results) => {
-      console.log('📋 Fetch results summary:');
-      results.forEach((result, index) => {
-        console.log(`  ${index + 1}. ${urlStrategies[index].name}:`, result.success ? '✅' : '❌', result.contentType);
-      });
-      console.groupEnd();
-    });
-
-    // Load model with detailed error tracking
     const loader = new GLTFLoader();
     let model: THREE.Group | null = null;
 
-    // Use resourcePath to help loader find associated files
+    // Set resource path for associated files (textures, etc.)
     loader.setResourcePath(modelPath.substring(0, modelPath.lastIndexOf('/') + 1));
 
-    console.log('🚀 Starting GLTFLoader.load with URL:', modelPath);
+    // Manual fetch + parse approach
+    const loadModel = async () => {
+      try {
+        console.log('🎮 Loading 3D model:', modelPath);
 
-    loader.load(
-      modelPath,
-      (gltf) => {
-        console.log('✅ Model loaded successfully!');
-        console.log('📦 GLTF scene:', gltf.scene);
-        console.log('🎨 Scene children count:', gltf.scene.children.length);
-
-        model = gltf.scene;
-        model.scale.setScalar(scale);
-        model.position.set(...position);
-        scene.add(model);
-        setLoading(false);
-
-        console.log('✨ Model added to scene!');
-        console.groupEnd();
-      },
-      (progress) => {
-        if (progress) {
-          console.log('📈 Loading progress:', {
-            loaded: progress.loaded,
-            total: progress.total || 'unknown',
-            percentage: progress.total ? Math.round((progress.loaded / progress.total) * 100) + '%' : 'calculating...',
-          });
+        const response = await fetch(modelPath);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch model: ${response.status} ${response.statusText}`);
         }
-      },
-      (err) => {
-        console.error('❌ GLTFLoader Error Details:');
-        console.error('🔴 Error object:', err);
-        console.error('🔴 Error message:', err?.message);
-        console.error('🔴 Error stack:', err?.stack);
 
-        // Try to extract more info from the error
-        if (err?.message) {
-          const errorMsg = err.message;
-          if (errorMsg.includes('<!DOCTYPE')) {
-            console.error('📄 HTML response detected! Server is returning HTML instead of the GLB file.');
-            console.error('🔧 This usually means:');
-            console.error('   1. The file path is incorrect (404 page)');
-            console.error('   2. Next.js is not serving from /public correctly');
-            console.error('   3. The dev server needs to be restarted');
+        const arrayBuffer = await response.arrayBuffer();
+        console.log('✅ Model fetched, size:', arrayBuffer.byteLength, 'bytes');
 
-            // Try to show what HTML we got
-            const match = errorMsg.match(/<!DOCTYPE[^>]*>[\s\S]{0,500}/);
-            if (match) {
-              console.error('📄 HTML preview:', match[0]);
-            }
+        // Parse the GLB data
+        loader.parse(
+          arrayBuffer,
+          '', // No URL needed since we have the data directly
+          (gltf) => {
+            console.log('✅ Model parsed successfully!');
+            model = gltf.scene;
+            model.scale.setScalar(scale);
+            model.position.set(...position);
+            scene.add(model);
+            setLoading(false);
+          },
+          (err) => {
+            console.error('❌ Error parsing GLB:', err);
+            setError('Failed to parse 3D model');
+            setLoading(false);
           }
-        }
-
+        );
+      } catch (err) {
+        console.error('❌ Error loading model:', err);
         setError('Failed to load 3D model');
         setLoading(false);
-        console.groupEnd();
       }
-    );
+    };
+
+    loadModel();
 
     // Mouse interaction
     let mouseX = 0;
