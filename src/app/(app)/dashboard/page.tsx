@@ -3,11 +3,10 @@
 import { Loader2, RefreshCw, Users, Package, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 
 
-import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 import { Button } from '@/components/ui/button';
 import { PageHeader, PageHeaderContent, PageTitle, PageDescription } from '@/components/ui/unified';
 import { UnifiedCard, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/unified/unified-card';
@@ -26,7 +25,6 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const [dismissBanner, setDismissBanner] = useState(false);
 
   const {
     data: dashboardData,
@@ -69,18 +67,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      {/* Email Verification Banner - Slim top bar */}
-      {user && !user.emailVerified && !dismissBanner && (
-        <div className="h-10 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-center px-4">
-          <EmailVerificationBanner
-            email={user.email}
-            onDismiss={() => setDismissBanner(true)}
-          />
-        </div>
-      )}
-
       {/* Premium Header - Proper flex alignment */}
-      <PageHeader className="pb-4">
+      <PageHeader className="pb-6">
         <PageHeaderContent>
           <div className="flex items-center justify-between w-full">
             <div className="flex-1">
@@ -131,12 +119,12 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <UnifiedCard variant="default" padding="none" className="border-zinc-800 overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
-                <CardHeader bordered>
+              <UnifiedCard variant="default" padding="md" className="border-zinc-800/60 overflow-hidden">
+                <CardHeader bordered className="px-6">
                   <CardTitle className="text-zinc-100">Community Contributions</CardTitle>
                   <CardDescription>Real-time updates from across the platform</CardDescription>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="px-6">
                   {activityLoading ? (
                     <div className="space-y-3">
                       {Array.from({ length: 5 }).map((_, i) => (

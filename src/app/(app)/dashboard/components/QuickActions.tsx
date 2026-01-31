@@ -13,8 +13,8 @@ interface QuickActionsProps {
 /**
  * Quick Actions Component - Premium Dark Theme
  *
- * Compact card with 2x2 grid of uniform action buttons.
- * Height is auto-fit to content - NO stretching.
+ * Vertical list of large, comfortable full-width buttons.
+ * Professional menu/control panel appearance.
  */
 export function QuickActions({ userId }: QuickActionsProps) {
   const handleShare = () => {
@@ -24,26 +24,26 @@ export function QuickActions({ userId }: QuickActionsProps) {
   const actions = [
     {
       icon: PlusCircle,
-      label: 'Request',
-      description: 'New asset',
+      label: 'Request an Asset',
+      description: 'Submit a new asset request',
       href: '/request',
     },
     {
       icon: ShoppingCart,
-      label: 'Market',
-      description: 'Browse',
+      label: 'Browse Marketplace',
+      description: 'Explore available assets',
       href: '/marketplace',
     },
     {
       icon: Wallet,
-      label: 'Wallet',
-      description: 'Manage',
+      label: 'Manage Wallet',
+      description: 'View balance and transactions',
       href: '/wallet',
     },
     {
       icon: Share2,
-      label: 'Invite',
-      description: 'Share',
+      label: 'Invite Friends',
+      description: 'Share and earn rewards',
       action: handleShare,
     },
   ];
@@ -55,29 +55,30 @@ export function QuickActions({ userId }: QuickActionsProps) {
         <CardDescription className="text-xs">Get started</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex flex-col gap-2">
           {actions.map((action) => {
             const Icon = action.icon;
             const content = (
               <button
                 onClick={action.action}
                 className={cn(
-                  'group relative flex flex-col items-center justify-center',
-                  'p-3 rounded-lg border',
+                  'group flex items-center justify-start',
+                  'h-14 px-4 gap-4',
+                  'bg-zinc-900 border border-zinc-800 rounded-lg',
+                  'hover:bg-zinc-800 hover:border-zinc-700',
                   'transition-all duration-200',
-                  'bg-zinc-900/50',
-                  'border-zinc-800',
-                  'hover:border-violet-500/50 hover:bg-violet-500/10',
-                  'active:scale-[0.98]'
+                  'active:scale-[0.99]'
                 )}
               >
-                <Icon className="w-5 h-5 text-zinc-400 group-hover:text-violet-400 transition-colors" />
-                <span className="text-xs font-medium text-zinc-300 group-hover:text-violet-200 mt-1.5">
-                  {action.label}
-                </span>
-                <span className="text-[10px] text-zinc-500 group-hover:text-zinc-400">
-                  {action.description}
-                </span>
+                <Icon className="w-5 h-5 text-zinc-400 group-hover:text-zinc-300 transition-colors flex-shrink-0" />
+                <div className="flex flex-col items-start flex-1">
+                  <span className="text-sm font-medium text-zinc-200 group-hover:text-white">
+                    {action.label}
+                  </span>
+                  <span className="text-xs text-zinc-500">
+                    {action.description}
+                  </span>
+                </div>
               </button>
             );
 

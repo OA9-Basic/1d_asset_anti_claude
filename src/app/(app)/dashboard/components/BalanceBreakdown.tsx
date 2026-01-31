@@ -13,36 +13,51 @@ interface BalanceBreakdownProps {
   stats?: DashboardStats;
 }
 
+/**
+ * Balance Breakdown Component - Premium Dark Theme
+ *
+ * Clean layout with proper spacing, neutral colors, and elegant button.
+ */
 export function BalanceBreakdown({ stats }: BalanceBreakdownProps) {
   if (!stats) return null;
 
   return (
     <UnifiedCard variant="default" padding="md">
       <CardHeader>
-        <CardTitle className="text-lg">Balance Breakdown</CardTitle>
-        <CardDescription>Your wallet at a glance</CardDescription>
+        <CardTitle className="text-base text-zinc-100">Balance Breakdown</CardTitle>
+        <CardDescription className="text-xs">Your wallet at a glance</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 pt-0">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">Available Balance</span>
-          <span className="font-semibold text-neutral-900 dark:text-white">
+        {/* Row 1: Available Balance */}
+        <div className="flex items-center justify-between py-2 border-b border-zinc-900">
+          <span className="text-sm text-zinc-500 font-medium">Available Balance</span>
+          <span className="font-mono text-lg text-zinc-100">
             ${prismaDecimalToNumber(stats.walletBalance).toFixed(2)}
           </span>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">Withdrawable</span>
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+
+        {/* Row 2: Withdrawable */}
+        <div className="flex items-center justify-between py-2 border-b border-zinc-900">
+          <span className="text-sm text-zinc-500 font-medium">Withdrawable</span>
+          <span className="font-mono text-lg text-zinc-100">
             ${prismaDecimalToNumber(stats.withdrawableBalance).toFixed(2)}
           </span>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">Store Credit</span>
-          <span className="font-semibold text-violet-600 dark:text-violet-400">
+
+        {/* Row 3: Store Credit - no border */}
+        <div className="flex items-center justify-between py-2">
+          <span className="text-sm text-zinc-500 font-medium">Store Credit</span>
+          <span className="font-mono text-lg text-zinc-100">
             ${prismaDecimalToNumber(stats.storeCredit).toFixed(2)}
           </span>
         </div>
-        <Link href="/wallet/deposit">
-          <Button className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:opacity-90">
+
+        {/* Premium Button - High contrast zinc outline */}
+        <Link href="/wallet/deposit" className="block pt-2">
+          <Button
+            variant="outline"
+            className="w-full h-11 bg-zinc-100 text-black border-0 hover:bg-zinc-200 font-medium"
+          >
             <Wallet className="w-4 h-4 mr-2" />
             Add Funds
           </Button>
