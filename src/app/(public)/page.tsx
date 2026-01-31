@@ -1,12 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import { type Metadata } from 'next';
 
+import { BentoGridFeatures } from '@/components/page/bento-features';
 import { CTASection } from '@/components/page/cta-section';
-import { FeaturesModern } from '@/components/page/features-modern';
 import { Footer } from '@/components/page/footer';
 import { Header } from '@/components/page/header';
 import { HeroPremium } from '@/components/page/hero-premium';
 import { HowItWorks } from '@/components/page/how-it-works';
+import { InfiniteMarquee } from '@/components/page/infinite-marquee';
 import { LiveStats } from '@/components/page/live-stats';
 
 export const metadata: Metadata = {
@@ -127,8 +128,9 @@ export default async function HomePage() {
       <main className="min-h-screen">
         <HeroPremium featuredCampaign={featuredCampaign} />
         <LiveStats stats={stats} />
-        <FeaturesModern />
+        <BentoGridFeatures />
         <HowItWorks />
+        <InfiniteMarquee />
         <CTASection />
       </main>
 

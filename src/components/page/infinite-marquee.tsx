@@ -1,12 +1,16 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useHover } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 /**
- * Infinite Marquee Component
- * Smooth scrolling ticker with live contributions
+ * Premium Infinite Marquee Component
+ * Features:
+ * - Slows down on hover
+ * - Refined styling with inner shadow
+ * - More padding for less cluttered feel
+ * - Smooth, seamless loop
  */
 
 interface Contribution {
@@ -31,6 +35,8 @@ const mockContributions: Contribution[] = [
 
 export function InfiniteMarquee() {
   const [contributions, setContributions] = useState<Contribution[]>([...mockContributions]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isHovered = useHover(containerRef);
 
   // Simulate live updates
   useEffect(() => {
@@ -54,36 +60,90 @@ export function InfiniteMarquee() {
   const displayItems = [...contributions, ...contributions];
 
   return (
-    <section className="border-y border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 backdrop-blur-sm overflow-hidden">
-      <div className="py-4">
+    <section className="relative py-16 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950 opacity-50" />
+
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Section Header */}
         <motion.div
-          animate={{ x: [0, -2000] }}
-          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-          className="flex gap-6 whitespace-nowrap"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
         >
-          {displayItems.map((contribution, index) => (
-            <div
-              key={`${contribution.id}-${index}`}
-              className="flex items-center gap-3 px-6 py-2 rounded-full bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 shrink-0"
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <CheckCircle className="w-4 h-4 text-green-500" />
-              </div>
-              <span className="text-sm font-medium text-neutral-900 dark:text-white">
-                {contribution.userName}
-              </span>
-              <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                contributed ${contribution.amount}
-              </span>
-              <span className="text-sm text-neutral-400">→</span>
-              <span className="text-sm font-medium text-violet-600 dark:text-violet-400">
-                {contribution.assetTitle}
-              </span>
-              <span className="text-xs text-neutral-400 ml-2">{contribution.timeAgo}</span>
-            </div>
-          ))}
+          <p className="text-sm font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+            Live Activity
+          </p>
+          <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            Join the movement
+          </h3>
         </motion.div>
+
+        {/* Marquee Container */}
+        <motion.div
+          ref={containerRef}
+          className="relative"
+        >
+          {/* Fade effect on left */}
+          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />
+
+          {/* Fade effect on right */}
+          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white via-white/80 to-transparent dark:from-zinc-950 dark:via-zinc-950/80 to-transparent z-10 pointer-events-none" />
+
+          {/* Scrolling content */}
+          <motion.div
+            animate={{ x: [0, -2000] }}
+            transition={{
+              duration: isHovered ? 120 : 40, // Slow down on hover
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+            className="flex gap-4 whitespace-nowrap py-4"
+          >
+            {displayItems.map((contribution, index) => (
+              <motion.div
+                key={`${contribution.id}-${index}`}
+                className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white dark:bg-black border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm hover:shadow-md transition-shadow shrink-0"
+                whileHover={{ scale: 1.02 }}
+                style={{
+                  boxShadow: 'inset 0 1px 0 0 rgba(0,0,0,0.05)',
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <span className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-50" />
+                  </div>
+                  <CheckCircle className="w-4 h-4 text-green-500" strokeWidth={2.5} />
+                </div>
+                <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                  {contribution.userName}
+                </span>
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                  contributed ${contribution.amount}
+                </span>
+                <span className="text-zinc-300 dark:text-zinc-700">→</span>
+                <span className="text-sm font-medium text-violet-600 dark:text-violet-400">
+                  {contribution.assetTitle}
+                </span>
+                <span className="text-xs text-zinc-400 dark:text-zinc-500 ml-1">{contribution.timeAgo}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Subtle text below */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center text-sm text-zinc-400 dark:text-zinc-600 mt-6"
+        >
+          Real contributions from our community
+        </motion.p>
       </div>
     </section>
   );

@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { ArrowRight, ChevronRight, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,22 +11,19 @@ import type { CampaignCard } from '@/types/page';
 
 /**
  * Premium Awwwards-Winning Hero Section
- *
  * Features:
- * - Large typography with gradient text
- * - Smooth scroll-triggered animations
- * - Magnetic button effects
- * - Floating cards with parallax
- * - Live activity feed
- * - Social proof
- * - Clean, minimalist design
+ * - Mouse parallax on background grid
+ * - 3D tilt effect on hover for cards
+ * - Enhanced magnetic button with scale
+ * - Animated gradient text
+ * - Smoother spring physics for parallax
  */
 
 interface HeroPremiumProps {
   featuredCampaign: CampaignCard | null;
 }
 
-// Magnetic button component
+// Enhanced Magnetic Button with scale effect
 function MagneticButton({
   children,
   className,
@@ -40,8 +37,8 @@ function MagneticButton({
     if (!button) return;
 
     const rect = button.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) * 0.2;
-    const y = (e.clientY - rect.top - rect.height / 2) * 0.2;
+    const x = (e.clientX - rect.left - rect.width / 2) * 0.15;
+    const y = (e.clientY - rect.top - rect.height / 2) * 0.15;
     setPosition({ x, y });
   };
 
@@ -55,43 +52,104 @@ function MagneticButton({
       className={className}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      animate={{ x: position.x, y: position.y }}
+      animate={{ x: position.x, y: position.y, scale: position.x !== 0 || position.y !== 0 ? 1.02 : 1 }}
       transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.5 }}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {...(props as any)}
     >
-      {children}
+      <motion.span
+        animate={{
+          x: position.x * -0.3,
+          y: position.y * -0.3,
+        }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+      >
+        {children}
+      </motion.span>
     </motion.button>
   );
 }
 
-// Floating card component with parallax
-function FloatingCard({
+// 3D Tilt Card Component
+function TiltCard({
   children,
   className,
-  delay = 0,
+  tiltAmount = 10,
 }: {
   children: React.ReactNode;
   className?: string;
-  delay?: number;
+  tiltAmount?: number;
 }) {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 300, 600], [0, -30 - delay * 10, -60 - delay * 10]);
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateXValue = ((y - centerY) / centerY) * -tiltAmount;
+    const rotateYValue = ((x - centerX) / centerX) * tiltAmount;
+
+    rotateX.set(rotateXValue);
+    rotateY.set(rotateYValue);
+  };
+
+  const handleMouseLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+  };
 
   return (
     <motion.div
-      style={{ y }}
+      ref={ref}
       className={className}
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.4 + delay * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX: useSpring(rotateX, { stiffness: 300, damping: 30 }),
+        rotateY: useSpring(rotateY, { stiffness: 300, damping: 30 }),
+        transformStyle: 'preserve-3d',
+      }}
     >
       {children}
     </motion.div>
   );
 }
 
-// Live activity indicator
+// Floating card with smoother spring parallax (available for future use)
+// function FloatingCard({
+//   children,
+//   className,
+//   delay = 0,
+// }: {
+//   children: React.ReactNode;
+//   className?: string;
+//   delay?: number;
+// }) {
+//   const { scrollY } = useScroll();
+//   const rawY = useTransform(scrollY, [0, 300, 600], [0, -30 - delay * 10, -60 - delay * 10]);
+//   const y = useSpring(rawY, { stiffness: 100, damping: 30 });
+//
+//   return (
+//     <motion.div
+//       style={{ y }}
+//       className={className}
+//       initial={{ opacity: 0, y: 50 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.8, delay: 0.4 + delay * 0.1, ease: [0.16, 1, 0.3, 1] }}
+//     >
+//       {children}
+//     </motion.div>
+//   );
+// }
+
+// Live indicator
 function LiveIndicator() {
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20">
@@ -138,14 +196,14 @@ function StatCard({
   );
 }
 
-// Campaign card mini
+// Campaign card mini with enhanced hover effects
 function CampaignCardMini({ campaign, delay }: { campaign: CampaignCard; delay: number }) {
   const progress = (campaign.raisedAmount / campaign.goalAmount) * 100;
 
   return (
-    <FloatingCard delay={delay}>
+    <TiltCard delay={delay} tiltAmount={8}>
       <Link href={`/assets/${campaign.id}`}>
-        <Card className="p-6 border-neutral-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-300 cursor-pointer group">
+        <Card className="p-6 border-neutral-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-300 cursor-pointer group h-full">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <LiveIndicator />
@@ -174,18 +232,21 @@ function CampaignCardMini({ campaign, delay }: { campaign: CampaignCard; delay: 
                 of ${campaign.goalAmount.toLocaleString()} goal
               </span>
             </div>
-            <div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+            <div className="h-2 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden relative">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 1.5, delay: 1 + delay * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full"
-              />
+                className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full relative overflow-hidden"
+              >
+                {/* Shimmer effect on hover */}
+                <div className="absolute inset-0 progress-shimmer" />
+              </motion.div>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
               <div className="flex -space-x-2">
                 {[...Array(3)].map((_, i) => (
                   <div
@@ -196,13 +257,13 @@ function CampaignCardMini({ campaign, delay }: { campaign: CampaignCard; delay: 
                   </div>
                 ))}
               </div>
-              <span className="text-sm text-neutral-500 dark:text-neutral-400">
+              <span className="text-sm font-medium">
                 +{campaign.backerCount} backers
               </span>
             </div>
             <motion.div
               className="flex items-center gap-1 text-violet-600 dark:text-violet-400 text-sm font-medium"
-              whileHover={{ x: 3 }}
+              whileHover={{ x: 5 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
               View
@@ -211,7 +272,7 @@ function CampaignCardMini({ campaign, delay }: { campaign: CampaignCard; delay: 
           </div>
         </Card>
       </Link>
-    </FloatingCard>
+    </TiltCard>
   );
 }
 
@@ -220,12 +281,35 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const scale = useTransform(scrollY, [0, 300], [1, 0.95]);
 
+  // Mouse parallax for background grid
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const gridX = useSpring(useTransform(mouseX, [-500, 500], [20, -20]), { stiffness: 100, damping: 30 });
+  const gridY = useSpring(useTransform(mouseY, [-500, 500], [20, -20]), { stiffness: 100, damping: 30 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX - window.innerWidth / 2);
+      mouseY.set(e.clientY - window.innerHeight / 2);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
+
+  // Text lines for stagger animation
+  const textLines = [
+    'Access Premium',
+    'Digital Assets',
+    'Together',
+  ];
+
   return (
     <section className="relative min-h-screen overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-50 via-white to-neutral-50 dark:from-neutral-950 dark:via-black dark:to-neutral-950" />
 
-      {/* Gradient orbs */}
+      {/* Mouse parallax gradient orbs */}
       <motion.div
         animate={{
           scale: [1, 1.2, 1],
@@ -233,6 +317,7 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
         }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute top-1/4 -left-40 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/10 blur-3xl"
+        style={{ x: gridX, y: gridY }}
       />
       <motion.div
         animate={{
@@ -241,18 +326,13 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
         }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute bottom-1/4 -right-40 w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/10 blur-3xl"
+        style={{ x: useSpring(useTransform(mouseX, [-500, 500], [-20, 20])), y: useSpring(useTransform(mouseY, [-500, 500], [-20, 20])) }}
       />
 
-      {/* Grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, currentColor 1px, transparent 1px),
-            linear-gradient(to bottom, currentColor 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px',
-        }}
+      {/* Mouse-reactive parallax grid */}
+      <motion.div
+        className="absolute inset-0 opacity-[0.03] parallax-grid"
+        style={{ x: gridX, y: gridY }}
       />
 
       {/* Main content */}
@@ -276,32 +356,35 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
                 <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-neutral-100/80 dark:bg-neutral-900/80 border border-neutral-200/50 dark:border-neutral-800/50 backdrop-blur-sm">
                   <LiveIndicator />
                   <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    10,000+ creators funding assets together
+                    Join thousands of creators funding assets together
                   </span>
                 </div>
               </motion.div>
 
-              {/* Main heading */}
+              {/* Main heading with stagger and animated gradient */}
               <div className="space-y-4">
-                <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]"
-                >
-                  <span className="text-neutral-900 dark:text-white">Access Premium</span>
-                  <br />
-                  <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient-x">
-                    Digital Assets
-                  </span>
-                  <br />
-                  <span className="text-neutral-900 dark:text-white">Together</span>
-                </motion.h1>
+                {textLines.map((line, i) => (
+                  <motion.h1
+                    key={i}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]"
+                  >
+                    {i === 1 ? (
+                      <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto]">
+                        {line}
+                      </span>
+                    ) : (
+                      <span className="text-neutral-900 dark:text-white">{line}</span>
+                    )}
+                  </motion.h1>
+                ))}
 
                 <motion.p
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   className="text-xl text-neutral-600 dark:text-neutral-400 max-w-xl leading-relaxed"
                 >
                   Pool resources with thousands of creators worldwide. Contribute any amount to unlock
@@ -313,7 +396,7 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
               >
                 <Link href="/auth/sign-up" className="flex-1 sm:flex-none">
@@ -335,7 +418,7 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
               </motion.div>
             </motion.div>
 
-            {/* Right column - Cards */}
+            {/* Right column - Cards with 3D tilt */}
             <div className="lg:col-span-5 space-y-4">
               {/* Featured campaign card */}
               {featuredCampaign && <CampaignCardMini campaign={featuredCampaign} delay={0} />}
@@ -361,7 +444,6 @@ export function HeroPremium({ featuredCampaign }: HeroPremiumProps) {
           </div>
         </div>
       </motion.div>
-
     </section>
   );
 }
