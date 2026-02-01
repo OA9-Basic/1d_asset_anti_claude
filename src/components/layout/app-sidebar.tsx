@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Wallet,
-  PlusCircle,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -35,7 +34,6 @@ const navigation: NavItem[] = [
   { title: 'Funding Assets', href: '/marketplace/funding', icon: DollarSign },
   { title: 'My Assets', href: '/my-assets', icon: Package },
   { title: 'Wallet', href: '/wallet', icon: Wallet },
-  { title: 'Create Asset', href: '/create', icon: PlusCircle },
   { title: 'Settings', href: '/settings', icon: Settings },
 ];
 

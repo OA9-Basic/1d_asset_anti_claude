@@ -3,7 +3,6 @@
 import {
   Menu,
   Home,
-  PlusCircle,
   BarChart3,
   LogOut,
   User,
@@ -31,7 +30,6 @@ const navigation = [
   { name: 'Home', href: '/', icon: Home },
   { name: 'Browse', href: '/#assets', icon: LayoutGrid },
   { name: 'Request', href: '/request', icon: GitPullRequest },
-  { name: 'Create', href: '/create', icon: PlusCircle },
 ];
 
 const adminNavigation = [{ name: 'Admin', href: '/admin', icon: BarChart3 }];

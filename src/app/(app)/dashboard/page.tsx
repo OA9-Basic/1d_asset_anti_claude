@@ -3,10 +3,10 @@
 import { Loader2, RefreshCw, Users, Package, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
-
+import { RequestAssetModal } from '@/components/dashboard/RequestAssetModal';
 import { Button } from '@/components/ui/button';
 import { PageHeader, PageHeaderContent, PageTitle, PageDescription } from '@/components/ui/unified';
 import { UnifiedCard, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/unified/unified-card';
@@ -25,6 +25,7 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
 
   const {
     data: dashboardData,
@@ -67,6 +68,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
+      {/* Request Asset Modal */}
+      <RequestAssetModal open={requestModalOpen} onOpenChange={setRequestModalOpen} />
+
       {/* Premium Header - Proper flex alignment */}
       <PageHeader className="pb-6">
         <PageHeaderContent>
@@ -199,7 +203,7 @@ export default function DashboardPage() {
 
           {/* Right Column - Sidebar (4 cols) - h-fit to prevent stretching */}
           <div className="lg:col-span-4 flex flex-col gap-6 h-fit">
-            <QuickActions userId={user.id} />
+            <QuickActions userId={user.id} onRequestAssetOpen={() => setRequestModalOpen(true)} />
             <MyContributions contributions={dashboardData?.contributions} loading={dashboardLoading} />
             <BalanceBreakdown stats={dashboardData?.stats} />
           </div>

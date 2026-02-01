@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { LayoutDashboard, ShoppingBag, Package, Wallet, PlusCircle } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -19,7 +19,6 @@ const navigation: NavItem[] = [
   { title: 'Marketplace', href: '/marketplace/available', icon: ShoppingBag },
   { title: 'My Assets', href: '/my-assets', icon: Package },
   { title: 'Wallet', href: '/wallet', icon: Wallet },
-  { title: 'Create', href: '/create', icon: PlusCircle },
 ];
 
 export function MobileNav() {

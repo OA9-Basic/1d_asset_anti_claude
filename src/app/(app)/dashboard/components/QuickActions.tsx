@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface QuickActionsProps {
   userId: string;
+  onRequestAssetOpen: () => void;
 }
 
 /**
@@ -16,7 +17,7 @@ interface QuickActionsProps {
  * Vertical list of large, comfortable full-width buttons.
  * Professional menu/control panel appearance.
  */
-export function QuickActions({ userId }: QuickActionsProps) {
+export function QuickActions({ userId, onRequestAssetOpen }: QuickActionsProps) {
   const handleShare = () => {
     navigator.clipboard.writeText(`${window.location.origin}?ref=${userId}`);
   };
@@ -26,7 +27,7 @@ export function QuickActions({ userId }: QuickActionsProps) {
       icon: PlusCircle,
       label: 'Request an Asset',
       description: 'Submit a new asset request',
-      href: '/request',
+      action: onRequestAssetOpen,
     },
     {
       icon: ShoppingCart,
